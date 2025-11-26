@@ -1,0 +1,10 @@
+<% const title = 'Error'; %>
+<%- include('layout-wrapper', { body: `
+<div style="max-width: 600px; margin: 0 auto; text-align: center; padding: 3rem 0;">
+  <h2 style="margin-bottom: 1rem; color: #e74c3c;">Error</h2>
+  <p style="font-size: 1.25rem; color: #7f8c8d;">${message}</p>
+  <div style="margin-top: 2rem;">
+    <a href="/" class="btn">Go Home</a>
+  </div>
+</div>
+` }) %>

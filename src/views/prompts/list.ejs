@@ -1,0 +1,46 @@
+<% const title = 'My Prompts'; %>
+<%- include('../layout-wrapper', { body: `
+<div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+  <h2>My Prompts</h2>
+  <a href="/frameworks" class="btn">Create New Prompt</a>
+</div>
+
+${!subscription.isPremium && prompts.length >= 5 ? `
+  <div class="error">
+    You've reached your free tier limit of 5 prompts. <a href="/premium">Upgrade to Premium</a> for unlimited prompts.
+  </div>
+` : ''}
+
+${prompts.length === 0 ? `
+  <div style="text-align: center; padding: 3rem; background: #f8f9fa; border-radius: 8px;">
+    <p style="font-size: 1.25rem; color: #7f8c8d; margin-bottom: 1rem;">You haven't saved any prompts yet.</p>
+    <a href="/frameworks" class="btn">Create Your First Prompt</a>
+  </div>
+` : `
+  <div style="display: grid; gap: 1rem;">
+    ${prompts.map(p => `
+      <div id="prompt-row-${p.id}" style="padding: 1.5rem; background: #f8f9fa; border-radius: 8px; display: flex; justify-content: space-between; align-items: start;">
+        <div style="flex: 1;">
+          <h3 style="margin-bottom: 0.25rem;">${p.title}</h3>
+          <p style="color: #7f8c8d; font-size: 0.875rem; margin-bottom: 0.5rem;">
+            ${p.frameworkType} • ${new Date(p.createdAt).toLocaleDateString()}
+          </p>
+          <p style="color: #555; white-space: pre-wrap; max-height: 100px; overflow: hidden;">${p.finalPromptText.substring(0, 200)}${p.finalPromptText.length > 200 ? '...' : ''}</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; margin-left: 1rem;">
+          <a href="/prompts/${p.id}" class="btn btn-secondary">View</a>
+          ${subscription.isPremium ? `
+            <a href="/prompts/${p.id}/export" class="btn">Export</a>
+          ` : ''}
+          <button 
+            hx-delete="/prompts/${p.id}" 
+            hx-target="#prompt-row-${p.id}" 
+            hx-swap="outerHTML"
+            hx-confirm="Are you sure you want to delete this prompt?"
+            class="btn btn-danger">Delete</button>
+        </div>
+      </div>
+    `).join('')}
+  </div>
+`}
+` }) %>

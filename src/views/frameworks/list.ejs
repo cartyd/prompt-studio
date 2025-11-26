@@ -1,0 +1,14 @@
+<% const title = 'Frameworks'; %>
+<%- include('../layout-wrapper', { body: `
+<h2 style="margin-bottom: 2rem;">Prompting Frameworks</h2>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1.5rem;">
+  ${frameworks.map(f => `
+    <div style="padding: 1.5rem; border: 2px solid #3498db; border-radius: 8px;">
+      <h3 style="margin-bottom: 0.5rem;">${f.name}</h3>
+      <p style="margin-bottom: 1rem; color: #7f8c8d;">${f.description}</p>
+      <a href="/frameworks/${f.id}" class="btn">Create Prompt</a>
+    </div>
+  `).join('')}
+</div>
+` }) %>

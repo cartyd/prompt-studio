@@ -1,0 +1,47 @@
+<% const title = 'Home'; %>
+<%- include('layout-wrapper', { body: `
+<div style="text-align: center; padding: 3rem 0;">
+  <h1 style="font-size: 3rem; margin-bottom: 1rem;">Prompt Framework Studio</h1>
+  <p style="font-size: 1.25rem; color: #7f8c8d; margin-bottom: 2rem;">
+    Create structured, effective prompts using proven LLM prompting frameworks
+  </p>
+
+  ${!user ? `
+    <div style="margin-bottom: 3rem;">
+      <a href="/auth/register" class="btn" style="margin-right: 1rem; font-size: 1.125rem; padding: 0.75rem 1.5rem;">Get Started</a>
+      <a href="/auth/login" class="btn btn-secondary" style="font-size: 1.125rem; padding: 0.75rem 1.5rem;">Login</a>
+    </div>
+  ` : `
+    <div style="margin-bottom: 3rem;">
+      <a href="/frameworks" class="btn" style="font-size: 1.125rem; padding: 0.75rem 1.5rem;">Explore Frameworks</a>
+    </div>
+  `}
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin: 3rem 0;">
+  <div style="padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px;">
+    <h3 style="margin-bottom: 0.5rem;">🌳 Multiple Frameworks</h3>
+    <p>Choose from Tree-of-Thought, Chain-of-Thought, Self-Consistency, Role-Based, and Reflection prompting strategies.</p>
+  </div>
+  <div style="padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px;">
+    <h3 style="margin-bottom: 0.5rem;">📝 Guided Forms</h3>
+    <p>Fill out simple forms tailored to each framework to generate professional, structured prompts.</p>
+  </div>
+  <div style="padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px;">
+    <h3 style="margin-bottom: 0.5rem;">💾 Prompt Library</h3>
+    <p>Save your prompts to a personal library for easy access and reuse.</p>
+  </div>
+  <div style="padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px;">
+    <h3 style="margin-bottom: 0.5rem;">⚡ Real-Time Preview</h3>
+    <p>See your prompt generated in real-time as you fill out the form.</p>
+  </div>
+  <div style="padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px;">
+    <h3 style="margin-bottom: 0.5rem;">🚀 Premium Features</h3>
+    <p>Upgrade for unlimited saved prompts and export capabilities.</p>
+  </div>
+  <div style="padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px;">
+    <h3 style="margin-bottom: 0.5rem;">🔒 Secure & Private</h3>
+    <p>Your prompts are private and secure, accessible only to you.</p>
+  </div>
+</div>
+` }) %>

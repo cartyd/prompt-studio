@@ -1,0 +1,26 @@
+<% const title = 'Login'; %>
+<%- include('../layout-wrapper', { body: `
+<div style="max-width: 500px; margin: 0 auto;">
+  <h2 style="margin-bottom: 1.5rem;">Login</h2>
+
+  ${error ? `<div class="error">${error}</div>` : ''}
+
+  <form method="POST" action="/auth/login">
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required>
+    </div>
+
+    <button type="submit" class="btn" style="width: 100%;">Login</button>
+  </form>
+
+  <p style="margin-top: 1rem; text-align: center;">
+    Don't have an account? <a href="/auth/register">Register here</a>
+  </p>
+</div>
+` }) %>

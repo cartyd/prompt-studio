@@ -1,0 +1,39 @@
+<% const title = framework.name; %>
+<%- include('../layout-wrapper', { body: `
+<div style="max-width: 900px; margin: 0 auto;">
+  <div style="margin-bottom: 1rem;">
+    <a href="/frameworks" style="color: #3498db;">&larr; Back to Frameworks</a>
+  </div>
+
+  <h2 style="margin-bottom: 0.5rem;">${framework.name}</h2>
+  <p style="color: #7f8c8d; margin-bottom: 2rem;">${framework.description}</p>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+    <div>
+      <h3 style="margin-bottom: 1rem;">Fill the Form</h3>
+      <form hx-post="/frameworks/${framework.id}/generate" 
+            hx-target="#prompt-preview" 
+            hx-trigger="submit"
+            style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px;">
+        ${framework.fields.map(field => `
+          <div class="form-group">
+            <label for="${field.name}">${field.label}${field.required ? ' *' : ''}</label>
+            ${field.type === 'textarea' 
+              ? `<textarea id="${field.name}" name="${field.name}" placeholder="${field.placeholder || ''}" ${field.required ? 'required' : ''}></textarea>`
+              : `<input type="${field.type}" id="${field.name}" name="${field.name}" placeholder="${field.placeholder || ''}" ${field.required ? 'required' : ''}>`
+            }
+          </div>
+        `).join('')}
+        <button type="submit" class="btn" style="width: 100%;">Generate Preview</button>
+      </form>
+    </div>
+
+    <div>
+      <h3 style="margin-bottom: 1rem;">Prompt Preview</h3>
+      <div id="prompt-preview" style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; min-height: 300px;">
+        <p style="color: #7f8c8d;">Fill out the form and click "Generate Preview" to see your prompt.</p>
+      </div>
+    </div>
+  </div>
+</div>
+` }) %>

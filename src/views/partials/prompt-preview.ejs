@@ -1,0 +1,20 @@
+<div>
+  <div style="background: white; padding: 1rem; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 1rem; max-height: 400px; overflow-y: auto;">
+    <pre style="white-space: pre-wrap; font-family: inherit; margin: 0;"><%= promptText %></pre>
+  </div>
+
+  <form hx-post="/prompts" hx-target="#save-result">
+    <input type="hidden" name="frameworkId" value="<%= frameworkId %>">
+    <input type="hidden" name="frameworkName" value="<%= frameworkName %>">
+    <input type="hidden" name="promptText" value="<%= promptText.replace(/"/g, '&quot;') %>">
+    
+    <div class="form-group">
+      <label for="title">Title (optional)</label>
+      <input type="text" id="title" name="title" placeholder="<%= frameworkName %> Prompt">
+    </div>
+
+    <button type="submit" class="btn" style="width: 100%;">Save Prompt</button>
+  </form>
+
+  <div id="save-result" style="margin-top: 1rem;"></div>
+</div>

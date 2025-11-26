@@ -1,0 +1,55 @@
+import { FastifyPluginAsync } from 'fastify';
+import { requireAuth } from '../plugins/auth';
+import { frameworks, getFrameworkById, generatePrompt } from '../frameworks';
+
+const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
+  // List all frameworks
+  fastify.get('/', { preHandler: requireAuth }, async (request, reply) => {
+    return reply.view('frameworks/list', {
+      frameworks,
+      user: request.user,
+      subscription: request.subscription,
+    });
+  });
+
+  // Show framework form
+  fastify.get('/:frameworkId', { preHandler: requireAuth }, async (request, reply) => {
+    const { frameworkId } = request.params as { frameworkId: string };
+    const framework = getFrameworkById(frameworkId);
+
+    if (!framework) {
+      return reply.status(404).view('error', {
+        message: 'Framework not found',
+        user: request.user,
+      });
+    }
+
+    return reply.view('frameworks/form', {
+      framework,
+      user: request.user,
+      subscription: request.subscription,
+    });
+  });
+
+  // Generate prompt preview (htmx endpoint)
+  fastify.post('/:frameworkId/generate', { preHandler: requireAuth }, async (request, reply) => {
+    const { frameworkId } = request.params as { frameworkId: string };
+    const framework = getFrameworkById(frameworkId);
+
+    if (!framework) {
+      return reply.status(404).send('<div class="error">Framework not found</div>');
+    }
+
+    const formData = request.body as Record<string, string>;
+    const promptText = generatePrompt(frameworkId, formData);
+
+    return reply.view('partials/prompt-preview', {
+      promptText,
+      frameworkId,
+      frameworkName: framework.name,
+      formData: JSON.stringify(formData),
+    });
+  });
+};
+
+export default frameworkRoutes;
