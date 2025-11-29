@@ -13,7 +13,7 @@
     <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
       <h3 style="margin: 0; color: #2c3e50;">📝 Reference Example</h3>
       <button type="button" 
-              onclick="loadExample()" 
+              id="load-example-btn" 
               style="padding: 0.4rem 0.8rem; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">
         Load Example
       </button>
@@ -59,18 +59,23 @@
     </div>
   </div>
 </div>
-
-${framework.example ? `
-<script>
-function loadExample() {
-  const example = ${JSON.stringify(framework.example)};
-  Object.keys(example).forEach(key => {
-    const field = document.getElementById(key);
-    if (field) {
-      field.value = example[key];
-    }
-  });
-}
-</script>
-` : ''}
 ` }) %>
+
+<% if (framework.example) { %>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const loadBtn = document.getElementById('load-example-btn');
+  if (loadBtn) {
+    loadBtn.addEventListener('click', function() {
+      const example = <%- JSON.stringify(framework.example) %>;
+      Object.keys(example).forEach(key => {
+        const field = document.getElementById(key);
+        if (field) {
+          field.value = example[key];
+        }
+      });
+    });
+  }
+});
+</script>
+<% } %>
