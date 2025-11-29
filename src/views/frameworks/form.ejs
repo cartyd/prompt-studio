@@ -8,6 +8,29 @@
   <h2 style="margin-bottom: 0.5rem;">${framework.name}</h2>
   <p style="color: #7f8c8d; margin-bottom: 2rem;">${framework.description}</p>
 
+  ${framework.example ? `
+  <div style="background: #e8f4f8; border-left: 4px solid #3498db; padding: 1rem; margin-bottom: 2rem; border-radius: 4px;">
+    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+      <h3 style="margin: 0; color: #2c3e50;">📝 Reference Example</h3>
+      <button type="button" 
+              onclick="loadExample()" 
+              style="padding: 0.4rem 0.8rem; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">
+        Load Example
+      </button>
+    </div>
+    <div style="font-size: 0.9rem; color: #34495e; margin-top: 0.75rem;">
+      ${framework.fields.map(field => {
+        const exampleValue = framework.example[field.name];
+        if (!exampleValue) return '';
+        return `<div style="margin-bottom: 0.5rem;">
+          <strong>${field.label}:</strong> 
+          <span style="font-style: italic;">${exampleValue.replace(/\n/g, '<br>')}</span>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>
+  ` : ''}
+
   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
     <div>
       <h3 style="margin-bottom: 1rem;">Fill the Form</h3>
@@ -36,4 +59,18 @@
     </div>
   </div>
 </div>
+
+${framework.example ? `
+<script>
+function loadExample() {
+  const example = ${JSON.stringify(framework.example)};
+  Object.keys(example).forEach(key => {
+    const field = document.getElementById(key);
+    if (field) {
+      field.value = example[key];
+    }
+  });
+}
+</script>
+` : ''}
 ` }) %>

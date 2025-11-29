@@ -218,6 +218,40 @@ describe('Framework Prompt Generation', () => {
         });
       });
     });
+
+    it('should have reference examples for all frameworks', () => {
+      const frameworkIds = ['tot', 'self-consistency', 'cot', 'role', 'reflection'];
+
+      frameworkIds.forEach((id) => {
+        const framework = getFrameworkById(id);
+        expect(framework).toBeDefined();
+        expect(framework?.example).toBeDefined();
+        expect(typeof framework?.example).toBe('object');
+        
+        // Verify example has values for required fields
+        framework?.fields.forEach((field) => {
+          if (field.required) {
+            expect(framework.example?.[field.name]).toBeTruthy();
+          }
+        });
+      });
+    });
+
+    it('should generate valid prompts using example data', () => {
+      const frameworkIds = ['tot', 'self-consistency', 'cot', 'role', 'reflection'];
+
+      frameworkIds.forEach((id) => {
+        const framework = getFrameworkById(id);
+        expect(framework).toBeDefined();
+        
+        if (framework?.example) {
+          const prompt = generatePrompt(id, framework.example);
+          expect(prompt).toBeTruthy();
+          expect(prompt).not.toContain('Missing required fields');
+          expect(prompt).not.toContain('Invalid framework type');
+        }
+      });
+    });
   });
 
   describe('Invalid Framework Handling', () => {
