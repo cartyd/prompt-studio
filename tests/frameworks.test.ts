@@ -225,14 +225,18 @@ describe('Framework Prompt Generation', () => {
       frameworkIds.forEach((id) => {
         const framework = getFrameworkById(id);
         expect(framework).toBeDefined();
-        expect(framework?.example).toBeDefined();
-        expect(typeof framework?.example).toBe('object');
+        expect(framework?.examples).toBeDefined();
+        expect(typeof framework?.examples).toBe('object');
+        expect(framework?.examples?.general).toBeDefined();
+        expect(framework?.examples?.business).toBeDefined();
         
-        // Verify example has values for required fields
-        framework?.fields.forEach((field) => {
-          if (field.required) {
-            expect(framework.example?.[field.name]).toBeTruthy();
-          }
+        // Verify both general and business examples have values for required fields
+        ['general', 'business'].forEach((category) => {
+          framework?.fields.forEach((field) => {
+            if (field.required) {
+              expect(framework.examples?.[category as 'general' | 'business']?.[field.name]).toBeTruthy();
+            }
+          });
         });
       });
     });
@@ -244,11 +248,18 @@ describe('Framework Prompt Generation', () => {
         const framework = getFrameworkById(id);
         expect(framework).toBeDefined();
         
-        if (framework?.example) {
-          const prompt = generatePrompt(id, framework.example);
-          expect(prompt).toBeTruthy();
-          expect(prompt).not.toContain('Missing required fields');
-          expect(prompt).not.toContain('Invalid framework type');
+        if (framework?.examples) {
+          // Test general examples
+          const generalPrompt = generatePrompt(id, framework.examples.general);
+          expect(generalPrompt).toBeTruthy();
+          expect(generalPrompt).not.toContain('Missing required fields');
+          expect(generalPrompt).not.toContain('Invalid framework type');
+          
+          // Test business examples
+          const businessPrompt = generatePrompt(id, framework.examples.business);
+          expect(businessPrompt).toBeTruthy();
+          expect(businessPrompt).not.toContain('Missing required fields');
+          expect(businessPrompt).not.toContain('Invalid framework type');
         }
       });
     });

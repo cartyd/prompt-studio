@@ -45,5 +45,8 @@ export interface Framework {
   name: string;
   description: string;
   fields: FrameworkField[];
-  example?: Record<string, string>;
+  examples?: {
+    general: Record<string, string>;
+    business: Record<string, string>;
+  };
 }

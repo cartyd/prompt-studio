@@ -8,23 +8,41 @@
   <h2 style="margin-bottom: 0.5rem;">${framework.name}</h2>
   <p style="color: #7f8c8d; margin-bottom: 2rem;">${framework.description}</p>
 
-  ${framework.example ? `
+  ${framework.examples ? `
   <div style="background: #e8f4f8; border-left: 4px solid #3498db; padding: 1rem; margin-bottom: 2rem; border-radius: 4px;">
     <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-      <h3 style="margin: 0; color: #2c3e50;">📝 Reference Example</h3>
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <h3 style="margin: 0; color: #2c3e50;">📝 Reference Example</h3>
+        <div style="display: flex; gap: 0.5rem; background: white; padding: 0.25rem; border-radius: 4px;">
+          <button type="button" 
+                  id="category-general" 
+                  class="category-btn active"
+                  data-category="general"
+                  style="padding: 0.3rem 0.7rem; background: #3498db; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 0.85rem;">
+            General
+          </button>
+          <button type="button" 
+                  id="category-business" 
+                  class="category-btn"
+                  data-category="business"
+                  style="padding: 0.3rem 0.7rem; background: transparent; color: #3498db; border: none; border-radius: 3px; cursor: pointer; font-size: 0.85rem;">
+            Business
+          </button>
+        </div>
+      </div>
       <button type="button" 
               id="load-example-btn" 
               style="padding: 0.4rem 0.8rem; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">
         Load Example
       </button>
     </div>
-    <div style="font-size: 0.9rem; color: #34495e; margin-top: 0.75rem;">
+    <div id="example-content" style="font-size: 0.9rem; color: #34495e; margin-top: 0.75rem;">
       ${framework.fields.map(field => {
-        const exampleValue = framework.example[field.name];
+        const exampleValue = framework.examples.general[field.name];
         if (!exampleValue) return '';
-        return `<div style="margin-bottom: 0.5rem;">
+        return `<div class="example-field" style="margin-bottom: 0.5rem;" data-field="${field.name}">
           <strong>${field.label}:</strong> 
-          <span style="font-style: italic;">${exampleValue.replace(/\n/g, '<br>')}</span>
+          <span class="example-value" style="font-style: italic;">${exampleValue.replace(/\n/g, '<br>')}</span>
         </div>`;
       }).join('')}
     </div>
@@ -61,13 +79,50 @@
 </div>
 ` }) %>
 
-<% if (framework.example) { %>
+<% if (framework.examples) { %>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  const examples = <%- JSON.stringify(framework.examples) %>;
+  let currentCategory = 'general';
+  
+  // Category switching
+  const categoryBtns = document.querySelectorAll('.category-btn');
+  categoryBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const category = this.dataset.category;
+      if (category === currentCategory) return;
+      
+      currentCategory = category;
+      
+      // Update button styles
+      categoryBtns.forEach(b => {
+        if (b.dataset.category === category) {
+          b.style.background = '#3498db';
+          b.style.color = 'white';
+        } else {
+          b.style.background = 'transparent';
+          b.style.color = '#3498db';
+        }
+      });
+      
+      // Update example content
+      const exampleFields = document.querySelectorAll('.example-field');
+      exampleFields.forEach(fieldDiv => {
+        const fieldName = fieldDiv.dataset.field;
+        const valueSpan = fieldDiv.querySelector('.example-value');
+        const exampleValue = examples[category][fieldName];
+        if (exampleValue) {
+          valueSpan.innerHTML = exampleValue.replace(/\n/g, '<br>');
+        }
+      });
+    });
+  });
+  
+  // Load example into form
   const loadBtn = document.getElementById('load-example-btn');
   if (loadBtn) {
     loadBtn.addEventListener('click', function() {
-      const example = <%- JSON.stringify(framework.example) %>;
+      const example = examples[currentCategory];
       Object.keys(example).forEach(key => {
         const field = document.getElementById(key);
         if (field) {
