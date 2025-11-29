@@ -1,24 +1,11 @@
 import { FastifyPluginAsync } from 'fastify';
-import { requireAuth } from '../plugins/auth';
+import { requireAuth, loadUserFromSession } from '../plugins/auth';
+import { TIME_CONSTANTS } from '../constants';
 
 const indexRoutes: FastifyPluginAsync = async (fastify) => {
   // Home page
   fastify.get('/', async (request, reply) => {
-    // Check if user is logged in
-    if (request.session.userId) {
-      const user = await fastify.prisma.user.findUnique({
-        where: { id: request.session.userId },
-      });
-      if (user) {
-        request.user = {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          subscriptionTier: user.subscriptionTier,
-          subscriptionExpiresAt: user.subscriptionExpiresAt,
-        };
-      }
-    }
+    await loadUserFromSession(request);
 
     return reply.view('home', {
       user: request.user,
@@ -35,11 +22,15 @@ const indexRoutes: FastifyPluginAsync = async (fastify) => {
 
   // Admin endpoint to make user premium (for testing)
   fastify.post('/admin/make-premium', { preHandler: requireAuth }, async (request, reply) => {
+    if (!request.user) {
+      return reply.status(401).redirect('/auth/login');
+    }
+
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 90); // 90 days from now
+    expiresAt.setDate(expiresAt.getDate() + TIME_CONSTANTS.PREMIUM_SUBSCRIPTION_DAYS);
 
     await fastify.prisma.user.update({
-      where: { id: request.user!.id },
+      where: { id: request.user.id },
       data: {
         subscriptionTier: 'premium',
         subscriptionExpiresAt: expiresAt,

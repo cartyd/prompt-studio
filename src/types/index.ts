@@ -13,7 +13,7 @@ export interface AuthUser {
   id: string;
   name: string;
   email: string;
-  subscriptionTier: string;
+  subscriptionTier: SubscriptionTier;
   subscriptionExpiresAt: Date | null;
 }
 

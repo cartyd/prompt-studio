@@ -1,12 +1,17 @@
 import { FastifyPluginAsync } from 'fastify';
 import { requireAuth } from '../plugins/auth';
 import { FREE_PROMPT_LIMIT } from '../types';
+import { ERROR_MESSAGES } from '../constants';
 
 const promptRoutes: FastifyPluginAsync = async (fastify) => {
   // List user's prompts
   fastify.get('/', { preHandler: requireAuth }, async (request, reply) => {
+    if (!request.user) {
+      return reply.status(401).redirect('/auth/login');
+    }
+
     const prompts = await fastify.prisma.prompt.findMany({
-      where: { userId: request.user!.id },
+      where: { userId: request.user.id },
       orderBy: { createdAt: 'desc' },
     });
 
@@ -19,18 +24,22 @@ const promptRoutes: FastifyPluginAsync = async (fastify) => {
 
   // View single prompt
   fastify.get('/:id', { preHandler: requireAuth }, async (request, reply) => {
+    if (!request.user) {
+      return reply.status(401).redirect('/auth/login');
+    }
+
     const { id } = request.params as { id: string };
 
     const prompt = await fastify.prisma.prompt.findFirst({
       where: {
         id,
-        userId: request.user!.id,
+        userId: request.user.id,
       },
     });
 
     if (!prompt) {
       return reply.status(404).view('error', {
-        message: 'Prompt not found',
+        message: ERROR_MESSAGES.PROMPTS.NOT_FOUND,
         user: request.user,
       });
     }
@@ -44,6 +53,10 @@ const promptRoutes: FastifyPluginAsync = async (fastify) => {
 
   // Save new prompt (htmx endpoint)
   fastify.post('/', { preHandler: requireAuth }, async (request, reply) => {
+    if (!request.user || !request.subscription) {
+      return reply.status(401).redirect('/auth/login');
+    }
+
     const { frameworkId, frameworkName, promptText, title } = request.body as {
       frameworkId: string;
       frameworkName: string;
@@ -52,9 +65,9 @@ const promptRoutes: FastifyPluginAsync = async (fastify) => {
     };
 
     // Check free tier limit
-    if (!request.subscription!.isPremium) {
+    if (!request.subscription.isPremium) {
       const promptCount = await fastify.prisma.prompt.count({
-        where: { userId: request.user!.id },
+        where: { userId: request.user.id },
       });
 
       if (promptCount >= FREE_PROMPT_LIMIT) {
@@ -67,7 +80,7 @@ const promptRoutes: FastifyPluginAsync = async (fastify) => {
     // Create the prompt
     const prompt = await fastify.prisma.prompt.create({
       data: {
-        userId: request.user!.id,
+        userId: request.user.id,
         frameworkType: frameworkId,
         title: title || `${frameworkName} Prompt`,
         finalPromptText: promptText,
@@ -81,12 +94,16 @@ const promptRoutes: FastifyPluginAsync = async (fastify) => {
 
   // Delete prompt (htmx endpoint)
   fastify.delete('/:id', { preHandler: requireAuth }, async (request, reply) => {
+    if (!request.user) {
+      return reply.status(401).send('');
+    }
+
     const { id } = request.params as { id: string };
 
     const prompt = await fastify.prisma.prompt.findFirst({
       where: {
         id,
-        userId: request.user!.id,
+        userId: request.user.id,
       },
     });
 
@@ -103,9 +120,13 @@ const promptRoutes: FastifyPluginAsync = async (fastify) => {
 
   // Export prompt (premium only)
   fastify.get('/:id/export', { preHandler: requireAuth }, async (request, reply) => {
-    if (!request.subscription!.isPremium) {
+    if (!request.user || !request.subscription) {
+      return reply.status(401).redirect('/auth/login');
+    }
+
+    if (!request.subscription.isPremium) {
       return reply.status(403).view('error', {
-        message: 'Exporting prompts is a premium feature. Upgrade to access this feature.',
+        message: ERROR_MESSAGES.PROMPTS.EXPORT_PREMIUM_ONLY,
         user: request.user,
       });
     }
@@ -115,13 +136,13 @@ const promptRoutes: FastifyPluginAsync = async (fastify) => {
     const prompt = await fastify.prisma.prompt.findFirst({
       where: {
         id,
-        userId: request.user!.id,
+        userId: request.user.id,
       },
     });
 
     if (!prompt) {
       return reply.status(404).view('error', {
-        message: 'Prompt not found',
+        message: ERROR_MESSAGES.PROMPTS.NOT_FOUND,
         user: request.user,
       });
     }

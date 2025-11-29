@@ -1,6 +1,7 @@
 import { FastifyPluginAsync } from 'fastify';
 import { requireAuth } from '../plugins/auth';
 import { frameworks, getFrameworkById, generatePrompt } from '../frameworks';
+import { ERROR_MESSAGES } from '../constants';
 
 const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
   // List all frameworks
@@ -19,7 +20,7 @@ const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
 
     if (!framework) {
       return reply.status(404).view('error', {
-        message: 'Framework not found',
+        message: ERROR_MESSAGES.FRAMEWORKS.NOT_FOUND,
         user: request.user,
       });
     }
@@ -47,7 +48,7 @@ const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
       promptText,
       frameworkId,
       frameworkName: framework.name,
-      formData: JSON.stringify(formData),
+      formData,
     });
   });
 };

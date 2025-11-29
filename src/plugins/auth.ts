@@ -1,6 +1,6 @@
 import { FastifyPluginAsync, FastifyRequest, FastifyReply } from 'fastify';
 import fp from 'fastify-plugin';
-import { SubscriptionInfo, AuthUser } from '../types';
+import { SubscriptionInfo, AuthUser, SubscriptionTier } from '../types';
 
 export async function requireAuth(request: FastifyRequest, reply: FastifyReply) {
   if (!request.session.userId) {
@@ -20,11 +20,32 @@ export async function requireAuth(request: FastifyRequest, reply: FastifyReply) 
     id: user.id,
     name: user.name,
     email: user.email,
-    subscriptionTier: user.subscriptionTier,
+    subscriptionTier: user.subscriptionTier as SubscriptionTier,
     subscriptionExpiresAt: user.subscriptionExpiresAt,
   };
 
-  request.subscription = getSubscriptionInfo(user);
+  request.subscription = getSubscriptionInfo(request.user);
+}
+
+export async function loadUserFromSession(request: FastifyRequest): Promise<void> {
+  if (!request.session.userId) {
+    return;
+  }
+
+  const user = await request.server.prisma.user.findUnique({
+    where: { id: request.session.userId },
+  });
+
+  if (user) {
+    request.user = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      subscriptionTier: user.subscriptionTier as SubscriptionTier,
+      subscriptionExpiresAt: user.subscriptionExpiresAt,
+    };
+    request.subscription = getSubscriptionInfo(request.user);
+  }
 }
 
 export function getSubscriptionInfo(user: AuthUser): SubscriptionInfo {

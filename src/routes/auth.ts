@@ -1,5 +1,7 @@
 import { FastifyPluginAsync } from 'fastify';
 import bcrypt from 'bcrypt';
+import { ERROR_MESSAGES } from '../constants';
+import { validateEmail, validatePassword, validateName } from '../validation';
 
 const authRoutes: FastifyPluginAsync = async (fastify) => {
   // Registration page
@@ -28,14 +30,34 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     // Validation
     if (!name || !email || !password) {
       return reply.view('auth/register', { 
-        error: 'All fields are required',
+        error: ERROR_MESSAGES.AUTH.ALL_FIELDS_REQUIRED,
         user: null 
       });
     }
 
-    if (password.length < 8) {
+    // Validate name
+    const nameValidation = validateName(name);
+    if (!nameValidation.isValid) {
       return reply.view('auth/register', { 
-        error: 'Password must be at least 8 characters',
+        error: nameValidation.error,
+        user: null 
+      });
+    }
+
+    // Validate email format
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.isValid) {
+      return reply.view('auth/register', { 
+        error: emailValidation.error,
+        user: null 
+      });
+    }
+
+    // Validate password strength
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      return reply.view('auth/register', { 
+        error: passwordValidation.error,
         user: null 
       });
     }
@@ -47,7 +69,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
 
     if (existingUser) {
       return reply.view('auth/register', { 
-        error: 'Email already registered',
+        error: ERROR_MESSAGES.AUTH.EMAIL_ALREADY_REGISTERED,
         user: null 
       });
     }
@@ -92,7 +114,16 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
 
     if (!email || !password) {
       return reply.view('auth/login', { 
-        error: 'Email and password are required',
+        error: ERROR_MESSAGES.AUTH.EMAIL_PASSWORD_REQUIRED,
+        user: null 
+      });
+    }
+
+    // Validate email format
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.isValid) {
+      return reply.view('auth/login', { 
+        error: emailValidation.error,
         user: null 
       });
     }
@@ -103,7 +134,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
 
     if (!user) {
       return reply.view('auth/login', { 
-        error: 'Invalid email or password',
+        error: ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS,
         user: null 
       });
     }
@@ -111,7 +142,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     const validPassword = await bcrypt.compare(password, user.passwordHash);
     if (!validPassword) {
       return reply.view('auth/login', { 
-        error: 'Invalid email or password',
+        error: ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS,
         user: null 
       });
     }

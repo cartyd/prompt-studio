@@ -5,9 +5,11 @@ import fastifyHelmet from '@fastify/helmet';
 import fastifyRateLimit from '@fastify/rate-limit';
 import fastifyView from '@fastify/view';
 import fastifyStatic from '@fastify/static';
+import fastifyFormbody from '@fastify/formbody';
 import ejs from 'ejs';
 import path from 'path';
 import './types';
+import { TIME_CONSTANTS } from './constants';
 
 // Plugins
 import prismaPlugin from './plugins/prisma';
@@ -21,7 +23,22 @@ import promptRoutes from './routes/prompts';
 
 const PORT = parseInt(process.env.PORT || '3000', 10);
 const HOST = process.env.HOST || '0.0.0.0';
-const SESSION_SECRET = process.env.SESSION_SECRET || 'change-this-secret-in-production';
+
+function getSessionSecret(): string {
+  const secret = process.env.SESSION_SECRET;
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  if (isProduction && (!secret || secret === 'change-this-secret-in-production')) {
+    throw new Error(
+      'SESSION_SECRET environment variable must be set in production. ' +
+      'Generate a secure secret using: openssl rand -base64 32'
+    );
+  }
+
+  return secret || 'change-this-secret-in-production';
+}
+
+const SESSION_SECRET = getSessionSecret();
 
 const server = Fastify({
   logger: {
@@ -56,9 +73,12 @@ async function start() {
       cookie: {
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        maxAge: TIME_CONSTANTS.SESSION_MAX_AGE_MS,
       },
     });
+
+    // Register form body parser
+    await server.register(fastifyFormbody);
 
     // Register Prisma
     await server.register(prismaPlugin);
@@ -89,7 +109,7 @@ async function start() {
 
     // Start server
     await server.listen({ port: PORT, host: HOST });
-    console.log(`Server listening on http://${HOST}:${PORT}`);
+    server.log.info(`Server listening on http://${HOST}:${PORT}`);
   } catch (err) {
     server.log.error(err);
     process.exit(1);

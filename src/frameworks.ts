@@ -1,4 +1,5 @@
 import { Framework } from './types';
+import { validateAndGenerate } from './prompt-generators';
 
 export const frameworks: Framework[] = [
   {
@@ -60,69 +61,9 @@ export function getFrameworkById(id: string): Framework | undefined {
 }
 
 export function generatePrompt(frameworkId: string, data: Record<string, string>): string {
-  switch (frameworkId) {
-    case 'tot':
-      return `You are a ${data.role}.
-
-Your objective: ${data.objective}
-
-Please generate ${data.approaches} different approaches to solve this problem. For each approach:
-1. Describe the reasoning path
-2. Evaluate it based on these criteria: ${data.criteria}
-3. Identify strengths and weaknesses
-
-After presenting all approaches, recommend the best one and explain why.`;
-
-    case 'self-consistency':
-      return `You are a ${data.role}.
-
-Goal: ${data.goal}
-
-Please provide ${data.versions} independent reasoning paths to answer this question. For each version:
-1. Show your complete reasoning process
-2. State your conclusion
-
-After all versions, identify the most consistent answer and explain why it's the most reliable.`;
-
-    case 'cot':
-      return `You are a ${data.role}.
-
-Problem: ${data.problem}
-${data.context ? `\nContext: ${data.context}` : ''}
-
-Please solve this problem step by step:
-1. Break down the problem into smaller parts
-2. Solve each part systematically
-3. Show your reasoning at each step
-4. Arrive at a final answer
-5. Verify your solution`;
-
-    case 'role':
-      return `You are a ${data.role}.
-
-Tone/Style: ${data.tone}
-
-Task: ${data.task}
-${data.examples ? `\nExamples:\n${data.examples}` : ''}
-
-Please complete this task following the tone and style demonstrated above.`;
-
-    case 'reflection':
-      return `You are a ${data.role}.
-
-Task: ${data.task}
-
-Step 1: Create an initial version
-First, produce your initial response to the task above.
-
-Step 2: Critical reflection
-Review your initial response and identify areas for improvement based on these criteria:
-${data.criteria}
-
-Step 3: Revised version
-Produce an improved version that addresses the issues identified in your reflection.`;
-
-    default:
-      return 'Invalid framework type';
+  try {
+    return validateAndGenerate(frameworkId, data);
+  } catch (error) {
+    return error instanceof Error ? error.message : 'Invalid framework type';
   }
 }
