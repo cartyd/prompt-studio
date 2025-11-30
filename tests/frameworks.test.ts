@@ -36,19 +36,17 @@ describe('Framework Prompt Generation', () => {
       expect(prompt).toContain('Speed > 100ms');
     });
 
-    it('should return error message when missing required fields', () => {
+    it('should throw error when missing required fields', () => {
       const data = {
         role: 'expert',
         objective: 'Solve problem',
         approaches: '3',
       };
 
-      const prompt = generatePrompt('tot', data);
-
-      expect(prompt).toContain('Missing required fields');
+      expect(() => generatePrompt('tot', data)).toThrow('Missing required fields');
     });
 
-    it('should return error message when fields are empty strings', () => {
+    it('should throw error when fields are empty strings', () => {
       const data = {
         role: '',
         objective: 'Solve problem',
@@ -56,9 +54,7 @@ describe('Framework Prompt Generation', () => {
         criteria: 'Accuracy',
       };
 
-      const prompt = generatePrompt('tot', data);
-
-      expect(prompt).toContain('Missing required fields');
+      expect(() => generatePrompt('tot', data)).toThrow('Missing required fields');
     });
   });
 
@@ -89,14 +85,12 @@ describe('Framework Prompt Generation', () => {
       expect(prompt).toContain('Context: Principal: $1000, Rate: 5%, Time: 10 years');
     });
 
-    it('should return error message when missing required problem field', () => {
+    it('should throw error when missing required problem field', () => {
       const data = {
         role: 'logical thinker',
       };
 
-      const prompt = generatePrompt('cot', data);
-
-      expect(prompt).toContain('Missing required fields');
+      expect(() => generatePrompt('cot', data)).toThrow('Missing required fields');
     });
   });
 
@@ -116,15 +110,13 @@ describe('Framework Prompt Generation', () => {
       expect(prompt).toContain('most consistent answer');
     });
 
-    it('should return error message when missing versions field', () => {
+    it('should throw error when missing versions field', () => {
       const data = {
         role: 'analytical reasoner',
         goal: 'Determine strategy',
       };
 
-      const prompt = generatePrompt('self-consistency', data);
-
-      expect(prompt).toContain('Missing required fields');
+      expect(() => generatePrompt('self-consistency', data)).toThrow('Missing required fields');
     });
   });
 
@@ -266,26 +258,22 @@ describe('Framework Prompt Generation', () => {
   });
 
   describe('Invalid Framework Handling', () => {
-    it('should return error message for invalid framework ID in generatePrompt', () => {
+    it('should throw error for invalid framework ID in generatePrompt', () => {
       const data = {
         role: 'test',
         problem: 'test problem',
       };
 
-      const prompt = generatePrompt('nonexistent-framework', data);
-
-      expect(prompt).toContain('Invalid framework type');
+      expect(() => generatePrompt('nonexistent-framework', data)).toThrow('Invalid framework type');
     });
 
-    it('should return error message for empty framework ID', () => {
+    it('should throw error for empty framework ID', () => {
       const data = {
         role: 'test',
         problem: 'test problem',
       };
 
-      const prompt = generatePrompt('', data);
-
-      expect(prompt).toContain('Invalid framework type');
+      expect(() => generatePrompt('', data)).toThrow('Invalid framework type');
     });
   });
 });

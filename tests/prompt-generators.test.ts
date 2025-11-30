@@ -1,32 +1,9 @@
 import { describe, it, expect } from '@jest/globals';
 import { 
   validateAndGenerate,
-  getPromptGenerator,
 } from '../src/prompt-generators';
 
 describe('Prompt Generator Functions', () => {
-  describe('getPromptGenerator', () => {
-    it('should return generator function for valid framework IDs', () => {
-      const validIds = ['tot', 'self-consistency', 'cot', 'role', 'reflection'];
-
-      validIds.forEach((id) => {
-        const generator = getPromptGenerator(id);
-        expect(generator).toBeDefined();
-        expect(typeof generator).toBe('function');
-      });
-    });
-
-    it('should return undefined for invalid framework ID', () => {
-      const generator = getPromptGenerator('invalid-framework');
-      expect(generator).toBeUndefined();
-    });
-
-    it('should return undefined for empty string', () => {
-      const generator = getPromptGenerator('');
-      expect(generator).toBeUndefined();
-    });
-  });
-
   describe('validateAndGenerate', () => {
     describe('Error Handling', () => {
       it('should throw error for invalid framework ID', () => {

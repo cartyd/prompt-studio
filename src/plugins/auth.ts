@@ -12,7 +12,7 @@ export async function requireAuth(request: FastifyRequest, reply: FastifyReply) 
   });
 
   if (!user) {
-    request.session.set('userId', undefined);
+    await request.session.destroy();
     return reply.status(401).redirect('/auth/login');
   }
 

@@ -1,7 +1,14 @@
-import { FastifyPluginAsync } from 'fastify';
+import { FastifyPluginAsync, FastifyReply } from 'fastify';
 import bcrypt from 'bcrypt';
 import { ERROR_MESSAGES } from '../constants';
 import { validateEmail, validatePassword, validateName } from '../validation';
+
+function renderAuthError(reply: FastifyReply, template: 'auth/register' | 'auth/login', error: string) {
+  return reply.view(template, { 
+    error,
+    user: null 
+  });
+}
 
 const authRoutes: FastifyPluginAsync = async (fastify) => {
   // Registration page
@@ -29,37 +36,25 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
 
     // Validation
     if (!name || !email || !password) {
-      return reply.view('auth/register', { 
-        error: ERROR_MESSAGES.AUTH.ALL_FIELDS_REQUIRED,
-        user: null 
-      });
+      return renderAuthError(reply, 'auth/register', ERROR_MESSAGES.AUTH.ALL_FIELDS_REQUIRED);
     }
 
     // Validate name
     const nameValidation = validateName(name);
     if (!nameValidation.isValid) {
-      return reply.view('auth/register', { 
-        error: nameValidation.error,
-        user: null 
-      });
+      return renderAuthError(reply, 'auth/register', nameValidation.error!);
     }
 
     // Validate email format
     const emailValidation = validateEmail(email);
     if (!emailValidation.isValid) {
-      return reply.view('auth/register', { 
-        error: emailValidation.error,
-        user: null 
-      });
+      return renderAuthError(reply, 'auth/register', emailValidation.error!);
     }
 
     // Validate password strength
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.isValid) {
-      return reply.view('auth/register', { 
-        error: passwordValidation.error,
-        user: null 
-      });
+      return renderAuthError(reply, 'auth/register', passwordValidation.error!);
     }
 
     // Check if user exists
@@ -68,10 +63,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     });
 
     if (existingUser) {
-      return reply.view('auth/register', { 
-        error: ERROR_MESSAGES.AUTH.EMAIL_ALREADY_REGISTERED,
-        user: null 
-      });
+      return renderAuthError(reply, 'auth/register', ERROR_MESSAGES.AUTH.EMAIL_ALREADY_REGISTERED);
     }
 
     // Hash password and create user
@@ -113,19 +105,13 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     };
 
     if (!email || !password) {
-      return reply.view('auth/login', { 
-        error: ERROR_MESSAGES.AUTH.EMAIL_PASSWORD_REQUIRED,
-        user: null 
-      });
+      return renderAuthError(reply, 'auth/login', ERROR_MESSAGES.AUTH.EMAIL_PASSWORD_REQUIRED);
     }
 
     // Validate email format
     const emailValidation = validateEmail(email);
     if (!emailValidation.isValid) {
-      return reply.view('auth/login', { 
-        error: emailValidation.error,
-        user: null 
-      });
+      return renderAuthError(reply, 'auth/login', emailValidation.error!);
     }
 
     const user = await fastify.prisma.user.findUnique({
@@ -133,18 +119,12 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     });
 
     if (!user) {
-      return reply.view('auth/login', { 
-        error: ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS,
-        user: null 
-      });
+      return renderAuthError(reply, 'auth/login', ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS);
     }
 
     const validPassword = await bcrypt.compare(password, user.passwordHash);
     if (!validPassword) {
-      return reply.view('auth/login', { 
-        error: ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS,
-        user: null 
-      });
+      return renderAuthError(reply, 'auth/login', ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS);
     }
 
     request.session.userId = user.id;
@@ -154,7 +134,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
 
   // Logout handler
   fastify.post('/logout', async (request, reply) => {
-    request.session.set('userId', undefined);
+    await request.session.destroy();
     return reply.redirect('/');
   });
 };

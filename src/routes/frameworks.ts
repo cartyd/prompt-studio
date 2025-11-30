@@ -42,14 +42,20 @@ const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
     }
 
     const formData = request.body as Record<string, string>;
-    const promptText = generatePrompt(frameworkId, formData);
-
-    return reply.view('partials/prompt-preview', {
-      promptText,
-      frameworkId,
-      frameworkName: framework.name,
-      formData,
-    });
+    
+    try {
+      const promptText = generatePrompt(frameworkId, formData);
+      
+      return reply.view('partials/prompt-preview', {
+        promptText,
+        frameworkId,
+        frameworkName: framework.name,
+        formData,
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to generate prompt';
+      return reply.status(400).send(`<div class="error">${errorMessage}</div>`);
+    }
   });
 };
 

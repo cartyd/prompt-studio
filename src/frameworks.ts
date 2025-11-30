@@ -125,9 +125,5 @@ export function getFrameworkById(id: string): Framework | undefined {
 }
 
 export function generatePrompt(frameworkId: string, data: Record<string, string>): string {
-  try {
-    return validateAndGenerate(frameworkId, data);
-  } catch (error) {
-    return error instanceof Error ? error.message : 'Invalid framework type';
-  }
+  return validateAndGenerate(frameworkId, data);
 }

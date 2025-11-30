@@ -22,15 +22,11 @@ const indexRoutes: FastifyPluginAsync = async (fastify) => {
 
   // Admin endpoint to make user premium (for testing)
   fastify.post('/admin/make-premium', { preHandler: requireAuth }, async (request, reply) => {
-    if (!request.user) {
-      return reply.status(401).redirect('/auth/login');
-    }
-
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + TIME_CONSTANTS.PREMIUM_SUBSCRIPTION_DAYS);
 
     await fastify.prisma.user.update({
-      where: { id: request.user.id },
+      where: { id: request.user!.id },
       data: {
         subscriptionTier: 'premium',
         subscriptionExpiresAt: expiresAt,

@@ -37,8 +37,6 @@ export type FrameworkData =
   | RolePromptingData
   | ReflectionData;
 
-export type PromptGeneratorFn = (data: FrameworkData) => string;
-
 function validateTreeOfThought(data: Record<string, string>): TreeOfThoughtData {
   const { role, objective, approaches, criteria } = data;
   if (!role || !objective || !approaches || !criteria) {
@@ -79,39 +77,36 @@ function validateReflection(data: Record<string, string>): ReflectionData {
   return { role, task, criteria };
 }
 
-function generateTreeOfThought(data: FrameworkData): string {
-  const d = data as TreeOfThoughtData;
-  return `You are a ${d.role}.
+function generateTreeOfThought(data: TreeOfThoughtData): string {
+  return `You are a ${data.role}.
 
-Your objective: ${d.objective}
+Your objective: ${data.objective}
 
-Please generate ${d.approaches} different approaches to solve this problem. For each approach:
+Please generate ${data.approaches} different approaches to solve this problem. For each approach:
 1. Describe the reasoning path
-2. Evaluate it based on these criteria: ${d.criteria}
+2. Evaluate it based on these criteria: ${data.criteria}
 3. Identify strengths and weaknesses
 
 After presenting all approaches, recommend the best one and explain why.`;
 }
 
-function generateSelfConsistency(data: FrameworkData): string {
-  const d = data as SelfConsistencyData;
-  return `You are a ${d.role}.
+function generateSelfConsistency(data: SelfConsistencyData): string {
+  return `You are a ${data.role}.
 
-Goal: ${d.goal}
+Goal: ${data.goal}
 
-Please provide ${d.versions} independent reasoning paths to answer this question. For each version:
+Please provide ${data.versions} independent reasoning paths to answer this question. For each version:
 1. Show your complete reasoning process
 2. State your conclusion
 
 After all versions, identify the most consistent answer and explain why it's the most reliable.`;
 }
 
-function generateChainOfThought(data: FrameworkData): string {
-  const d = data as ChainOfThoughtData;
-  return `You are a ${d.role}.
+function generateChainOfThought(data: ChainOfThoughtData): string {
+  return `You are a ${data.role}.
 
-Problem: ${d.problem}
-${d.context ? `\nContext: ${d.context}` : ''}
+Problem: ${data.problem}
+${data.context ? `\nContext: ${data.context}` : ''}
 
 Please solve this problem step by step:
 1. Break down the problem into smaller parts
@@ -121,65 +116,68 @@ Please solve this problem step by step:
 5. Verify your solution`;
 }
 
-function generateRolePrompting(data: FrameworkData): string {
-  const d = data as RolePromptingData;
-  return `You are a ${d.role}.
+function generateRolePrompting(data: RolePromptingData): string {
+  return `You are a ${data.role}.
 
-Tone/Style: ${d.tone}
+Tone/Style: ${data.tone}
 
-Task: ${d.task}
-${d.examples ? `\nExamples:\n${d.examples}` : ''}
+Task: ${data.task}
+${data.examples ? `\nExamples:\n${data.examples}` : ''}
 
 Please complete this task following the tone and style demonstrated above.`;
 }
 
-function generateReflection(data: FrameworkData): string {
-  const d = data as ReflectionData;
-  return `You are a ${d.role}.
+function generateReflection(data: ReflectionData): string {
+  return `You are a ${data.role}.
 
-Task: ${d.task}
+Task: ${data.task}
 
 Step 1: Create an initial version
 First, produce your initial response to the task above.
 
 Step 2: Critical reflection
 Review your initial response and identify areas for improvement based on these criteria:
-${d.criteria}
+${data.criteria}
 
 Step 3: Revised version
 Produce an improved version that addresses the issues identified in your reflection.`;
 }
 
-type ValidatorFn = (data: Record<string, string>) => FrameworkData;
-
-const validators: Record<string, ValidatorFn> = {
-  tot: validateTreeOfThought,
-  'self-consistency': validateSelfConsistency,
-  cot: validateChainOfThought,
-  role: validateRolePrompting,
-  reflection: validateReflection,
-};
-
-const generators: Record<string, PromptGeneratorFn> = {
-  tot: generateTreeOfThought,
-  'self-consistency': generateSelfConsistency,
-  cot: generateChainOfThought,
-  role: generateRolePrompting,
-  reflection: generateReflection,
-};
-
-export function getPromptGenerator(frameworkId: string): PromptGeneratorFn | undefined {
-  return generators[frameworkId];
+interface ValidatorGeneratorPair<T extends FrameworkData> {
+  validator: (data: Record<string, string>) => T;
+  generator: (data: T) => string;
 }
 
-export function validateAndGenerate(frameworkId: string, data: Record<string, string>): string {
-  const validator = validators[frameworkId];
-  const generator = generators[frameworkId];
+const frameworkHandlers: Record<string, ValidatorGeneratorPair<any>> = {
+  tot: {
+    validator: validateTreeOfThought,
+    generator: generateTreeOfThought,
+  },
+  'self-consistency': {
+    validator: validateSelfConsistency,
+    generator: generateSelfConsistency,
+  },
+  cot: {
+    validator: validateChainOfThought,
+    generator: generateChainOfThought,
+  },
+  role: {
+    validator: validateRolePrompting,
+    generator: generateRolePrompting,
+  },
+  reflection: {
+    validator: validateReflection,
+    generator: generateReflection,
+  },
+};
 
-  if (!validator || !generator) {
+export function validateAndGenerate(frameworkId: string, data: Record<string, string>): string {
+  const handler = frameworkHandlers[frameworkId];
+
+  if (!handler) {
     throw new Error(`Invalid framework type: ${frameworkId}`);
   }
 
-  const validatedData = validator(data);
-  return generator(validatedData);
+  const validatedData = handler.validator(data);
+  return handler.generator(validatedData);
 }
