@@ -46,6 +46,9 @@ COPY --from=builder /app/dist ./dist
 # Copy public assets
 COPY public ./public
 
+# Create directory for SQLite database
+RUN mkdir -p /app/prisma/data
+
 # Expose port
 EXPOSE 3000
 
