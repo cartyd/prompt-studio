@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# Deployment script for prompt-studio on DigitalOcean
+# Run this script on the Droplet to update the application
+
+set -e
+
+APP_DIR="/var/www/prompt-studio"
+BRANCH="main"
+
+echo "🚀 Starting deployment..."
+
+# Navigate to app directory
+cd $APP_DIR
+
+# Pull latest changes
+echo "📥 Pulling latest code from $BRANCH..."
+git pull origin $BRANCH
+
+# Install dependencies
+echo "📦 Installing dependencies..."
+npm install --production
+
+# Generate Prisma client
+echo "🔧 Generating Prisma client..."
+npm run prisma:generate
+
+# Run database migrations
+echo "🗄️  Running database migrations..."
+npm run prisma:migrate:deploy
+
+# Build TypeScript
+echo "🔨 Building application..."
+npm run build
+
+# Restart PM2 process
+echo "♻️  Restarting application..."
+pm2 restart prompt-studio
+
+# Save PM2 configuration
+pm2 save
+
+echo "✅ Deployment complete!"
+echo "📊 Check status with: pm2 status"
+echo "📜 View logs with: pm2 logs prompt-studio"

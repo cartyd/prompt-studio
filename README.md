@@ -242,6 +242,18 @@ prompt-studio/
 | `NODE_ENV` | Environment mode | `development` |
 | `LOG_LEVEL` | Logging level | `info` |
 
+## Deployment
+
+Ready to deploy to production? See [DEPLOYMENT.md](./DEPLOYMENT.md) for a complete guide to deploying on DigitalOcean.
+
+**Quick Deploy:**
+1. Create a DigitalOcean Droplet (Ubuntu 22.04)
+2. SSH into the Droplet and clone this repo
+3. Run `./setup-droplet.sh` for automated setup
+4. Access your app at `http://YOUR_DROPLET_IP`
+
+Cost: Starting at $6/month
+
 ## Troubleshooting
 
 ### Database Connection Issues

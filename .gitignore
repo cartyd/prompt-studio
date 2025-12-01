@@ -2,9 +2,11 @@ node_modules/
 dist/
 .env
 *.log
+logs/
 .DS_Store
 dev.db
 dev.db-journal
+prisma/data/
 coverage/
 *.sqlite
 *.sqlite-journal
