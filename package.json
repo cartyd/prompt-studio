@@ -20,9 +20,11 @@
     "htmx",
     "prisma",
     "llm",
-    "prompts"
+    "prompts",
+    "ai-automation",
+    "prompt-engineering"
   ],
-  "author": "",
+  "author": "Dave Carty <https://simplicate.ai>",
   "license": "MIT",
   "dependencies": {
     "@fastify/cookie": "^11.0.2",

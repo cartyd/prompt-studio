@@ -98,7 +98,7 @@ async function start() {
     // Register static files
     await server.register(fastifyStatic, {
       root: path.join(__dirname, '../public'),
-      prefix: '/public/',
+      prefix: '/',
     });
 
     // Register routes

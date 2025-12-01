@@ -3,7 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= typeof title !== 'undefined' ? title + ' - ' : '' %>Prompt Framework Studio</title>
+  <meta name="description" content="<%= typeof description !== 'undefined' ? description : 'Create structured, effective prompts using proven LLM prompting frameworks including Tree-of-Thought, Chain-of-Thought, and more.' %>">
+  <meta name="keywords" content="LLM prompts, AI prompting, prompt engineering, Chain-of-Thought, Tree-of-Thought, prompt frameworks, AI automation">
+  <meta name="author" content="Dave Carty">
+  <link rel="canonical" href="<%= typeof canonicalUrl !== 'undefined' ? canonicalUrl : 'https://simplicate.ai' %>">
+  
+  <!-- Open Graph Tags -->
+  <meta property="og:title" content="<%= typeof title !== 'undefined' ? title + ' - ' : '' %>Prompt Framework Studio">
+  <meta property="og:description" content="<%= typeof description !== 'undefined' ? description : 'Create structured LLM prompts with proven frameworks by Simplicate AI' %>">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="<%= typeof canonicalUrl !== 'undefined' ? canonicalUrl : 'https://simplicate.ai' %>">
+  <meta property="og:site_name" content="Simplicate AI">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Prompt Framework Studio">
+  <meta name="twitter:description" content="Create structured LLM prompts with proven frameworks">
+  
+  <title><%= typeof title !== 'undefined' ? title + ' - ' : '' %>Prompt Framework Studio | Simplicate AI</title>
   <script src="https://unpkg.com/htmx.org@1.9.10"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -67,8 +84,35 @@
 
   <footer>
     <div class="container">
-      <p>&copy; 2024 Prompt Framework Studio. All rights reserved.</p>
+      <p>&copy; 2024 Prompt Framework Studio by <a href="https://simplicate.ai" style="color: #3498db; text-decoration: none;">Simplicate AI</a>. Created by Dave Carty.</p>
     </div>
   </footer>
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Prompt Framework Studio",
+    "description": "Create structured, effective prompts using proven LLM prompting frameworks",
+    "url": "https://simplicate.ai",
+    "author": {
+      "@type": "Person",
+      "name": "Dave Carty"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Simplicate AI",
+      "url": "https://simplicate.ai"
+    },
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web Browser",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
 </body>
 </html>
