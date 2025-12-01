@@ -20,7 +20,8 @@ model User {
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
-  prompts Prompt[]
+  prompts         Prompt[]
+  customCriteria  CustomCriteria[]
 }
 
 model Prompt {
@@ -33,4 +34,15 @@ model Prompt {
   updatedAt       DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CustomCriteria {
+  id           String   @id @default(cuid())
+  userId       String
+  criteriaName String
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, criteriaName])
 }

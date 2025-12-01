@@ -25,10 +25,21 @@ const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
       });
     }
 
+    // Fetch custom criteria for premium users
+    let customCriteria: string[] = [];
+    if (request.subscription?.isPremium) {
+      const criteria = await fastify.prisma.customCriteria.findMany({
+        where: { userId: request.user!.id },
+        orderBy: { createdAt: 'desc' },
+      });
+      customCriteria = criteria.map((c) => c.criteriaName);
+    }
+
     return reply.view('frameworks/form', {
       framework,
       user: request.user,
       subscription: request.subscription,
+      customCriteria,
     });
   });
 
@@ -41,7 +52,22 @@ const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.status(404).send('<div class="error">Framework not found</div>');
     }
 
-    const formData = request.body as Record<string, string>;
+    const formData = request.body as Record<string, string | string[]>;
+    
+    // Validate version/approach limits based on subscription
+    const maxLimit = request.subscription!.isPremium ? 7 : 3;
+    if (formData.approaches) {
+      const approaches = parseInt(formData.approaches as string, 10);
+      if (approaches > maxLimit) {
+        return reply.status(400).send(`<div class="error">Number of approaches cannot exceed ${maxLimit} for ${request.subscription!.isPremium ? 'premium' : 'free'} users</div>`);
+      }
+    }
+    if (formData.versions) {
+      const versions = parseInt(formData.versions as string, 10);
+      if (versions > maxLimit) {
+        return reply.status(400).send(`<div class="error">Number of versions cannot exceed ${maxLimit} for ${request.subscription!.isPremium ? 'premium' : 'free'} users</div>`);
+      }
+    }
     
     try {
       const promptText = generatePrompt(frameworkId, formData);

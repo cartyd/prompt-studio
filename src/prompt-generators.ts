@@ -2,7 +2,7 @@ export interface TreeOfThoughtData {
   role: string;
   objective: string;
   approaches: string;
-  criteria: string;
+  criteria: string | string[];
 }
 
 export interface SelfConsistencyData {
@@ -37,54 +37,61 @@ export type FrameworkData =
   | RolePromptingData
   | ReflectionData;
 
-function validateTreeOfThought(data: Record<string, string>): TreeOfThoughtData {
+function validateTreeOfThought(data: Record<string, string | string[]>): TreeOfThoughtData {
   const { role, objective, approaches, criteria } = data;
   if (!role || !objective || !approaches || !criteria) {
     throw new Error('Missing required fields for Tree-of-Thought framework');
   }
-  return { role, objective, approaches, criteria };
+  // Handle both string and array formats
+  const criteriaValue = Array.isArray(criteria) ? criteria : criteria;
+  return { role: role as string, objective: objective as string, approaches: approaches as string, criteria: criteriaValue };
 }
 
-function validateSelfConsistency(data: Record<string, string>): SelfConsistencyData {
+function validateSelfConsistency(data: Record<string, string | string[]>): SelfConsistencyData {
   const { role, goal, versions } = data;
   if (!role || !goal || !versions) {
     throw new Error('Missing required fields for Self-Consistency framework');
   }
-  return { role, goal, versions };
+  return { role: role as string, goal: goal as string, versions: versions as string };
 }
 
-function validateChainOfThought(data: Record<string, string>): ChainOfThoughtData {
+function validateChainOfThought(data: Record<string, string | string[]>): ChainOfThoughtData {
   const { role, problem, context } = data;
   if (!role || !problem) {
     throw new Error('Missing required fields for Chain-of-Thought framework');
   }
-  return { role, problem, context };
+  return { role: role as string, problem: problem as string, context: context as string | undefined };
 }
 
-function validateRolePrompting(data: Record<string, string>): RolePromptingData {
+function validateRolePrompting(data: Record<string, string | string[]>): RolePromptingData {
   const { role, tone, task, examples } = data;
   if (!role || !tone || !task) {
     throw new Error('Missing required fields for Role Prompting framework');
   }
-  return { role, tone, task, examples };
+  return { role: role as string, tone: tone as string, task: task as string, examples: examples as string | undefined };
 }
 
-function validateReflection(data: Record<string, string>): ReflectionData {
+function validateReflection(data: Record<string, string | string[]>): ReflectionData {
   const { role, task, criteria } = data;
   if (!role || !task || !criteria) {
     throw new Error('Missing required fields for Reflection framework');
   }
-  return { role, task, criteria };
+  return { role: role as string, task: task as string, criteria: criteria as string };
 }
 
 function generateTreeOfThought(data: TreeOfThoughtData): string {
+  // Format criteria as numbered list
+  const criteriaText = Array.isArray(data.criteria)
+    ? data.criteria.map((c, i) => `(${i + 1}) ${c}`).join(', ')
+    : data.criteria;
+
   return `You are a ${data.role}.
 
 Your objective: ${data.objective}
 
 Please generate ${data.approaches} different approaches to solve this problem. For each approach:
 1. Describe the reasoning path
-2. Evaluate it based on these criteria: ${data.criteria}
+2. Evaluate it based on these criteria: ${criteriaText}
 3. Identify strengths and weaknesses
 
 After presenting all approaches, recommend the best one and explain why.`;
@@ -144,7 +151,7 @@ Produce an improved version that addresses the issues identified in your reflect
 }
 
 interface ValidatorGeneratorPair<T extends FrameworkData> {
-  validator: (data: Record<string, string>) => T;
+  validator: (data: Record<string, string | string[]>) => T;
   generator: (data: T) => string;
 }
 
@@ -171,7 +178,7 @@ const frameworkHandlers: Record<string, ValidatorGeneratorPair<any>> = {
   },
 };
 
-export function validateAndGenerate(frameworkId: string, data: Record<string, string>): string {
+export function validateAndGenerate(frameworkId: string, data: Record<string, string | string[]>): string {
   const handler = frameworkHandlers[frameworkId];
 
   if (!handler) {

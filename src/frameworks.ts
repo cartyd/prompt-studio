@@ -1,4 +1,4 @@
-import { Framework } from './types';
+import { Framework, DEFAULT_EVALUATION_CRITERIA } from './types';
 import { validateAndGenerate } from './prompt-generators';
 
 export const frameworks: Framework[] = [
@@ -10,20 +10,20 @@ export const frameworks: Framework[] = [
       { name: 'role', label: 'Role', type: 'text', placeholder: 'e.g., expert problem solver', required: true },
       { name: 'objective', label: 'Objective', type: 'textarea', placeholder: 'What problem needs to be solved?', required: true },
       { name: 'approaches', label: 'Number of Approaches', type: 'number', placeholder: '3', required: true },
-      { name: 'criteria', label: 'Evaluation Criteria', type: 'textarea', placeholder: 'How should approaches be evaluated?', required: true },
+      { name: 'criteria', label: 'Evaluation Criteria', type: 'multi-select-criteria', placeholder: 'Select or add criteria', required: true, options: [...DEFAULT_EVALUATION_CRITERIA] },
     ],
     examples: {
       general: {
         role: 'decision-making expert specializing in life transitions',
         objective: 'I received a job offer paying $95k in Austin, TX (cost of living index: 119) versus staying in my current role in Cleveland, OH (cost of living index: 84) with a promotion to $85k. I have aging parents 2 hours from Cleveland and a partner who works remotely.',
         approaches: '3',
-        criteria: '(1) Net financial impact after cost of living adjustments, (2) Career trajectory over 5 years, (3) Family obligations and relationship stability, (4) Quality of life factors (community, climate, activities)',
+        criteria: ['Net financial impact after cost of living adjustments', 'Career trajectory over 5 years', 'Family obligations and relationship stability', 'Quality of life factors (community, climate, activities)'],
       },
       business: {
         role: 'strategic business analyst with expertise in market expansion',
         objective: 'Our SaaS company ($12M ARR, 45% growth) can invest $2M in expansion. Option A: Enter Southeast Asian market (200M potential users, 15 competitors). Option B: Double down on North American enterprise segment (50M users, 8 major competitors, 25% market penetration).',
         approaches: '3',
-        criteria: '(1) 24-month ROI with realistic conversion assumptions, (2) Operational complexity and required team size, (3) Competitive positioning and differentiation, (4) Risk factors and mitigation strategies',
+        criteria: ['24-month ROI with realistic conversion assumptions', 'Operational complexity and required team size', 'Competitive positioning and differentiation', 'Risk factors and mitigation strategies'],
       },
     },
   },
@@ -124,6 +124,6 @@ export function getFrameworkById(id: string): Framework | undefined {
   return frameworks.find((f) => f.id === id);
 }
 
-export function generatePrompt(frameworkId: string, data: Record<string, string>): string {
+export function generatePrompt(frameworkId: string, data: Record<string, string | string[]>): string {
   return validateAndGenerate(frameworkId, data);
 }

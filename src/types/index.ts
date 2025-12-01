@@ -35,9 +35,10 @@ declare module 'fastify' {
 export interface FrameworkField {
   name: string;
   label: string;
-  type: 'text' | 'textarea' | 'number';
+  type: 'text' | 'textarea' | 'number' | 'multi-select-criteria';
   placeholder?: string;
   required?: boolean;
+  options?: string[];
 }
 
 export interface Framework {
@@ -46,7 +47,25 @@ export interface Framework {
   description: string;
   fields: FrameworkField[];
   examples?: {
-    general: Record<string, string>;
-    business: Record<string, string>;
+    general: Record<string, string | string[]>;
+    business: Record<string, string | string[]>;
   };
 }
+
+export interface CustomCriteria {
+  id: string;
+  userId: string;
+  criteriaName: string;
+  createdAt: Date;
+}
+
+export const DEFAULT_EVALUATION_CRITERIA = [
+  'Accuracy/Correctness',
+  'Clarity/Coherence',
+  'Feasibility/Practicality',
+  'Efficiency/Performance',
+  'Completeness/Thoroughness',
+  'Innovation/Creativity',
+  'Risk/Safety',
+  'Cost/Resource Impact',
+] as const;

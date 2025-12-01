@@ -20,6 +20,7 @@ import indexRoutes from './routes/index';
 import authRoutes from './routes/auth';
 import frameworkRoutes from './routes/frameworks';
 import promptRoutes from './routes/prompts';
+import customCriteriaRoutes from './routes/custom-criteria';
 
 const PORT = parseInt(process.env.PORT || '3000', 10);
 const HOST = process.env.HOST || '0.0.0.0';
@@ -106,6 +107,7 @@ async function start() {
     await server.register(authRoutes, { prefix: '/auth' });
     await server.register(frameworkRoutes, { prefix: '/frameworks' });
     await server.register(promptRoutes, { prefix: '/prompts' });
+    await server.register(customCriteriaRoutes, { prefix: '/api/custom-criteria' });
 
     // Start server
     await server.listen({ port: PORT, host: HOST });

@@ -206,7 +206,7 @@ describe('Framework Prompt Generation', () => {
         framework?.fields.forEach((field) => {
           expect(field.name).toBeTruthy();
           expect(field.label).toBeTruthy();
-          expect(['text', 'textarea', 'number']).toContain(field.type);
+          expect(['text', 'textarea', 'number', 'multi-select-criteria']).toContain(field.type);
         });
       });
     });
@@ -242,13 +242,13 @@ describe('Framework Prompt Generation', () => {
         
         if (framework?.examples) {
           // Test general examples
-          const generalPrompt = generatePrompt(id, framework.examples.general);
+          const generalPrompt = generatePrompt(id, framework.examples.general as Record<string, string>);
           expect(generalPrompt).toBeTruthy();
           expect(generalPrompt).not.toContain('Missing required fields');
           expect(generalPrompt).not.toContain('Invalid framework type');
           
           // Test business examples
-          const businessPrompt = generatePrompt(id, framework.examples.business);
+          const businessPrompt = generatePrompt(id, framework.examples.business as Record<string, string>);
           expect(businessPrompt).toBeTruthy();
           expect(businessPrompt).not.toContain('Missing required fields');
           expect(businessPrompt).not.toContain('Invalid framework type');

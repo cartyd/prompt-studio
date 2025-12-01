@@ -1,0 +1,240 @@
+<div class="form-group">
+  <label for="criteria">Evaluation Criteria *</label>
+  <div style="background: white; border: 1px solid #ddd; border-radius: 4px; padding: 1rem; max-height: 300px; overflow-y: auto;">
+    <div id="criteria-checkboxes" style="display: flex; flex-direction: column; gap: 0.5rem;">
+      <!-- Default criteria checkboxes will be rendered here -->
+    </div>
+    
+    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee;">
+      <button type="button" 
+              id="add-custom-btn" 
+              style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; background: #f8f9fa; border: 1px dashed #3498db; border-radius: 4px; cursor: pointer; color: #3498db; font-size: 0.9rem;">
+        <span>+ Add Custom Criteria</span>
+      </button>
+      
+      <div id="custom-input-container" style="display: none; margin-top: 0.75rem;">
+        <div style="display: flex; gap: 0.5rem; align-items: start;">
+          <div style="flex: 1;">
+            <input type="text" 
+                   id="custom-criteria-input" 
+                   placeholder="Enter custom criteria..."
+                   maxlength="200"
+                   style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;">
+            <small style="display: block; margin-top: 0.25rem; color: #7f8c8d; font-size: 0.8rem;">
+              <% if (subscription.isPremium) { %>
+                💾 Custom criteria can be saved for future use
+              <% } else { %>
+                ⏱️ Custom criteria available this session only · <a href="/premium" style="color: #3498db;">Upgrade to save</a>
+              <% } %>
+            </small>
+          </div>
+          <button type="button" 
+                  id="add-custom-submit-btn" 
+                  style="padding: 0.5rem 1rem; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap;">
+            Add
+          </button>
+          <button type="button" 
+                  id="cancel-custom-btn" 
+                  style="padding: 0.5rem 1rem; background: #f8f9fa; color: #7f8c8d; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+            Cancel
+          </button>
+        </div>
+        <% if (subscription.isPremium) { %>
+        <div style="margin-top: 0.5rem;">
+          <label style="display: inline-flex; align-items: center; gap: 0.25rem; cursor: pointer; font-size: 0.85rem;">
+            <input type="checkbox" id="save-custom-checkbox" style="cursor: pointer;">
+            <span>💾 Save for future sessions</span>
+          </label>
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Hidden input to store selected criteria as JSON array -->
+  <input type="hidden" id="criteria" name="criteria" value="[]">
+  
+  <small style="display: block; margin-top: 0.5rem; color: #7f8c8d; font-size: 0.85rem;">
+    <span id="criteria-count">0</span> criteria selected
+  </small>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const isPremium = <%= subscription.isPremium %>;
+  const defaultCriteria = <%- JSON.stringify(field.options || []) %>;
+  const savedCustomCriteria = <%- JSON.stringify(customCriteria || []) %>;
+  
+  const criteriaCheckboxesContainer = document.getElementById('criteria-checkboxes');
+  const criteriaInput = document.getElementById('criteria');
+  const criteriaCount = document.getElementById('criteria-count');
+  const addCustomBtn = document.getElementById('add-custom-btn');
+  const customInputContainer = document.getElementById('custom-input-container');
+  const customCriteriaInput = document.getElementById('custom-criteria-input');
+  const addCustomSubmitBtn = document.getElementById('add-custom-submit-btn');
+  const cancelCustomBtn = document.getElementById('cancel-custom-btn');
+  const saveCustomCheckbox = document.getElementById('save-custom-checkbox');
+  
+  let selectedCriteria = [];
+  let allCriteria = [...defaultCriteria];
+  
+  // Load custom criteria from localStorage for free users
+  if (!isPremium) {
+    const localCustom = localStorage.getItem('customCriteria');
+    if (localCustom) {
+      try {
+        const parsed = JSON.parse(localCustom);
+        allCriteria = [...allCriteria, ...parsed];
+      } catch (e) {}
+    }
+  } else {
+    // Add saved custom criteria for premium users
+    allCriteria = [...allCriteria, ...savedCustomCriteria];
+  }
+  
+  function renderCheckboxes() {
+    criteriaCheckboxesContainer.innerHTML = '';
+    
+    allCriteria.forEach((criteria, index) => {
+      const isCustom = index >= defaultCriteria.length;
+      const isChecked = selectedCriteria.includes(criteria);
+      
+      const wrapper = document.createElement('div');
+      wrapper.style.cssText = 'display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem; border-radius: 4px; transition: background 0.2s;';
+      wrapper.onmouseenter = () => wrapper.style.background = '#f8f9fa';
+      wrapper.onmouseleave = () => wrapper.style.background = 'transparent';
+      
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.id = `criteria-${index}`;
+      checkbox.checked = isChecked;
+      checkbox.style.cssText = 'cursor: pointer;';
+      
+      const label = document.createElement('label');
+      label.htmlFor = `criteria-${index}`;
+      label.style.cssText = 'flex: 1; cursor: pointer; font-size: 0.9rem;';
+      label.textContent = criteria;
+      
+      checkbox.addEventListener('change', function() {
+        if (this.checked) {
+          selectedCriteria.push(criteria);
+        } else {
+          selectedCriteria = selectedCriteria.filter(c => c !== criteria);
+        }
+        updateHiddenInput();
+      });
+      
+      wrapper.appendChild(checkbox);
+      wrapper.appendChild(label);
+      
+      if (isCustom) {
+        const indicator = document.createElement('span');
+        indicator.style.cssText = 'font-size: 0.75rem; color: #7f8c8d; padding: 0.15rem 0.4rem; background: #f8f9fa; border-radius: 3px;';
+        indicator.textContent = isPremium ? '💾' : '⏱️';
+        indicator.title = isPremium ? 'Saved custom criteria' : 'Session only';
+        wrapper.appendChild(indicator);
+        
+        if (isPremium) {
+          const deleteBtn = document.createElement('button');
+          deleteBtn.type = 'button';
+          deleteBtn.textContent = '×';
+          deleteBtn.style.cssText = 'background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1.2rem; padding: 0 0.25rem;';
+          deleteBtn.title = 'Delete this criteria';
+          deleteBtn.addEventListener('click', () => deleteCustomCriteria(criteria));
+          wrapper.appendChild(deleteBtn);
+        }
+      }
+      
+      criteriaCheckboxesContainer.appendChild(wrapper);
+    });
+  }
+  
+  function updateHiddenInput() {
+    criteriaInput.value = JSON.stringify(selectedCriteria);
+    criteriaCount.textContent = selectedCriteria.length;
+  }
+  
+  function addCustomCriteria(criteriaName, shouldSave) {
+    if (!criteriaName || criteriaName.trim().length === 0) return;
+    
+    criteriaName = criteriaName.trim();
+    
+    if (allCriteria.includes(criteriaName)) {
+      alert('This criteria already exists');
+      return;
+    }
+    
+    allCriteria.push(criteriaName);
+    selectedCriteria.push(criteriaName);
+    
+    if (isPremium && shouldSave) {
+      // Save to database
+      fetch('/api/custom-criteria', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ criteriaName }),
+      }).catch(err => console.error('Failed to save criteria:', err));
+    } else if (!isPremium) {
+      // Save to localStorage
+      const customOnly = allCriteria.slice(defaultCriteria.length);
+      localStorage.setItem('customCriteria', JSON.stringify(customOnly));
+    }
+    
+    renderCheckboxes();
+    updateHiddenInput();
+    customCriteriaInput.value = '';
+    customInputContainer.style.display = 'none';
+  }
+  
+  function deleteCustomCriteria(criteriaName) {
+    if (!confirm(`Delete "${criteriaName}"?`)) return;
+    
+    allCriteria = allCriteria.filter(c => c !== criteriaName);
+    selectedCriteria = selectedCriteria.filter(c => c !== criteriaName);
+    
+    // Delete from database
+    fetch(`/api/custom-criteria/${encodeURIComponent(criteriaName)}`, {
+      method: 'DELETE',
+    }).catch(err => console.error('Failed to delete criteria:', err));
+    
+    renderCheckboxes();
+    updateHiddenInput();
+  }
+  
+  // Event listeners
+  addCustomBtn.addEventListener('click', () => {
+    customInputContainer.style.display = 'block';
+    customCriteriaInput.focus();
+  });
+  
+  cancelCustomBtn.addEventListener('click', () => {
+    customInputContainer.style.display = 'none';
+    customCriteriaInput.value = '';
+  });
+  
+  addCustomSubmitBtn.addEventListener('click', () => {
+    const shouldSave = isPremium && saveCustomCheckbox && saveCustomCheckbox.checked;
+    addCustomCriteria(customCriteriaInput.value, shouldSave);
+  });
+  
+  customCriteriaInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const shouldSave = isPremium && saveCustomCheckbox && saveCustomCheckbox.checked;
+      addCustomCriteria(customCriteriaInput.value, shouldSave);
+    }
+  });
+  
+  // Listen for example loading event
+  criteriaInput.addEventListener('loadExampleCriteria', (e) => {
+    const exampleCriteria = e.detail;
+    selectedCriteria = [...exampleCriteria];
+    renderCheckboxes();
+    updateHiddenInput();
+  });
+  
+  // Initial render
+  renderCheckboxes();
+  updateHiddenInput();
+});
+</script>
