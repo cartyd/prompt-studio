@@ -42,6 +42,7 @@ function getSessionSecret(): string {
 const SESSION_SECRET = getSessionSecret();
 
 const server = Fastify({
+  trustProxy: true, // Needed for DigitalOcean deployment with nginx
   logger: {
     level: process.env.LOG_LEVEL || 'info',
   },
