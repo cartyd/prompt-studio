@@ -10,3 +10,5 @@ prisma/data/
 coverage/
 *.sqlite
 *.sqlite-journal
+sessions.db
+sessions.db-journal

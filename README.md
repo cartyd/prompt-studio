@@ -18,6 +18,7 @@ A full-stack web application for creating structured, effective prompts using pr
 - **Database**: Prisma ORM with SQLite (dev) and PostgreSQL (prod)
 - **Frontend**: Server-rendered EJS templates enhanced with htmx
 - **Authentication**: Cookie-based sessions with bcrypt
+- **Session Storage**: Persistent SQLite session storage (survives server restarts)
 - **Security**: @fastify/helmet, @fastify/rate-limit, @fastify/session
 - **Testing**: Jest with TypeScript support
 
@@ -227,6 +228,7 @@ prompt-studio/
 
 - Password hashing with bcrypt (10 salt rounds)
 - HTTP-only secure session cookies
+- Persistent session storage using SQLite (sessions survive server restarts)
 - Rate limiting on authentication endpoints (5 requests per 5 minutes)
 - Helmet.js security headers
 - Content Security Policy

@@ -36,12 +36,15 @@
     "@fastify/view": "^11.1.1",
     "@prisma/client": "^5.20.0",
     "bcrypt": "^5.1.1",
+    "better-sqlite3": "^12.5.0",
     "ejs": "^3.1.10",
     "fastify": "^5.0.0",
-    "fastify-plugin": "^4.5.1"
+    "fastify-plugin": "^4.5.1",
+    "fastify-session-better-sqlite3-store": "^2.1.2"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/ejs": "^3.1.5",
     "@types/jest": "^29.5.13",
     "@types/node": "^22.7.5",

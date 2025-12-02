@@ -8,6 +8,8 @@ import fastifyStatic from '@fastify/static';
 import fastifyFormbody from '@fastify/formbody';
 import ejs from 'ejs';
 import path from 'path';
+import Database from 'better-sqlite3';
+import SqliteStore from 'fastify-session-better-sqlite3-store';
 import './types';
 import { TIME_CONSTANTS } from './constants';
 
@@ -41,6 +43,9 @@ function getSessionSecret(): string {
 
 const SESSION_SECRET = getSessionSecret();
 
+// Initialize SQLite database for session storage
+const sessionDb = new Database(path.join(__dirname, '../sessions.db'));
+
 const server = Fastify({
   trustProxy: true, // Needed for DigitalOcean deployment with nginx
   logger: {
@@ -72,6 +77,7 @@ async function start() {
     await server.register(fastifyCookie);
     await server.register(fastifySession, {
       secret: SESSION_SECRET,
+      store: new SqliteStore(sessionDb),
       cookie: {
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
