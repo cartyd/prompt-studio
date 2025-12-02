@@ -107,7 +107,10 @@
           <input type="hidden" id="criteria" name="criteria" value="[]">
           <small style="display: block; margin-top: 0.5rem; color: #7f8c8d; font-size: 0.85rem;"><span id="criteria-count">0</span>/4 criteria selected</small>
         </div>` : '') + `
-        <button type="submit" class="btn" style="width: 100%;">Generate Preview</button>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="submit" class="btn" style="flex: 1;">Generate Preview</button>
+          <button type="button" id="clear-form-btn" class="btn" style="flex: 0 0 auto; background: #95a5a6;">Clear Form</button>
+        </div>
       </form>
     </div>
 
@@ -408,7 +411,63 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   <% } %>
   
+  // Listen for reset criteria event
+  criteriaField.addEventListener('resetCriteria', () => {
+    selectedCriteria = [];
+    renderCheckboxes();
+    updateHiddenInput();
+  });
+  
   renderCheckboxes();
   updateHiddenInput();
+});
+
+// Clear form functionality
+const clearFormBtn = document.getElementById('clear-form-btn');
+if (clearFormBtn) {
+  clearFormBtn.addEventListener('click', function() {
+    if (!confirm('Clear all form fields?')) return;
+    
+    // Clear all text inputs and textareas
+    const form = this.closest('form');
+    form.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(field => {
+      if (field.type === 'number' && (field.name === 'approaches' || field.name === 'versions')) {
+        field.value = '3'; // Reset to default
+      } else {
+        field.value = '';
+      }
+    });
+    
+    // Clear multi-select criteria checkboxes
+    const criteriaField = document.getElementById('criteria');
+    if (criteriaField) {
+      const checkboxes = document.querySelectorAll('#criteria-checkboxes input[type="checkbox"]');
+      checkboxes.forEach(cb => cb.checked = false);
+      
+      // Update the selectedCriteria array and hidden input
+      const event = new CustomEvent('clearCriteria');
+      criteriaField.dispatchEvent(event);
+    }
+    
+    // Clear preview
+    const preview = document.getElementById('prompt-preview');
+    if (preview) {
+      preview.innerHTML = '<p style="color: #7f8c8d;">Fill out the form and click "Generate Preview" to see your prompt.</p>';
+    }
+  });
+}
+</script>
+
+<script>
+// Listen for clear criteria event
+document.addEventListener('DOMContentLoaded', function() {
+  const criteriaField = document.getElementById('criteria');
+  if (criteriaField) {
+    criteriaField.addEventListener('clearCriteria', function() {
+      // This will be handled by the multi-select criteria script
+      const event = new CustomEvent('resetCriteria');
+      this.dispatchEvent(event);
+    });
+  }
 });
 </script>
