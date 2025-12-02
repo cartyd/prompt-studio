@@ -586,28 +586,31 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Advanced options toggle
-const toggleAdvancedBtn = document.getElementById('toggle-advanced-btn');
-if (toggleAdvancedBtn) {
-  toggleAdvancedBtn.addEventListener('click', function() {
-    const advancedOptions = document.getElementById('advanced-options');
-    const advancedIcon = document.getElementById('advanced-icon');
-    
-    if (advancedOptions.style.display === 'none') {
-      advancedOptions.style.display = 'block';
-      advancedIcon.style.transform = 'rotate(90deg)';
-      advancedIcon.textContent = '▼';
-    } else {
-      advancedOptions.style.display = 'none';
-      advancedIcon.style.transform = 'rotate(0deg)';
-      advancedIcon.textContent = '▶';
-    }
-  });
-}
+document.addEventListener('DOMContentLoaded', function() {
+  const toggleAdvancedBtn = document.getElementById('toggle-advanced-btn');
+  if (toggleAdvancedBtn) {
+    toggleAdvancedBtn.addEventListener('click', function() {
+      const advancedOptions = document.getElementById('advanced-options');
+      const advancedIcon = document.getElementById('advanced-icon');
+      
+      if (advancedOptions.style.display === 'none') {
+        advancedOptions.style.display = 'block';
+        advancedIcon.style.transform = 'rotate(90deg)';
+        advancedIcon.textContent = '▼';
+      } else {
+        advancedOptions.style.display = 'none';
+        advancedIcon.style.transform = 'rotate(0deg)';
+        advancedIcon.textContent = '▶';
+      }
+    });
+  }
+});
 
 // Clear form functionality
-const clearFormBtn = document.getElementById('clear-form-btn');
-if (clearFormBtn) {
-  clearFormBtn.addEventListener('click', function() {
+document.addEventListener('DOMContentLoaded', function() {
+  const clearFormBtn = document.getElementById('clear-form-btn');
+  if (clearFormBtn) {
+    clearFormBtn.addEventListener('click', function() {
     if (!confirm('Clear all form fields?')) return;
     
     // Clear all text inputs and textareas
@@ -637,7 +640,8 @@ if (clearFormBtn) {
       preview.innerHTML = '<p style="color: #7f8c8d;">Fill out the form and click "Generate Preview" to see your prompt.</p>';
     }
   });
-}
+  }
+});
 </script>
 
 <script>
