@@ -78,8 +78,7 @@
             ${field.type === 'textarea' 
               ? `<textarea id="${field.name}" name="${field.name}" placeholder="${field.placeholder || ''}" ${field.required ? 'required' : ''}></textarea>`
               : field.type === 'number' && (field.name === 'approaches' || field.name === 'versions')
-                ? `<input type="${field.type}" id="${field.name}" name="${field.name}" placeholder="${field.placeholder || ''}" value="3" min="1" max="${subscription.isPremium ? '7' : '3'}" ${field.required ? 'required' : ''}>
-                   <small style="color: #7f8c8d; font-size: 0.85rem; display: block; margin-top: 0.25rem;">${subscription.isPremium ? 'Premium: Up to 7' : 'Free: Max 3'} ${subscription.isPremium ? '' : '· <a href="/premium" style="color: #3498db;">Upgrade for up to 7</a>'}</small>`
+                ? `<input type="${field.type}" id="${field.name}" name="${field.name}" placeholder="${field.placeholder || ''}" value="3" min="1" max="5" ${field.required ? 'required' : ''}>`
                 : `<input type="${field.type}" id="${field.name}" name="${field.name}" placeholder="${field.placeholder || ''}" ${field.required ? 'required' : ''}>`
             }
           </div>`;

@@ -54,18 +54,18 @@ const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
 
     const formData = request.body as Record<string, string | string[]>;
     
-    // Validate version/approach limits based on subscription
-    const maxLimit = request.subscription!.isPremium ? 7 : 3;
+    // Validate version/approach limits (max 5 for all users)
+    const maxLimit = 5;
     if (formData.approaches) {
       const approaches = parseInt(formData.approaches as string, 10);
       if (approaches > maxLimit) {
-        return reply.status(400).send(`<div class="error">Number of approaches cannot exceed ${maxLimit} for ${request.subscription!.isPremium ? 'premium' : 'free'} users</div>`);
+        return reply.status(400).send(`<div class="error">Number of approaches cannot exceed ${maxLimit}</div>`);
       }
     }
     if (formData.versions) {
       const versions = parseInt(formData.versions as string, 10);
       if (versions > maxLimit) {
-        return reply.status(400).send(`<div class="error">Number of versions cannot exceed ${maxLimit} for ${request.subscription!.isPremium ? 'premium' : 'free'} users</div>`);
+        return reply.status(400).send(`<div class="error">Number of versions cannot exceed ${maxLimit}</div>`);
       }
     }
     
