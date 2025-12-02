@@ -199,6 +199,39 @@ document.addEventListener('DOMContentLoaded', function() {
   const loadBtn = document.getElementById('load-example-btn');
   if (loadBtn) {
     loadBtn.addEventListener('click', function() {
+      // Reset form to initial state first
+      const form = document.querySelector('form');
+      if (form) {
+        // Clear all text inputs and textareas
+        form.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(field => {
+          if (field.type === 'number' && (field.name === 'approaches' || field.name === 'versions')) {
+            field.value = '3'; // Reset to default
+          } else {
+            field.value = '';
+          }
+        });
+        
+        // Clear criteria checkboxes
+        const criteriaField = document.getElementById('criteria');
+        if (criteriaField) {
+          const event = new CustomEvent('resetCriteria');
+          criteriaField.dispatchEvent(event);
+        }
+        
+        // Clear preview
+        const preview = document.getElementById('prompt-preview');
+        if (preview) {
+          preview.innerHTML = '<p style="color: #7f8c8d;">Fill out the form and click "Generate Preview" to see your prompt.</p>';
+        }
+      }
+      
+      // Reset to general category if not already
+      if (currentCategory !== 'general') {
+        const generalBtn = document.getElementById('category-general');
+        if (generalBtn) generalBtn.click();
+      }
+      
+      // Load the example
       const example = examples[currentCategory];
       Object.keys(example).forEach(key => {
         const field = document.getElementById(key);
