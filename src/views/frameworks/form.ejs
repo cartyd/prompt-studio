@@ -587,22 +587,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Advanced options toggle
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('[Advanced Options] DOM loaded');
   const toggleAdvancedBtn = document.getElementById('toggle-advanced-btn');
+  console.log('[Advanced Options] Button found:', toggleAdvancedBtn);
   if (toggleAdvancedBtn) {
+    console.log('[Advanced Options] Adding click listener');
     toggleAdvancedBtn.addEventListener('click', function() {
+      console.log('[Advanced Options] Button clicked!');
       const advancedOptions = document.getElementById('advanced-options');
       const advancedIcon = document.getElementById('advanced-icon');
+      console.log('[Advanced Options] Current display:', advancedOptions.style.display);
       
       if (advancedOptions.style.display === 'none' || advancedOptions.style.display === '') {
+        console.log('[Advanced Options] Expanding...');
         advancedOptions.style.display = 'block';
         advancedIcon.style.transform = 'rotate(90deg)';
         advancedIcon.textContent = '▼';
       } else {
+        console.log('[Advanced Options] Collapsing...');
         advancedOptions.style.display = 'none';
         advancedIcon.style.transform = 'rotate(0deg)';
         advancedIcon.textContent = '▶';
       }
+      console.log('[Advanced Options] New display:', advancedOptions.style.display);
     });
+  } else {
+    console.error('[Advanced Options] Button NOT found!');
   }
 });
 
