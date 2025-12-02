@@ -593,7 +593,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const advancedOptions = document.getElementById('advanced-options');
       const advancedIcon = document.getElementById('advanced-icon');
       
-      if (advancedOptions.style.display === 'none') {
+      if (advancedOptions.style.display === 'none' || advancedOptions.style.display === '') {
         advancedOptions.style.display = 'block';
         advancedIcon.style.transform = 'rotate(90deg)';
         advancedIcon.textContent = '▼';
