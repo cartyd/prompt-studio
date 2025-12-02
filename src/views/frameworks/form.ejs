@@ -225,13 +225,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
       
-      // Reset to general category if not already
-      if (currentCategory !== 'general') {
-        const generalBtn = document.getElementById('category-general');
-        if (generalBtn) generalBtn.click();
-      }
-      
-      // Load the example
+      // Load the example from current category (keep selected tab)
       const example = examples[currentCategory];
       Object.keys(example).forEach(key => {
         const field = document.getElementById(key);
