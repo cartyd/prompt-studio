@@ -1,5 +1,43 @@
 <% const title = framework.name; %>
 <%- include('../layout-wrapper', { body: `
+<style>
+.template-card:hover {
+  border-color: #3498db !important;
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.15);
+  transform: translateY(-2px);
+}
+
+.template-card.selected {
+  border-color: #3498db !important;
+  background: #f0f8ff !important;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+.template-card::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #e0e0e0;
+  background: white;
+  transition: all 0.2s;
+}
+
+.template-card.selected::before {
+  background: #3498db;
+  border-color: #3498db;
+  content: '✓';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+</style>
 <div style="max-width: 900px; margin: 0 auto;">
   <div style="margin-bottom: 1rem;">
     <a href="/frameworks" style="color: #3498db;">&larr; Back to Frameworks</a>
@@ -7,6 +45,53 @@
 
   <h2 style="margin-bottom: 0.5rem;">${framework.name}</h2>
   <p style="color: #7f8c8d; margin-bottom: 2rem;">${framework.description}</p>
+
+  ${framework.templates && framework.templates.length > 0 ? `
+  <div style="margin-bottom: 2rem;">
+    <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">🚀 Quick Start Templates</h3>
+    <div id="templates-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+      ${framework.templates.map(template => `
+        <div class="template-card" data-template-id="${template.id}" style="
+          background: white;
+          border: 2px solid #e0e0e0;
+          border-radius: 8px;
+          padding: 1rem;
+          cursor: pointer;
+          transition: all 0.2s;
+          position: relative;
+        ">
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+            <h4 style="margin: 0; font-size: 0.95rem; color: #2c3e50; line-height: 1.3;">${template.name}</h4>
+            <span class="template-category" style="
+              font-size: 0.7rem;
+              padding: 0.2rem 0.5rem;
+              border-radius: 12px;
+              background: ${
+                template.category === 'personal' ? '#e3f2fd' :
+                template.category === 'business' ? '#f3e5f5' :
+                template.category === 'technical' ? '#e8f5e9' :
+                '#fff3e0'
+              };
+              color: ${
+                template.category === 'personal' ? '#1976d2' :
+                template.category === 'business' ? '#7b1fa2' :
+                template.category === 'technical' ? '#388e3c' :
+                '#f57c00'
+              };
+              font-weight: 600;
+              flex-shrink: 0;
+              margin-left: 0.5rem;
+            ">${template.category}</span>
+          </div>
+          <p style="margin: 0; font-size: 0.85rem; color: #7f8c8d; line-height: 1.4;">${template.description}</p>
+          <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #f0f0f0;">
+            <span style="font-size: 0.75rem; color: #95a5a6;">Click to populate form</span>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  </div>
+  ` : ''}
 
   ${framework.examples ? `
   <div style="margin-bottom: 2rem;">
@@ -547,3 +632,142 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 </script>
+
+<% if (framework.templates && framework.templates.length > 0) { %>
+<script>
+// Template selection logic
+document.addEventListener('DOMContentLoaded', function() {
+  const templates = <%- JSON.stringify(framework.templates) %>;
+  const templateCards = document.querySelectorAll('.template-card');
+  let selectedTemplateId = null;
+  
+  templateCards.forEach(card => {
+    card.addEventListener('click', function() {
+      const templateId = this.dataset.templateId;
+      const template = templates.find(t => t.id === templateId);
+      
+      if (!template) return;
+      
+      // Toggle selection visually
+      if (selectedTemplateId === templateId) {
+        // Deselect
+        this.classList.remove('selected');
+        selectedTemplateId = null;
+        clearForm();
+      } else {
+        // Deselect previous and select new
+        templateCards.forEach(c => c.classList.remove('selected'));
+        this.classList.add('selected');
+        selectedTemplateId = templateId;
+        
+        // Populate form with template fields
+        populateFormFromTemplate(template);
+      }
+    });
+  });
+  
+  function clearForm() {
+    const form = document.querySelector('form');
+    if (!form) return;
+    
+    // Clear all text inputs and textareas
+    form.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(field => {
+      if (field.type === 'number' && (field.name === 'approaches' || field.name === 'versions')) {
+        field.value = '3'; // Reset to default
+      } else {
+        field.value = '';
+      }
+    });
+    
+    // Clear criteria checkboxes
+    const criteriaField = document.getElementById('criteria');
+    if (criteriaField) {
+      const event = new CustomEvent('resetCriteria');
+      criteriaField.dispatchEvent(event);
+    }
+    
+    // Clear preview
+    const preview = document.getElementById('prompt-preview');
+    if (preview) {
+      preview.innerHTML = '<p style="color: #7f8c8d;">Fill out the form and click "Generate Preview" to see your prompt.</p>';
+    }
+  }
+  
+  function populateFormFromTemplate(template) {
+    // First clear the form
+    clearForm();
+    
+    // Populate each field from template
+    Object.keys(template.fields).forEach(fieldName => {
+      const fieldValue = template.fields[fieldName];
+      const field = document.getElementById(fieldName);
+      
+      if (!field) return;
+      
+      if (Array.isArray(fieldValue)) {
+        // For criteria arrays
+        field.value = JSON.stringify(fieldValue);
+        const event = new CustomEvent('loadExampleCriteria', { detail: fieldValue });
+        field.dispatchEvent(event);
+      } else {
+        // For regular fields
+        field.value = fieldValue;
+      }
+    });
+    
+    // Show a brief notification
+    showTemplateNotification(template.name);
+  }
+  
+  function showTemplateNotification(templateName) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #3498db;
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      animation: slideIn 0.3s ease-out;
+    `;
+    notification.innerHTML = `<strong>🎉 Template Applied:</strong> ${templateName}`;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.style.animation = 'slideOut 0.3s ease-in';
+      setTimeout(() => notification.remove(), 300);
+    }, 2000);
+  }
+  
+  // Add animations
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+});
+</script>
+<% } %>

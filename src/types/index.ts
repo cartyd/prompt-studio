@@ -43,11 +43,20 @@ export interface FrameworkField {
   options?: string[];
 }
 
+export interface Template {
+  id: string;
+  name: string;
+  description: string;
+  category: 'personal' | 'business' | 'technical' | 'creative';
+  fields: Record<string, string | string[]>;
+}
+
 export interface Framework {
   id: string;
   name: string;
   description: string;
   fields: FrameworkField[];
+  templates?: Template[];
   examples?: {
     general: Record<string, string | string[]>;
     business: Record<string, string | string[]>;
