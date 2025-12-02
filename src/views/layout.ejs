@@ -53,9 +53,14 @@
 <body>
   <header>
     <nav class="container">
-      <div>
-        <h1><a href="/" style="color: white; text-decoration: none; display: flex; align-items: center; gap: 0.75rem;"><img src="/simplicate.png" alt="Simplicate AI Logo" style="height: 40px; width: auto;">Prompt Framework Studio</a></h1>
-        <p style="margin: 0; padding-left: 3.25rem; font-size: 0.875rem; color: #95a5a6; font-style: italic;">Nothing but prompt</p>
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <a href="/" style="color: white; text-decoration: none;">
+          <img src="/simplicate.png" alt="Simplicate AI Logo" style="height: 40px; width: auto;">
+        </a>
+        <div>
+          <h1 style="margin: 0;"><a href="/" style="color: white; text-decoration: none;">Prompt Framework Studio</a></h1>
+          <p style="margin: 0; font-size: 0.875rem; color: #95a5a6; font-style: italic;">Nothing but prompt</p>
+        </div>
       </div>
       <ul>
         <% if (typeof user !== 'undefined' && user) { %>
