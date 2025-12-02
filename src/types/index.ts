@@ -38,6 +38,8 @@ export interface FrameworkField {
   type: 'text' | 'textarea' | 'number' | 'multi-select-criteria';
   placeholder?: string;
   required?: boolean;
+  optional?: boolean;
+  defaultValue?: string | string[];
   options?: string[];
 }
 

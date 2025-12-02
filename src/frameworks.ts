@@ -7,10 +7,10 @@ export const frameworks: Framework[] = [
     name: 'Tree-of-Thought (ToT)',
     description: 'Explore multiple reasoning paths and evaluate approaches to find the best solution.',
     fields: [
-      { name: 'role', label: 'Role', type: 'text', placeholder: 'e.g., expert problem solver', required: true },
+      { name: 'role', label: 'Role', type: 'text', placeholder: 'e.g., expert problem solver', required: true, defaultValue: 'expert problem solver' },
       { name: 'objective', label: 'Objective', type: 'textarea', placeholder: 'What problem needs to be solved?', required: true },
-      { name: 'approaches', label: 'Number of Approaches', type: 'number', placeholder: '3', required: true },
-      { name: 'criteria', label: 'Evaluation Criteria', type: 'multi-select-criteria', placeholder: 'Select or add criteria', required: true, options: [...DEFAULT_EVALUATION_CRITERIA] },
+      { name: 'approaches', label: 'Number of Approaches', type: 'number', placeholder: '3', required: true, defaultValue: '3' },
+      { name: 'criteria', label: 'Evaluation Criteria', type: 'multi-select-criteria', placeholder: 'Select or add criteria', required: true, options: [...DEFAULT_EVALUATION_CRITERIA], defaultValue: ['Accuracy/Correctness', 'Feasibility/Practicality', 'Completeness/Thoroughness', 'Clarity/Coherence'] },
     ],
     examples: {
       general: {
@@ -32,9 +32,9 @@ export const frameworks: Framework[] = [
     name: 'Self-Consistency',
     description: 'Generate multiple reasoning paths and select the most consistent answer.',
     fields: [
-      { name: 'role', label: 'Role', type: 'text', placeholder: 'e.g., analytical reasoner', required: true },
+      { name: 'role', label: 'Role', type: 'text', placeholder: 'e.g., analytical reasoner', required: true, defaultValue: 'analytical reasoner' },
       { name: 'goal', label: 'Goal', type: 'textarea', placeholder: 'What question needs to be answered?', required: true },
-      { name: 'versions', label: 'Number of Versions', type: 'number', placeholder: '3', required: true },
+      { name: 'versions', label: 'Number of Versions', type: 'number', placeholder: '3', required: true, defaultValue: '3' },
     ],
     examples: {
       general: {
@@ -54,9 +54,9 @@ export const frameworks: Framework[] = [
     name: 'Chain-of-Thought (CoT)',
     description: 'Break down complex problems into step-by-step reasoning.',
     fields: [
-      { name: 'role', label: 'Role', type: 'text', placeholder: 'e.g., logical thinker', required: true },
+      { name: 'role', label: 'Role', type: 'text', placeholder: 'e.g., logical thinker', required: true, defaultValue: 'logical thinker' },
       { name: 'problem', label: 'Problem', type: 'textarea', placeholder: 'Describe the problem to solve', required: true },
-      { name: 'context', label: 'Context', type: 'textarea', placeholder: 'Any relevant background information', required: false },
+      { name: 'context', label: 'Context', type: 'textarea', placeholder: 'Any relevant background information', required: false, optional: true },
     ],
     examples: {
       general: {
@@ -76,10 +76,10 @@ export const frameworks: Framework[] = [
     name: 'Few-Shot / Role Prompting',
     description: 'Provide examples and define a specific role for the AI to embody.',
     fields: [
-      { name: 'role', label: 'Role', type: 'text', placeholder: 'e.g., professional copywriter', required: true },
+      { name: 'role', label: 'Role', type: 'text', placeholder: 'e.g., professional copywriter', required: true, defaultValue: 'professional copywriter' },
       { name: 'tone', label: 'Tone Sample', type: 'textarea', placeholder: 'Example of desired tone/style', required: true },
       { name: 'task', label: 'Task', type: 'textarea', placeholder: 'What should be produced?', required: true },
-      { name: 'examples', label: 'Examples', type: 'textarea', placeholder: 'Provide 2-3 examples', required: false },
+      { name: 'examples', label: 'Examples', type: 'textarea', placeholder: 'Provide 2-3 examples', required: false, optional: true },
     ],
     examples: {
       general: {
@@ -101,7 +101,7 @@ export const frameworks: Framework[] = [
     name: 'Reflection / Revision',
     description: 'Generate an initial response, then critically evaluate and improve it.',
     fields: [
-      { name: 'role', label: 'Role', type: 'text', placeholder: 'e.g., critical editor', required: true },
+      { name: 'role', label: 'Role', type: 'text', placeholder: 'e.g., critical editor', required: true, defaultValue: 'critical editor' },
       { name: 'task', label: 'Task', type: 'textarea', placeholder: 'What needs to be created?', required: true },
       { name: 'criteria', label: 'Revision Criteria', type: 'textarea', placeholder: 'What should be improved?', required: true },
     ],

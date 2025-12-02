@@ -73,13 +73,19 @@
           if (field.type === 'multi-select-criteria') {
             return ``; // Rendered separately below
           }
+          if (field.optional) {
+            return ``; // Optional fields rendered in Advanced Options section
+          }
+          const defaultVal = field.defaultValue || '';
           return `<div class="form-group">
-            <label for="${field.name}">${field.label}${field.required ? ' *' : ''}</label>
+            <label for="${field.name}">${field.label}${field.required ? ' *' : ''}
+              ${defaultVal && field.type !== 'number' ? `<small style="color: #7f8c8d; font-weight: normal; margin-left: 0.5rem;">(using default)</small>` : ''}
+            </label>
             ${field.type === 'textarea' 
-              ? `<textarea id="${field.name}" name="${field.name}" placeholder="${field.placeholder || ''}" ${field.required ? 'required' : ''}></textarea>`
+              ? `<textarea id="${field.name}" name="${field.name}" placeholder="${field.placeholder || ''}" ${field.required ? 'required' : ''}>${defaultVal}</textarea>`
               : field.type === 'number' && (field.name === 'approaches' || field.name === 'versions')
-                ? `<input type="${field.type}" id="${field.name}" name="${field.name}" placeholder="${field.placeholder || ''}" value="3" min="1" max="5" ${field.required ? 'required' : ''}>`
-                : `<input type="${field.type}" id="${field.name}" name="${field.name}" placeholder="${field.placeholder || ''}" ${field.required ? 'required' : ''}>`
+                ? `<input type="${field.type}" id="${field.name}" name="${field.name}" placeholder="${field.placeholder || ''}" value="${defaultVal || '3'}" min="1" max="5" ${field.required ? 'required' : ''}>`
+                : `<input type="${field.type}" id="${field.name}" name="${field.name}" placeholder="${field.placeholder || ''}" value="${defaultVal}" ${field.required ? 'required' : ''}>`
             }
           </div>`;
         }).join('')}
@@ -105,9 +111,27 @@
             </div>
           </div>
           <input type="hidden" id="criteria" name="criteria" value="[]">
-          <small style="display: block; margin-top: 0.5rem; color: #7f8c8d; font-size: 0.85rem;"><span id="criteria-count">0</span>/4 criteria selected</small>
+          <small style="display: block; margin-top: 0.5rem; color: #7f8c8d; font-size: 0.85rem;"><span id="criteria-count">0</span>/4 criteria selected <span style="color: #95a5a6;">(4 defaults selected)</span></small>
         </div>` : '') + `
-        <div style="display: flex; gap: 0.5rem;">
+
+        ${framework.fields.some(f => f.optional) ? `
+        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ddd;">
+          <button type="button" id="toggle-advanced-btn" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: transparent; border: none; cursor: pointer; color: #3498db; font-size: 0.9rem;">
+            <span id="advanced-icon" style="transition: transform 0.2s;">▶</span>
+            <span>Advanced Options (optional)</span>
+          </button>
+          <div id="advanced-options" style="display: none; margin-top: 1rem;">
+            ${framework.fields.filter(f => f.optional).map(field => `
+              <div class="form-group">
+                <label for="${field.name}">${field.label}</label>
+                <textarea id="${field.name}" name="${field.name}" placeholder="${field.placeholder || ''}"></textarea>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        ` : ''}
+
+        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
           <button type="submit" class="btn" style="flex: 1;">Generate Preview</button>
           <button type="button" id="clear-form-btn" class="btn" style="flex: 0 0 auto; background: #95a5a6;">Clear Form</button>
         </div>
@@ -445,9 +469,34 @@ document.addEventListener('DOMContentLoaded', function() {
     updateHiddenInput();
   });
   
+  // Set default criteria if defined
+  const defaultCriteriaValues = criteriaFieldDef.defaultValue || [];
+  if (Array.isArray(defaultCriteriaValues) && defaultCriteriaValues.length > 0) {
+    selectedCriteria = [...defaultCriteriaValues];
+  }
+  
   renderCheckboxes();
   updateHiddenInput();
 });
+
+// Advanced options toggle
+const toggleAdvancedBtn = document.getElementById('toggle-advanced-btn');
+if (toggleAdvancedBtn) {
+  toggleAdvancedBtn.addEventListener('click', function() {
+    const advancedOptions = document.getElementById('advanced-options');
+    const advancedIcon = document.getElementById('advanced-icon');
+    
+    if (advancedOptions.style.display === 'none') {
+      advancedOptions.style.display = 'block';
+      advancedIcon.style.transform = 'rotate(90deg)';
+      advancedIcon.textContent = '▼';
+    } else {
+      advancedOptions.style.display = 'none';
+      advancedIcon.style.transform = 'rotate(0deg)';
+      advancedIcon.textContent = '▶';
+    }
+  });
+}
 
 // Clear form functionality
 const clearFormBtn = document.getElementById('clear-form-btn');
