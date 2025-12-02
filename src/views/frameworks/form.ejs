@@ -98,11 +98,14 @@
     <button type="button" 
             id="toggle-examples-btn" 
             style="display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem; background: #e8f4f8; border: 2px solid #3498db; border-radius: 4px; cursor: pointer; font-size: 0.95rem; color: #2c3e50; width: 100%; justify-content: space-between; transition: all 0.2s;">
-      <span style="display: flex; align-items: center; gap: 0.5rem;">
-        <span id="toggle-icon" style="font-size: 1.2rem; transition: transform 0.2s;">▶</span>
-        <strong>📝 View Reference Examples</strong>
+      <span style="display: flex; flex-direction: column; gap: 0.25rem;">
+        <span style="display: flex; align-items: center; gap: 0.5rem;">
+          <span id="toggle-icon" style="font-size: 1.2rem; transition: transform 0.2s;">▶</span>
+          <strong>📚 View Detailed Examples</strong>
+        </span>
+        <span style="color: #7f8c8d; font-size: 0.8rem; margin-left: 1.7rem;">Learn what makes a high-quality prompt</span>
       </span>
-      <span id="toggle-hint" style="color: #7f8c8d; font-size: 0.85rem;">Click to expand</span>
+      <span id="toggle-hint" style="color: #7f8c8d; font-size: 0.85rem; align-self: center;">Click to expand</span>
     </button>
     
     <div id="examples-container" style="display: none; background: #e8f4f8; border-left: 4px solid #3498db; border-right: 2px solid #3498db; border-bottom: 2px solid #3498db; padding: 1rem; border-radius: 0 0 4px 4px; margin-top: -2px;">
