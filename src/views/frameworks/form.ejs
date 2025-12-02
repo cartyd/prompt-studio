@@ -37,6 +37,25 @@
   font-size: 12px;
   font-weight: bold;
 }
+
+/* Custom scrollbar for template sidebar */
+#templates-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+#templates-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+#templates-container::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 3px;
+}
+
+#templates-container::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
 </style>
 <div style="max-width: 900px; margin: 0 auto;">
   <div style="margin-bottom: 1rem;">
@@ -45,53 +64,6 @@
 
   <h2 style="margin-bottom: 0.5rem;">${framework.name}</h2>
   <p style="color: #7f8c8d; margin-bottom: 2rem;">${framework.description}</p>
-
-  ${framework.templates && framework.templates.length > 0 ? `
-  <div style="margin-bottom: 2rem;">
-    <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">🚀 Quick Start Templates</h3>
-    <div id="templates-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
-      ${framework.templates.map(template => `
-        <div class="template-card" data-template-id="${template.id}" style="
-          background: white;
-          border: 2px solid #e0e0e0;
-          border-radius: 8px;
-          padding: 1rem;
-          cursor: pointer;
-          transition: all 0.2s;
-          position: relative;
-        ">
-          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-            <h4 style="margin: 0; font-size: 0.95rem; color: #2c3e50; line-height: 1.3;">${template.name}</h4>
-            <span class="template-category" style="
-              font-size: 0.7rem;
-              padding: 0.2rem 0.5rem;
-              border-radius: 12px;
-              background: ${
-                template.category === 'personal' ? '#e3f2fd' :
-                template.category === 'business' ? '#f3e5f5' :
-                template.category === 'technical' ? '#e8f5e9' :
-                '#fff3e0'
-              };
-              color: ${
-                template.category === 'personal' ? '#1976d2' :
-                template.category === 'business' ? '#7b1fa2' :
-                template.category === 'technical' ? '#388e3c' :
-                '#f57c00'
-              };
-              font-weight: 600;
-              flex-shrink: 0;
-              margin-left: 0.5rem;
-            ">${template.category}</span>
-          </div>
-          <p style="margin: 0; font-size: 0.85rem; color: #7f8c8d; line-height: 1.4;">${template.description}</p>
-          <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #f0f0f0;">
-            <span style="font-size: 0.75rem; color: #95a5a6;">Click to populate form</span>
-          </div>
-        </div>
-      `).join('')}
-    </div>
-  </div>
-  ` : ''}
 
   ${framework.examples ? `
   <div style="margin-bottom: 2rem;">
@@ -150,7 +122,7 @@
   </div>
   ` : ''}
 
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+  <div style="display: grid; grid-template-columns: ${framework.templates && framework.templates.length > 0 ? '1fr 1fr 320px' : '1fr 1fr'}; gap: 2rem; align-items: start;">
     <div>
       <h3 style="margin-bottom: 1rem;">Fill the Form</h3>
       <form hx-post="/frameworks/${framework.id}/generate" 
@@ -232,6 +204,52 @@
         <p style="color: #7f8c8d;">Fill out the form and click "Generate Preview" to see your prompt.</p>
       </div>
     </div>
+
+    ${framework.templates && framework.templates.length > 0 ? `
+    <div style="position: sticky; top: 1rem; height: calc(100vh - 2rem); overflow-y: auto; padding-right: 0.5rem;">
+      <h3 style="margin-bottom: 1rem; font-size: 1rem; color: #2c3e50;">🚀 Templates</h3>
+      <div id="templates-container" style="display: flex; flex-direction: column; gap: 0.75rem;">
+        ${framework.templates.map(template => `
+          <div class="template-card" data-template-id="${template.id}" style="
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+          ">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+              <h4 style="margin: 0; font-size: 0.875rem; color: #2c3e50; line-height: 1.3; padding-right: 1.5rem;">${template.name}</h4>
+              <span class="template-category" style="
+                font-size: 0.65rem;
+                padding: 0.15rem 0.4rem;
+                border-radius: 10px;
+                background: ${
+                  template.category === 'personal' ? '#e3f2fd' :
+                  template.category === 'business' ? '#f3e5f5' :
+                  template.category === 'technical' ? '#e8f5e9' :
+                  '#fff3e0'
+                };
+                color: ${
+                  template.category === 'personal' ? '#1976d2' :
+                  template.category === 'business' ? '#7b1fa2' :
+                  template.category === 'technical' ? '#388e3c' :
+                  '#f57c00'
+                };
+                font-weight: 600;
+                flex-shrink: 0;
+                position: absolute;
+                top: 0.875rem;
+                right: 0.875rem;
+              ">${template.category}</span>
+            </div>
+            <p style="margin: 0; font-size: 0.8rem; color: #7f8c8d; line-height: 1.35;">${template.description}</p>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    ` : ''}
   </div>
 </div>
 ` }) %>
