@@ -2,6 +2,7 @@ import { FastifyPluginAsync, FastifyReply } from 'fastify';
 import bcrypt from 'bcrypt';
 import { ERROR_MESSAGES } from '../constants';
 import { validateEmail, validatePassword, validateName } from '../validation';
+import { logEvent } from '../utils/analytics';
 
 function renderAuthError(reply: FastifyReply, template: 'auth/register' | 'auth/login', error: string) {
   return reply.view(template, { 
@@ -128,6 +129,9 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     }
 
     request.session.userId = user.id;
+
+    // Log login event
+    await logEvent(fastify.prisma, user.id, 'login');
 
     return reply.redirect('/frameworks');
   });

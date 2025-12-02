@@ -22,6 +22,7 @@ model User {
 
   prompts         Prompt[]
   customCriteria  CustomCriteria[]
+  events          Event[]
 }
 
 model Prompt {
@@ -45,4 +46,18 @@ model CustomCriteria {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, criteriaName])
+}
+
+model Event {
+  id        String   @id @default(cuid())
+  userId    String?
+  eventType String   // "login", "framework_view", "prompt_generate", "prompt_save"
+  metadata  String?  // JSON string with additional data (e.g., {"frameworkId": "tot"})
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([eventType])
+  @@index([createdAt])
 }

@@ -2,6 +2,7 @@ import { FastifyPluginAsync } from 'fastify';
 import { requireAuth } from '../plugins/auth';
 import { FREE_PROMPT_LIMIT } from '../types';
 import { ERROR_MESSAGES } from '../constants';
+import { logEvent } from '../utils/analytics';
 
 const MAX_FILENAME_LENGTH = 255; // Most filesystems support up to 255 characters
 const DEFAULT_FILENAME = 'prompt';
@@ -102,6 +103,13 @@ const promptRoutes: FastifyPluginAsync = async (fastify) => {
         title: title || `${frameworkName} Prompt`,
         finalPromptText: promptText,
       },
+    });
+
+    // Log prompt save event
+    await logEvent(fastify.prisma, request.user?.id, 'prompt_save', {
+      promptId: prompt.id,
+      frameworkType: frameworkId,
+      frameworkName,
     });
 
     return reply.view('partials/prompt-saved', {

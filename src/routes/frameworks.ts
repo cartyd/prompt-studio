@@ -2,6 +2,7 @@ import { FastifyPluginAsync } from 'fastify';
 import { requireAuth } from '../plugins/auth';
 import { frameworks, getFrameworkById, generatePrompt } from '../frameworks';
 import { ERROR_MESSAGES } from '../constants';
+import { logEvent } from '../utils/analytics';
 
 const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
   // List all frameworks
@@ -34,6 +35,12 @@ const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
       });
       customCriteria = criteria.map((c) => c.criteriaName);
     }
+
+    // Log framework view event
+    await logEvent(fastify.prisma, request.user?.id, 'framework_view', {
+      frameworkId,
+      frameworkName: framework.name,
+    });
 
     return reply.view('frameworks/form', {
       framework,
@@ -71,6 +78,12 @@ const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
     
     try {
       const promptText = generatePrompt(frameworkId, formData);
+      
+      // Log prompt generation event
+      await logEvent(fastify.prisma, request.user?.id, 'prompt_generate', {
+        frameworkId,
+        frameworkType: framework.name,
+      });
       
       return reply.view('partials/prompt-preview', {
         promptText,
