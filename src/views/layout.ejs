@@ -31,12 +31,152 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #333; }
     .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-    header { background: #2c3e50; color: white; padding: 1.25rem 0; margin-bottom: 2rem; }
-    nav { display: flex; justify-content: space-between; align-items: center; }
-    nav h1 { font-size: 1.5rem; }
-    nav ul { list-style: none; display: flex; gap: 1.5rem; }
-    nav a { color: white; text-decoration: none; }
-    nav a:hover { text-decoration: underline; }
+    
+    /* HEADER */
+    header { 
+      background: linear-gradient(to right, #1a2733, #2c3e50); 
+      color: white; 
+      margin-bottom: 2rem; 
+    }
+
+    .nav-header {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      align-items: center;
+      padding: 1rem 1rem;
+      gap: 0.5rem;
+    }
+
+    /* LEFT: Logo */
+    .nav-left { 
+      grid-column: 1 / span 4; 
+      text-align: left; 
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-left .logo { 
+      height: 60px; 
+      object-fit: contain; 
+    }
+
+    /* CENTER: Title & Tagline */
+    .nav-center { 
+      grid-column: 5 / span 4; 
+      text-align: center; 
+      color: white; 
+    }
+
+    .nav-center h1 { 
+      font-size: 1.5rem; 
+      font-weight: 600; 
+      margin-bottom: 0rem;
+    }
+
+    .nav-center p { 
+      font-size: 0.9rem; 
+      opacity: 0.85; 
+      margin: 0;
+    }
+
+    /* RIGHT: Premium button + Avatar */
+    .nav-right { 
+      grid-column: 9 / span 4; 
+      display: flex; 
+      justify-content: flex-end; 
+      align-items: center; 
+      gap: 1rem; 
+    }
+
+    /* PREMIUM BUTTON */
+    .btn-premium {
+      padding: 0.4rem 0.8rem;
+      border: 2px solid #F26631;
+      color: #FFFFFF;
+      border-radius: 20px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-premium:hover { 
+      background: #F26631; 
+      color: #FFFFFF; 
+    }
+
+    /* AVATAR */
+    .avatar-wrapper { position: relative; cursor: pointer; }
+    .avatar {
+      width: 36px; height: 36px;
+      background: #3498db; color: white;
+      border-radius: 50%;
+      display: flex; justify-content: center; align-items: center;
+      font-weight: bold; font-size: 0.95rem;
+    }
+
+    /* DROPDOWN MENU */
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 48px;
+      right: 0;
+      width: 170px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+      padding: 0.5rem 0;
+      z-index: 100;
+    }
+
+    .dropdown-menu hr {
+      border: none;
+      border-top: 1px solid #ddd;
+      margin: 0.5rem 0;
+    }
+
+    .dropdown-menu a, .dropdown-menu button {
+      display: block;
+      width: 100%;
+      padding: 0.5rem 1rem;
+      color: #333;
+      text-decoration: none;
+      font-size: 0.95rem;
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .dropdown-menu a:hover, .dropdown-menu button:hover {
+      background: #f2f2f2;
+    }
+
+    .dropdown-title {
+      padding: 0.5rem 1rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .dropdown-menu .logout {
+      color: #333;
+      font-weight: 600;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .nav-header { 
+        grid-template-columns: 1fr; 
+        row-gap: 0.75rem; 
+        text-align: center; 
+      }
+      .nav-left, .nav-center, .nav-right { 
+        grid-column: 1 / -1; 
+        justify-self: center; 
+      }
+      .nav-right { justify-content: center; gap: 0.5rem; }
+    }
+
     main { min-height: calc(100vh - 200px); }
     .btn { display: inline-block; padding: 0.5rem 1rem; background: #3498db; color: white; text-decoration: none; border-radius: 4px; border: none; cursor: pointer; font-size: 1rem; }
     .btn:hover { background: #2980b9; }
@@ -57,38 +197,63 @@
 </head>
 <body>
   <header>
-    <nav class="container">
-      <div style="display: flex; align-items: center; gap: 0.75rem;">
-        <a href="/" style="color: white; text-decoration: none;">
-          <img src="/simplicate.png" alt="Simplicate AI Logo" style="height: 40px; width: auto;">
-        </a>
-        <div>
-          <h1 style="margin: 0;"><a href="/" style="color: white; text-decoration: none;">Prompt Framework Studio</a></h1>
-          <p style="margin: 0; font-size: 0.875rem; color: #95a5a6; font-style: italic;">Nothing But Prompt</p>
+    <div class="container">
+      <nav class="nav-header">
+        
+        <!-- LEFT: Logo -->
+        <div class="nav-left">
+          <a href="/">
+            <img src="/simplicate.png" class="logo" alt="Simplicate AI Logo">
+          </a>
         </div>
-      </div>
-      <ul>
-        <% if (typeof user !== 'undefined' && user) { %>
-          <li><a href="/frameworks">Frameworks</a></li>
-          <li><a href="/prompts">My Prompts</a></li>
-          <li><a href="/premium">Premium</a></li>
-          <li>
-            <span style="margin-right: 1rem;"><%= user.name %></span>
-            <% if (typeof subscription !== 'undefined' && subscription && subscription.isPremium) { %>
-              <span class="badge badge-premium">Premium</span>
+
+        <!-- CENTER: Title & Tagline -->
+        <div class="nav-center">
+          <h1><a href="/" style="color: white; text-decoration: none;">Prompt Framework Studio</a></h1>
+          <p style="color: #95a5a6;"><em>Nothing But Prompt</em></p>
+        </div>
+
+        <!-- RIGHT: Premium Button + Avatar / Login -->
+        <div class="nav-right">
+          <% if (typeof user !== 'undefined' && user) { %>
+            <!-- Premium Button (if not premium) -->
+            <% if (!subscription || !subscription.isPremium) { %>
+              <a href="/premium" class="btn-premium">Upgrade to Premium</a>
             <% } %>
-          </li>
-          <li>
-            <form action="/auth/logout" method="POST" style="display: inline;">
-              <button type="submit" class="btn btn-secondary" style="padding: 0.25rem 0.75rem;">Logout</button>
-            </form>
-          </li>
-        <% } else { %>
-          <li><a href="/auth/login">Login</a></li>
-          <li><a href="/auth/register">Register</a></li>
-        <% } %>
-      </ul>
-    </nav>
+
+            <!-- Avatar with Dropdown -->
+            <div class="avatar-wrapper" id="avatar-wrapper">
+              <div class="avatar"><%= user.name.charAt(0).toUpperCase() %></div>
+              
+              <!-- Dropdown Menu -->
+              <div class="dropdown-menu" id="dropdown-menu">
+                <div class="dropdown-title">
+                  <%= user.name %>
+                  <% if (subscription && subscription.isPremium) { %>
+                    <span class="badge badge-premium" style="margin-left: 0.5rem;">Premium</span>
+                  <% } %>
+                </div>
+                <hr>
+                <a href="/frameworks">Frameworks</a>
+                <a href="/prompts">My Prompts</a>
+                <% if (!subscription || !subscription.isPremium) { %>
+                  <a href="/premium">Upgrade to Premium</a>
+                <% } %>
+                <hr>
+                <form action="/auth/logout" method="POST">
+                  <button type="submit" class="logout">Logout</button>
+                </form>
+              </div>
+            </div>
+          <% } else { %>
+            <!-- Login/Register for non-authenticated users -->
+            <a href="/auth/login" class="btn" style="padding: 0.4rem 0.8rem; font-size: 0.9rem;">Login</a>
+            <a href="/auth/register" class="btn" style="padding: 0.4rem 0.8rem; font-size: 0.9rem;">Register</a>
+          <% } %>
+        </div>
+
+      </nav>
+    </div>
   </header>
 
   <main class="container">
@@ -127,5 +292,25 @@
     }
   }
   </script>
+
+  <% if (typeof user !== 'undefined' && user) { %>
+  <script>
+    // Toggle dropdown menu when avatar is clicked
+    const avatarWrapper = document.getElementById('avatar-wrapper');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+
+    if (avatarWrapper && dropdownMenu) {
+      avatarWrapper.addEventListener('click', function(e) {
+        e.stopPropagation();
+        dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+      });
+
+      // Close dropdown if clicking outside
+      document.body.addEventListener('click', function() {
+        dropdownMenu.style.display = 'none';
+      });
+    }
+  </script>
+  <% } %>
 </body>
 </html>
