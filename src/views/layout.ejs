@@ -294,6 +294,30 @@
     
     .badge-premium { background: var(--color-warning); }
 
+    /* Utility spacing classes */
+    .ml-sm { margin-left: var(--spacing-sm); }
+    .ml-md { margin-left: var(--spacing-md); }
+    .mr-sm { margin-right: var(--spacing-sm); }
+    .mr-md { margin-right: var(--spacing-md); }
+    .mt-sm { margin-top: var(--spacing-sm); }
+    .mt-md { margin-top: var(--spacing-md); }
+    .mb-sm { margin-bottom: var(--spacing-sm); }
+    .mb-md { margin-bottom: var(--spacing-md); }
+
+    /* Utility display classes */
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .items-center { align-items: center; }
+    .justify-center { justify-content: center; }
+    .gap-sm { gap: var(--spacing-sm); }
+    .gap-md { gap: var(--spacing-md); }
+
+    /* Utility text classes */
+    .text-center { text-align: center; }
+    .text-muted { color: var(--color-text-light); }
+    .font-bold { font-weight: bold; }
+    .font-semibold { font-weight: 600; }
+
     /* ==========  FORMS  ========== */
     .form-group { margin-bottom: var(--spacing-md); }
     .form-group label { display: block; margin-bottom: var(--spacing-xs); font-weight: 500; }
@@ -308,6 +332,14 @@
   </style>
 </head>
 <body>
+  <%
+    // Helper variables to reduce repeated logic
+    const isAuthenticated = typeof user !== 'undefined' && user;
+    const isPremiumUser = isAuthenticated && subscription && subscription.isPremium;
+    const showPremiumUpgrade = isAuthenticated && !isPremiumUser;
+    const userInitial = isAuthenticated ? user.name.charAt(0).toUpperCase() : '';
+  %>
+  
   <header>
     <div class="container">
       <nav class="nav-header">
@@ -327,9 +359,9 @@
 
         <!-- RIGHT: Premium Button + Avatar / Login -->
         <div class="nav-right">
-          <% if (typeof user !== 'undefined' && user) { %>
+          <% if (isAuthenticated) { %>
             <!-- Premium Button (if not premium) -->
-            <% if (!subscription || !subscription.isPremium) { %>
+            <% if (showPremiumUpgrade) { %>
               <a href="/premium" class="btn-premium">Upgrade to Premium</a>
             <% } %>
 
@@ -340,21 +372,21 @@
                     aria-label="User menu"
                     aria-haspopup="true"
                     aria-expanded="false">
-              <div class="avatar"><%= user.name.charAt(0).toUpperCase() %></div>
+              <div class="avatar"><%= userInitial %></div>
             </button>
               
             <!-- Dropdown Menu -->
             <div class="dropdown-menu" id="dropdown-menu" role="menu" hidden>
                 <div class="dropdown-title">
                   <%= user.name %>
-                  <% if (subscription && subscription.isPremium) { %>
-                    <span class="badge badge-premium" style="margin-left: 0.5rem;">Premium</span>
+                  <% if (isPremiumUser) { %>
+                    <span class="badge badge-premium ml-sm">Premium</span>
                   <% } %>
                 </div>
                 <hr>
                 <a href="/frameworks" role="menuitem">Frameworks</a>
                 <a href="/prompts" role="menuitem">My Prompts</a>
-                <% if (!subscription || !subscription.isPremium) { %>
+                <% if (showPremiumUpgrade) { %>
                   <a href="/premium" role="menuitem">Upgrade to Premium</a>
                 <% } %>
                 <hr>
@@ -411,23 +443,25 @@
   }
   </script>
 
-  <% if (typeof user !== 'undefined' && user) { %>
+  <% if (isAuthenticated) { %>
   <script>
-    // Toggle dropdown menu when avatar is clicked
-    const avatarWrapper = document.getElementById('avatar-wrapper');
-    const dropdownMenu = document.getElementById('dropdown-menu');
+    // ==========  USER DROPDOWN MENU  ==========
+    (function() {
+      const avatarWrapper = document.getElementById('avatar-wrapper');
+      const dropdownMenu = document.getElementById('dropdown-menu');
 
-    if (avatarWrapper && dropdownMenu) {
+      if (!avatarWrapper || !dropdownMenu) return;
+
+      // Toggle dropdown on avatar click
       avatarWrapper.addEventListener('click', function(e) {
         e.stopPropagation();
         const isExpanded = this.getAttribute('aria-expanded') === 'true';
         
-        // Toggle dropdown
         dropdownMenu.toggleAttribute('hidden');
         this.setAttribute('aria-expanded', !isExpanded);
       });
 
-      // Close dropdown if clicking outside
+      // Close dropdown when clicking outside
       document.body.addEventListener('click', function() {
         if (!dropdownMenu.hasAttribute('hidden')) {
           dropdownMenu.setAttribute('hidden', '');
@@ -435,7 +469,7 @@
         }
       });
 
-      // Close on Escape key
+      // Close dropdown on Escape key and return focus
       document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && !dropdownMenu.hasAttribute('hidden')) {
           dropdownMenu.setAttribute('hidden', '');
@@ -443,7 +477,7 @@
           avatarWrapper.focus();
         }
       });
-    }
+    })();
   </script>
   <% } %>
 </body>
