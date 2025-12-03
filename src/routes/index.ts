@@ -1,6 +1,7 @@
 import { FastifyPluginAsync } from 'fastify';
 import { requireAuth, loadUserFromSession } from '../plugins/auth';
 import { TIME_CONSTANTS } from '../constants';
+import { getAppVersion } from '../utils/version';
 
 const indexRoutes: FastifyPluginAsync = async (fastify) => {
   // Home page
@@ -9,6 +10,17 @@ const indexRoutes: FastifyPluginAsync = async (fastify) => {
 
     return reply.view('home', {
       user: request.user,
+    });
+  });
+
+  // About page
+  fastify.get('/about', async (request, reply) => {
+    await loadUserFromSession(request);
+
+    return reply.view('about', {
+      user: request.user,
+      subscription: request.subscription,
+      version: getAppVersion(),
     });
   });
 
