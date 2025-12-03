@@ -4,8 +4,8 @@ import { ERROR_MESSAGES } from '../constants';
 import { validateEmail, validatePassword, validateName } from '../validation';
 import { logEvent } from '../utils/analytics';
 
-function renderAuthError(reply: FastifyReply, template: 'auth/register' | 'auth/login', error: string) {
-  return reply.view(template, { 
+async function renderAuthError(reply: FastifyReply, template: 'auth/register' | 'auth/login', error: string) {
+  return reply.viewWithCsrf(template, { 
     error,
     user: null 
   });
@@ -16,7 +16,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
   
   // Registration page
   fastify.get('/register', async (request, reply) => {
-    return reply.view('auth/register', { 
+    return reply.viewWithCsrf('auth/register', { 
       error: null,
       user: request.user 
     });
@@ -87,7 +87,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
 
   // Login page
   fastify.get('/login', async (request, reply) => {
-    return reply.view('auth/login', { 
+    return reply.viewWithCsrf('auth/login', { 
       error: null,
       user: request.user 
     });
@@ -138,8 +138,10 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     return reply.redirect('/frameworks');
   });
 
-  // Logout handler
-  fastify.post('/logout', async (request, reply) => {
+  // Logout handler with CSRF protection
+  fastify.post('/logout', {
+    onRequest: fastify.csrfProtection,
+  }, async (request, reply) => {
     await request.session.destroy();
     return reply.redirect('/');
   });

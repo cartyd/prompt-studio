@@ -6,6 +6,7 @@ import fastifyRateLimit from '@fastify/rate-limit';
 import fastifyView from '@fastify/view';
 import fastifyStatic from '@fastify/static';
 import fastifyFormbody from '@fastify/formbody';
+import fastifyCsrf from '@fastify/csrf-protection';
 import ejs from 'ejs';
 import path from 'path';
 import Database from 'better-sqlite3';
@@ -16,6 +17,7 @@ import { TIME_CONSTANTS } from './constants';
 // Plugins
 import prismaPlugin from './plugins/prisma';
 import authPlugin from './plugins/auth';
+import csrfPlugin from './plugins/csrf';
 
 // Routes
 import indexRoutes from './routes/index';
@@ -85,6 +87,11 @@ async function start() {
       },
     });
 
+    // Register CSRF protection
+    await server.register(fastifyCsrf, {
+      sessionPlugin: '@fastify/session',
+    });
+
     // Register form body parser
     await server.register(fastifyFormbody);
 
@@ -93,6 +100,9 @@ async function start() {
 
     // Register auth plugin
     await server.register(authPlugin);
+
+    // Register CSRF plugin
+    await server.register(csrfPlugin);
 
     // Register view engine
     await server.register(fastifyView, {

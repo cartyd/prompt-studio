@@ -8,7 +8,7 @@ const indexRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/', async (request, reply) => {
     await loadUserFromSession(request);
 
-    return reply.view('home', {
+    return reply.viewWithCsrf('home', {
       user: request.user,
     });
   });
@@ -17,7 +17,7 @@ const indexRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/about', async (request, reply) => {
     await loadUserFromSession(request);
 
-    return reply.view('about', {
+    return reply.viewWithCsrf('about', {
       user: request.user,
       subscription: request.subscription,
       version: getAppVersion(),
@@ -26,7 +26,7 @@ const indexRoutes: FastifyPluginAsync = async (fastify) => {
 
   // Premium page
   fastify.get('/premium', { preHandler: requireAuth }, async (request, reply) => {
-    return reply.view('premium', {
+    return reply.viewWithCsrf('premium', {
       user: request.user,
       subscription: request.subscription,
     });

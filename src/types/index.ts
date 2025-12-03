@@ -20,11 +20,18 @@ export interface AuthUser {
 declare module 'fastify' {
   interface FastifyInstance {
     prisma: PrismaClient;
+    csrfProtection(request: any, reply: any, done: () => void): void;
   }
 
   interface FastifyRequest {
     user?: AuthUser;
     subscription?: SubscriptionInfo;
+    generateCsrf(): Promise<string>;
+  }
+
+  interface FastifyReply {
+    generateCsrf(): Promise<string>;
+    viewWithCsrf(page: string, data?: Record<string, any>): Promise<void>;
   }
 
   interface Session {

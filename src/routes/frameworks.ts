@@ -7,7 +7,7 @@ import { logEvent } from '../utils/analytics';
 const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
   // List all frameworks
   fastify.get('/', { preHandler: requireAuth }, async (request, reply) => {
-    return reply.view('frameworks/list', {
+    return reply.viewWithCsrf('frameworks/list', {
       frameworks,
       user: request.user,
       subscription: request.subscription,
@@ -20,7 +20,7 @@ const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
     const framework = getFrameworkById(frameworkId);
 
     if (!framework) {
-      return reply.status(404).view('error', {
+      return reply.status(404).viewWithCsrf('error', {
         message: ERROR_MESSAGES.FRAMEWORKS.NOT_FOUND,
         user: request.user,
       });
@@ -42,7 +42,7 @@ const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
       frameworkName: framework.name,
     });
 
-    return reply.view('frameworks/form', {
+    return reply.viewWithCsrf('frameworks/form', {
       framework,
       user: request.user,
       subscription: request.subscription,

@@ -391,8 +391,8 @@
                 <hr>
                 <a href="/about" role="menuitem">About</a>
                 <hr>
-                <!-- TODO: Add CSRF protection token for enhanced security -->
                 <form action="/auth/logout" method="POST">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                   <button type="submit" class="logout" role="menuitem">Logout</button>
                 </form>
             </div>

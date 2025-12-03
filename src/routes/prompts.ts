@@ -41,7 +41,7 @@ const promptRoutes: FastifyPluginAsync = async (fastify) => {
       orderBy: { createdAt: 'desc' },
     });
 
-    return reply.view('prompts/list', {
+    return reply.viewWithCsrf('prompts/list', {
       prompts,
       user: request.user,
       subscription: request.subscription,
@@ -60,13 +60,13 @@ const promptRoutes: FastifyPluginAsync = async (fastify) => {
     });
 
     if (!prompt) {
-      return reply.status(404).view('error', {
+      return reply.status(404).viewWithCsrf('error', {
         message: ERROR_MESSAGES.PROMPTS.NOT_FOUND,
         user: request.user,
       });
     }
 
-    return reply.view('prompts/detail', {
+    return reply.viewWithCsrf('prompts/detail', {
       prompt,
       user: request.user,
       subscription: request.subscription,
@@ -142,7 +142,7 @@ const promptRoutes: FastifyPluginAsync = async (fastify) => {
   // Export prompt (premium only)
   fastify.get('/:id/export', { preHandler: requireAuth }, async (request, reply) => {
     if (!request.subscription!.isPremium) {
-      return reply.status(403).view('error', {
+      return reply.status(403).viewWithCsrf('error', {
         message: ERROR_MESSAGES.PROMPTS.EXPORT_PREMIUM_ONLY,
         user: request.user,
       });
@@ -158,7 +158,7 @@ const promptRoutes: FastifyPluginAsync = async (fastify) => {
     });
 
     if (!prompt) {
-      return reply.status(404).view('error', {
+      return reply.status(404).viewWithCsrf('error', {
         message: ERROR_MESSAGES.PROMPTS.NOT_FOUND,
         user: request.user,
       });
