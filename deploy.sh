@@ -13,9 +13,19 @@ echo "🚀 Starting deployment..."
 # Navigate to app directory
 cd $APP_DIR
 
+# Stash any local changes
+echo "💾 Stashing any local changes..."
+git stash
+
 # Pull latest changes
 echo "📥 Pulling latest code from $BRANCH..."
 git pull origin $BRANCH
+
+# Reapply stashed changes if any
+if git stash list | grep -q "stash@{0}"; then
+  echo "🔄 Reapplying stashed changes..."
+  git stash pop || echo "⚠️  Could not reapply stash (conflicts may exist)"
+fi
 
 # Install dependencies
 echo "📦 Installing dependencies..."
