@@ -12,6 +12,8 @@ function renderAuthError(reply: FastifyReply, template: 'auth/register' | 'auth/
 }
 
 const authRoutes: FastifyPluginAsync = async (fastify) => {
+  const isTest = process.env.NODE_ENV === 'test';
+  
   // Registration page
   fastify.get('/register', async (request, reply) => {
     return reply.view('auth/register', { 
@@ -23,7 +25,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
   // Registration handler
   fastify.post('/register', {
     config: {
-      rateLimit: {
+      rateLimit: isTest ? false : {
         max: 5,
         timeWindow: '5 minutes',
       },
@@ -94,7 +96,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
   // Login handler
   fastify.post('/login', {
     config: {
-      rateLimit: {
+      rateLimit: isTest ? false : {
         max: 5,
         timeWindow: '5 minutes',
       },

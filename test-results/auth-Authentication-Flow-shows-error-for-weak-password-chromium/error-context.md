@@ -1,0 +1,46 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - navigation [ref=e4]:
+      - link "Simplicate AI Logo" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - img "Simplicate AI Logo" [ref=e7]
+      - generic [ref=e8]:
+        - heading "Prompt Framework Studio" [level=1] [ref=e9]:
+          - link "Prompt Framework Studio" [ref=e10] [cursor=pointer]:
+            - /url: /
+        - paragraph [ref=e11]:
+          - emphasis [ref=e12]: Nothing But Prompt
+      - generic [ref=e13]:
+        - link "Login" [ref=e14] [cursor=pointer]:
+          - /url: /auth/login
+        - link "Register" [ref=e15] [cursor=pointer]:
+          - /url: /auth/register
+  - main [ref=e16]:
+    - generic [ref=e17]:
+      - heading "Create Account" [level=2] [ref=e18]
+      - generic [ref=e19]:
+        - generic [ref=e20]:
+          - generic [ref=e21]: Name
+          - textbox "Name" [ref=e22]: Test User
+        - generic [ref=e23]:
+          - generic [ref=e24]: Email
+          - textbox "Email" [ref=e25]: test-1764780591027-c8n3yn@example.com
+        - generic [ref=e26]:
+          - generic [ref=e27]: Password
+          - textbox "Password" [active] [ref=e28]: weak
+          - text: Minimum 8 characters
+        - button "Register" [ref=e29] [cursor=pointer]
+      - paragraph [ref=e30]:
+        - text: Already have an account?
+        - link "Login here" [ref=e31] [cursor=pointer]:
+          - /url: /auth/login
+  - contentinfo [ref=e32]:
+    - paragraph [ref=e34]:
+      - text: © 2026 Prompt Framework Studio by
+      - link "Simplicate AI" [ref=e35] [cursor=pointer]:
+        - /url: https://simplicate.ai
+      - text: . Created by Dave Carty.
+```

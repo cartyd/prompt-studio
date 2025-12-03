@@ -1,0 +1,55 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - navigation [ref=e4]:
+      - link "Simplicate AI Logo" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - img "Simplicate AI Logo" [ref=e7]
+      - generic [ref=e8]:
+        - heading "Prompt Framework Studio" [level=1] [ref=e9]:
+          - link "Prompt Framework Studio" [ref=e10] [cursor=pointer]:
+            - /url: /
+        - paragraph [ref=e11]:
+          - emphasis [ref=e12]: Nothing But Prompt
+      - generic [ref=e13]:
+        - link "Upgrade to Premium" [ref=e14] [cursor=pointer]:
+          - /url: /premium
+        - button "User menu" [ref=e15] [cursor=pointer]:
+          - generic [ref=e16]: T
+  - main [ref=e17]:
+    - heading "Prompting Frameworks" [level=2] [ref=e18]
+    - generic [ref=e19]:
+      - generic [ref=e20]:
+        - heading "Tree-of-Thought (ToT)" [level=3] [ref=e21]
+        - paragraph [ref=e22]: Explore multiple reasoning paths and evaluate approaches to find the best solution.
+        - link "Create Prompt" [ref=e23] [cursor=pointer]:
+          - /url: /frameworks/tot
+      - generic [ref=e24]:
+        - heading "Self-Consistency" [level=3] [ref=e25]
+        - paragraph [ref=e26]: Generate multiple reasoning paths and select the most consistent answer.
+        - link "Create Prompt" [ref=e27] [cursor=pointer]:
+          - /url: /frameworks/self-consistency
+      - generic [ref=e28]:
+        - heading "Chain-of-Thought (CoT)" [level=3] [ref=e29]
+        - paragraph [ref=e30]: Break down complex problems into step-by-step reasoning.
+        - link "Create Prompt" [ref=e31] [cursor=pointer]:
+          - /url: /frameworks/cot
+      - generic [ref=e32]:
+        - heading "Few-Shot / Role Prompting" [level=3] [ref=e33]
+        - paragraph [ref=e34]: Provide examples and define a specific role for the AI to embody.
+        - link "Create Prompt" [ref=e35] [cursor=pointer]:
+          - /url: /frameworks/role
+      - generic [ref=e36]:
+        - heading "Reflection / Revision" [level=3] [ref=e37]
+        - paragraph [ref=e38]: Generate an initial response, then critically evaluate and improve it.
+        - link "Create Prompt" [ref=e39] [cursor=pointer]:
+          - /url: /frameworks/reflection
+  - contentinfo [ref=e40]:
+    - paragraph [ref=e42]:
+      - text: © 2026 Prompt Framework Studio by
+      - link "Simplicate AI" [ref=e43] [cursor=pointer]:
+        - /url: https://simplicate.ai
+      - text: . Created by Dave Carty.
+```

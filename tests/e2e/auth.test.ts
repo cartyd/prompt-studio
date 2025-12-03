@@ -5,7 +5,7 @@ test.describe('Authentication Flow', () => {
   test('can register a new user', async ({ page }) => {
     const email = generateTestEmail();
     
-    await page.goto('/register');
+    await page.goto('/auth/register');
     await page.fill('input[name="name"]', 'Test User');
     await page.fill('input[name="email"]', email);
     await page.fill('input[name="password"]', 'TestPassword123!');
@@ -19,7 +19,7 @@ test.describe('Authentication Flow', () => {
   });
 
   test('shows error for invalid email', async ({ page }) => {
-    await page.goto('/register');
+    await page.goto('/auth/register');
     await page.fill('input[name="name"]', 'Test User');
     await page.fill('input[name="email"]', 'invalid-email');
     await page.fill('input[name="password"]', 'TestPassword123!');
@@ -33,7 +33,7 @@ test.describe('Authentication Flow', () => {
   test('shows error for weak password', async ({ page }) => {
     const email = generateTestEmail();
     
-    await page.goto('/register');
+    await page.goto('/auth/register');
     await page.fill('input[name="name"]', 'Test User');
     await page.fill('input[name="email"]', email);
     await page.fill('input[name="password"]', 'weak');
@@ -47,7 +47,7 @@ test.describe('Authentication Flow', () => {
   test('can login with existing user', async ({ page }) => {
     // First register
     const email = generateTestEmail();
-    await page.goto('/register');
+    await page.goto('/auth/register');
     await page.fill('input[name="name"]', 'Test User');
     await page.fill('input[name="email"]', email);
     await page.fill('input[name="password"]', 'TestPassword123!');
@@ -60,7 +60,7 @@ test.describe('Authentication Flow', () => {
     await page.waitForURL('/');
     
     // Login again
-    await page.goto('/login');
+    await page.goto('/auth/login');
     await page.fill('input[name="email"]', email);
     await page.fill('input[name="password"]', 'TestPassword123!');
     await page.click('button[type="submit"]');
@@ -71,7 +71,7 @@ test.describe('Authentication Flow', () => {
   });
 
   test('shows error for invalid credentials', async ({ page }) => {
-    await page.goto('/login');
+    await page.goto('/auth/login');
     await page.fill('input[name="email"]', 'nonexistent@example.com');
     await page.fill('input[name="password"]', 'WrongPassword123!');
     await page.click('button[type="submit"]');
@@ -85,7 +85,7 @@ test.describe('Authentication Flow', () => {
     const email = generateTestEmail();
     
     // Register
-    await page.goto('/register');
+    await page.goto('/auth/register');
     await page.fill('input[name="name"]', 'Test User');
     await page.fill('input[name="email"]', email);
     await page.fill('input[name="password"]', 'TestPassword123!');

@@ -5,7 +5,7 @@ import { Page } from '@playwright/test';
  */
 export async function registerAndLogin(page: Page, email: string, password: string, name: string = 'Test User') {
   // Register user
-  await page.goto('/register');
+  await page.goto('/auth/register');
   await page.fill('input[name="name"]', name);
   await page.fill('input[name="email"]', email);
   await page.fill('input[name="password"]', password);
@@ -19,7 +19,7 @@ export async function registerAndLogin(page: Page, email: string, password: stri
  * Helper to login an existing user
  */
 export async function login(page: Page, email: string, password: string) {
-  await page.goto('/login');
+  await page.goto('/auth/login');
   await page.fill('input[name="email"]', email);
   await page.fill('input[name="password"]', password);
   await page.click('button[type="submit"]');
