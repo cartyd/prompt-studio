@@ -5,9 +5,10 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsx scripts/bump-version.ts patch && tsc && cp -r src/views dist/",
-    "build:minor": "tsx scripts/bump-version.ts minor && tsc && cp -r src/views dist/",
-    "build:major": "tsx scripts/bump-version.ts major && tsc && cp -r src/views dist/",
+    "build": "tsc && cp -r src/views dist/",
+    "version:patch": "tsx scripts/bump-version.ts patch",
+    "version:minor": "tsx scripts/bump-version.ts minor",
+    "version:major": "tsx scripts/bump-version.ts major",
     "start": "node dist/server.js",
     "test": "jest",
     "test:watch": "jest --watch",

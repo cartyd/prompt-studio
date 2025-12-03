@@ -10,39 +10,49 @@ The current version is displayed in the About page, accessible from the user dro
 - **MINOR**: New functionality in a backward-compatible manner (e.g., 0.1.0 → 0.2.0)
 - **PATCH**: Backward-compatible bug fixes (e.g., 0.1.0 → 0.1.1)
 
-## Build Commands
+## Workflow for Version Management
 
-### Standard Build (Patch Bump)
+### Development Workflow
+1. Make your code changes
+2. Bump the version (see commands below)
+3. Build the project: `npm run build`
+4. Commit changes including the new version: `git commit -am "Your message"`
+5. Push to remote: `git push`
+6. Deploy to production: `./deploy-remote.sh`
+
+### Version Bump Commands
+
+**Patch Version (Bug fixes)**
+```bash
+npm run version:patch
+```
+Increments the patch version (0.1.0 → 0.1.1). Use for bug fixes.
+
+**Minor Version (New features)**
+```bash
+npm run version:minor
+```
+Increments the minor version (0.1.0 → 0.2.0). Use for new features.
+
+**Major Version (Breaking changes)**
+```bash
+npm run version:major
+```
+Increments the major version (0.1.0 → 1.0.0). Use for breaking changes.
+
+### Build Command
 ```bash
 npm run build
 ```
-This automatically increments the patch version (0.1.0 → 0.1.1) and builds the project.
-
-### Minor Version Bump
-```bash
-npm run build:minor
-```
-This increments the minor version (0.1.0 → 0.2.0) and builds the project.
-Use this when adding new features.
-
-### Major Version Bump
-```bash
-npm run build:major
-```
-This increments the major version (0.1.0 → 1.0.0) and builds the project.
-Use this for breaking changes.
-
-## Manual Version Bump
-If you need to bump the version without building:
-```bash
-tsx scripts/bump-version.ts [major|minor|patch]
-```
+Builds the project without changing the version.
 
 ## How It Works
 1. The version is stored in `package.json`
-2. The build script automatically runs `scripts/bump-version.ts` before compilation
-3. The `getAppVersion()` utility reads the version from `package.json` at runtime
-4. The version is displayed on the About page at `/about`
+2. You manually bump the version using `npm run version:patch|minor|major` commands
+3. The version is committed to git along with your code changes
+4. When deployed, the production server uses the same version from `package.json`
+5. The `getAppVersion()` utility reads the version from `package.json` at runtime
+6. The version is displayed on the About page at `/about`
 
 ## Viewing the Version
 Users can view the current app version by:
