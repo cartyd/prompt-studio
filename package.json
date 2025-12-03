@@ -44,7 +44,8 @@
     "ejs": "^3.1.10",
     "fastify": "^5.0.0",
     "fastify-plugin": "^4.5.1",
-    "fastify-session-better-sqlite3-store": "^2.1.2"
+    "fastify-session-better-sqlite3-store": "^2.1.2",
+    "typescript": "^5.6.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",
@@ -57,7 +58,6 @@
     "prisma": "^5.20.0",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
-    "tsx": "^4.19.1",
-    "typescript": "^5.6.3"
+    "tsx": "^4.19.1"
   }
 }
