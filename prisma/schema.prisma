@@ -49,15 +49,30 @@ model CustomCriteria {
 }
 
 model Event {
-  id        String   @id @default(cuid())
-  userId    String?
-  eventType String   // "login", "framework_view", "prompt_generate", "prompt_save"
-  metadata  String?  // JSON string with additional data (e.g., {"frameworkId": "tot"})
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  userId     String?
+  eventType  String   // "login", "framework_view", "prompt_generate", "prompt_save"
+  metadata   String?  // JSON string with additional data (e.g., {"frameworkId": "tot"})
+  
+  // Traffic source tracking
+  userAgent  String?  // Full user agent string
+  deviceType String?  // 'mobile' | 'tablet' | 'desktop' | 'bot' | 'unknown'
+  browser    String?  // Browser name and version
+  os         String?  // Operating system
+  
+  // Geographic tracking
+  ipAddress  String?  // User's IP address
+  country    String?  // Country code (e.g., 'US', 'GB')
+  region     String?  // State/province
+  city       String?  // City name
+  
+  createdAt  DateTime @default(now())
 
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([eventType])
   @@index([createdAt])
+  @@index([deviceType])
+  @@index([country])
 }

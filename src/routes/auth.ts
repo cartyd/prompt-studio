@@ -133,7 +133,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     request.session.userId = user.id;
 
     // Log login event
-    await logEvent(fastify.prisma, user.id, 'login');
+    await logEvent(fastify.prisma, request, user.id, 'login');
 
     return reply.redirect('/frameworks');
   });

@@ -37,7 +37,7 @@ const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
     }
 
     // Log framework view event
-    await logEvent(fastify.prisma, request.user?.id, 'framework_view', {
+    await logEvent(fastify.prisma, request, request.user?.id, 'framework_view', {
       frameworkId,
       frameworkName: framework.name,
     });
@@ -80,7 +80,7 @@ const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
       const promptText = generatePrompt(frameworkId, formData);
       
       // Log prompt generation event
-      await logEvent(fastify.prisma, request.user?.id, 'prompt_generate', {
+      await logEvent(fastify.prisma, request, request.user?.id, 'prompt_generate', {
         frameworkId,
         frameworkType: framework.name,
       });

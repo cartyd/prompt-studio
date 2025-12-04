@@ -106,7 +106,7 @@ const promptRoutes: FastifyPluginAsync = async (fastify) => {
     });
 
     // Log prompt save event
-    await logEvent(fastify.prisma, request.user?.id, 'prompt_save', {
+    await logEvent(fastify.prisma, request, request.user?.id, 'prompt_save', {
       promptId: prompt.id,
       frameworkType: frameworkId,
       frameworkName,
