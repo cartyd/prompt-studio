@@ -37,6 +37,7 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
 
     return reply.viewWithCsrf('admin/dashboard', {
       user: request.user,
+      subscription: request.subscription,
       stats: {
         totalUsers,
         premiumUsers,
@@ -74,6 +75,7 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
 
     return reply.viewWithCsrf('admin/users', {
       user: request.user,
+      subscription: request.subscription,
       users,
       pagination: {
         currentPage: page,
@@ -186,6 +188,7 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
 
     return reply.viewWithCsrf('admin/analytics', {
       user: request.user,
+      subscription: request.subscription,
       days,
       eventStats,
       dailyEvents,
