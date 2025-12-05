@@ -488,6 +488,12 @@
                   <% } %>
                 </div>
                 <hr>
+                <% if (user.isAdmin) { %>
+                  <a href="/admin/dashboard" role="menuitem"><strong>Admin Dashboard</strong></a>
+                  <a href="/admin/users" role="menuitem">Manage Users</a>
+                  <a href="/admin/analytics" role="menuitem">Analytics</a>
+                  <hr>
+                <% } %>
                 <a href="/frameworks" role="menuitem">Frameworks</a>
                 <a href="/prompts" role="menuitem">My Prompts</a>
                 <% if (showPremiumUpgrade) { %>

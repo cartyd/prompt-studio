@@ -135,6 +135,10 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     // Log login event
     await logEvent(fastify.prisma, request, user.id, 'login');
 
+    // Redirect admin users to dashboard, regular users to frameworks
+    if (user.isAdmin) {
+      return reply.redirect('/admin/dashboard');
+    }
     return reply.redirect('/frameworks');
   });
 
