@@ -10,6 +10,7 @@ const indexRoutes: FastifyPluginAsync = async (fastify) => {
 
     return reply.viewWithCsrf('home', {
       user: request.user,
+      subscription: request.subscription,
     });
   });
 

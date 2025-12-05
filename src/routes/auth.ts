@@ -140,7 +140,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
 
   // Logout handler with CSRF protection
   fastify.post('/logout', {
-    onRequest: fastify.csrfProtection,
+    preHandler: fastify.csrfProtection,
   }, async (request, reply) => {
     await request.session.destroy();
     return reply.redirect('/');

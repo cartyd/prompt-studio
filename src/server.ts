@@ -89,13 +89,13 @@ async function start() {
       },
     });
 
+    // Register form body parser BEFORE CSRF (CSRF needs to read _csrf from form body)
+    await server.register(fastifyFormbody);
+
     // Register CSRF protection
     await server.register(fastifyCsrf, {
       sessionPlugin: '@fastify/session',
     });
-
-    // Register form body parser
-    await server.register(fastifyFormbody);
 
     // Register Prisma
     await server.register(prismaPlugin);
