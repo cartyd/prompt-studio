@@ -72,6 +72,14 @@ npm run prisma:migrate:deploy
 echo "🔨 Building application..."
 npm run build
 
+# Clean up unnecessary files
+echo "🧹 Cleaning up production files..."
+if [ -f "$APP_DIR/cleanup-production.sh" ]; then
+  ./cleanup-production.sh
+else
+  echo "⚠️  Cleanup script not found, skipping..."
+fi
+
 # Restart PM2 process
 echo "♻️  Restarting application..."
 pm2 restart prompt-studio

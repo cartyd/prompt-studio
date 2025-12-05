@@ -1,0 +1,42 @@
+# Development files
+.vscode/
+.git/
+.gitignore
+.env.example
+tsconfig.json
+
+# Source files (only need compiled dist/)
+src/
+
+# Tests
+tests/
+test-results/
+playwright-report/
+playwright.config.ts
+jest.config.js
+coverage/
+
+# Documentation
+docs/
+README.md
+DEPLOYMENT.md
+TESTING.md
+VERSION.md
+
+# Scripts (except production utilities)
+scripts/reset-dev-users.ts
+scripts/bump-version.ts
+scripts/view-production-analytics.sh
+
+# Setup files
+setup-droplet.sh
+deploy-remote.sh
+nginx-config
+
+# Misc
+*.png
+*.jpg
+*.gif
+sh
+session.db
+dev.db*
