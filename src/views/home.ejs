@@ -1,101 +1,620 @@
 <% const title = 'Home'; %>
-<%- include('layout-wrapper', { body: `
+<%
+const bodyContent = `
 <style>
+  /* ==========  HERO SECTION  ========== */
   .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    padding-top: 50px;
+    padding-bottom: 50px;
     text-align: center;
-    padding: 2rem 0;
+    min-height: 500px;
   }
   
-  .hero h1 {
-    font-size: clamp(2rem, 5vw, 3rem);
-    margin-bottom: 1rem;
+  .hero-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
   }
   
-  .hero-description {
-    font-size: clamp(1rem, 3vw, 1.25rem);
-    color: var(--color-text-light);
+  .hero-content {
+    position: relative;
+    z-index: 5;
+    margin: 100px 0px;
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+  
+  .hero-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #3498db; /* Fallback for browsers without gradient support */
+    background: linear-gradient(90deg, #3498db, #d85c28);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -moz-background-clip: text;
+    -moz-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent; /* Standard property (future-proofing) */
+    background-size: 200% 100%;
+    background-position: left;
+    transition: background-position 1s ease;
+    cursor: pointer;
+  }
+  
+  /* Enhanced fallback for browsers without background-clip support */
+  @supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+    .hero-title {
+      color: #3498db;
+      -webkit-text-fill-color: inherit;
+      -moz-text-fill-color: inherit;
+      text-fill-color: inherit;
+    }
+  }
+  
+  .hero-title:hover {
+    background-position: right;
+  }
+  
+  .hero p {
+    font-size: 1.25rem;
+    color: #333;
     margin-bottom: 2rem;
   }
   
-  .hero-actions {
-    margin-bottom: 3rem;
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
+  .hero-btn {
+    font-size: 1.125rem;
+    padding: 0.75rem 1.5rem;
+    background-color: #d85c28;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
   }
   
-  .hero-btn {
-    font-size: clamp(1rem, 2vw, 1.125rem);
-    padding: 0.75rem 1.5rem;
-    min-height: var(--touch-target-min);
+  .hero-btn:hover {
+    background-color: #c04d20;
+    transform: translateY(-2px);
+  }
+  
+  .hero-btn i {
+    color: white;
+    font-size: 1em;
+  }
+  
+  /* ==========  CAROUSEL  ========== */
+  .hero-carousel-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    margin-top: 2rem;
+  }
+  
+  .hero-carousel-wrapper::after {
+    content: "";
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 50px;
+    background: radial-gradient(ellipse at center, rgba(221, 221, 221, 0.3) 0%, rgba(0,0,0,0) 80%);
+    pointer-events: none;
+    z-index: 2;
+  }
+  
+  .hero-carousel {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 60px;
+    z-index: 3;
+  }
+  
+  .hero-carousel img {
+    max-width: 460px;
+    max-height: 320px;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    transition: all 0.5s ease;
+    border-radius: 12px;
+  }
+  
+  .hero-carousel img.side {
+    max-width: 360px;
+    opacity: 0.5;
+    filter: blur(1px);
+  }
+  
+  .hero-carousel img.center {
+    opacity: 1;
+    filter: blur(0);
+  }
+  
+  .hero-carousel img.center:hover {
+    transform: scale(1.08);
+    filter: blur(0);
+  }
+  
+  
+  /* ==========  FEATURE GRID  ========== */
+  .feature-grid-wrapper {
+    position: relative;
+    margin: 3rem 0;
+  }
+  
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    background-color: #fff;
+    position: relative;
+    z-index: 1;
   }
   
   .feature-card {
-    padding: 1.5rem;
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    transition: transform 0.2s, box-shadow 0.2s;
+    padding: 2rem;
+    border: 1px solid #eee;
+    text-align: left;
+    transition: all 0.3s ease;
   }
   
-  .feature-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  .feature-card .icon {
+    font-size: 2.5rem;
+    color: #555;
+    margin-bottom: 1rem;
+    transition: color 0.3s ease;
   }
   
   .feature-card h3 {
-    margin-bottom: 0.5rem;
+    font-size: 1.4rem;
+    margin: 0.75rem 0;
+    color: #333;
+    transition: color 0.3s ease;
   }
   
-  @media (min-width: 768px) {
-    .hero {
-      padding: 3rem 0;
+  .feature-card p {
+    color: #555;
+    line-height: 1.6;
+  }
+  
+  .feature-card:hover {
+    border-color: #F26631;
+  }
+  
+  .feature-card:hover .icon {
+    color: #F26631;
+    transform: rotate(360deg);
+    transition: transform 0.6s ease;
+  }
+  
+  .feature-card:hover h3 {
+    color: #3498db;
+  }
+  
+  /* Decorative corners */
+  .corner {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    z-index: 2;
+  }
+  
+  .corner::before,
+  .corner::after {
+    content: "";
+    position: absolute;
+    background-color: #eee;
+  }
+  
+  .corner::before {
+    width: 2px;
+    height: 100%;
+    left: 0;
+    top: 0;
+  }
+  
+  .corner::after {
+    width: 100%;
+    height: 2px;
+    left: 0;
+    top: 0;
+  }
+  
+  .top-left {
+    top: -29px;
+    left: -29px;
+    transform: scaleX(-1) scaleY(-1);
+  }
+  
+  .top-right {
+    top: -29px;
+    right: -29px;
+    transform: scaleY(-1);
+  }
+  
+  .bottom-left {
+    bottom: -29px;
+    left: -29px;
+    transform: scaleX(-1);
+  }
+  
+  .bottom-right {
+    bottom: -29px;
+    right: -29px;
+  }
+  
+  /* ==========  RESPONSIVE  ========== */
+  @media (max-width: 768px) {
+    .hero-carousel img.side {
+      display: none;
+    }
+    
+    .hero-carousel {
+      gap: 0;
+    }
+    
+    .feature-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .corner {
+      display: none;
+    }
+  }
+  
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .feature-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (min-width: 1025px) {
+    .feature-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  /* Respect reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-title,
+    .hero-carousel img,
+    .feature-card .icon {
+      transition: none;
+    }
+    
+    .hero-carousel img {
+      animation: none;
     }
   }
 </style>
 
+<!-- HERO SECTION -->
 <div class="hero">
-  <h1>Prompt Framework Studio</h1>
-  <p class="hero-description">
-    Create structured, effective prompts using proven LLM prompting frameworks
-  </p>
-
-  ${!user ? `
-    <div class="hero-actions">
-      <a href="/auth/register" class="btn hero-btn">Get Started</a>
-      <a href="/auth/login" class="btn btn-secondary hero-btn">Login</a>
+  <canvas id="heroCanvas" class="hero-canvas" aria-hidden="true"></canvas>
+  <div class="hero-content">
+    <h1 class="hero-title">Prompt Framework Studio</h1>
+    <p>Create structured, effective prompts using proven LLM prompting frameworks</p>
+` + (!user ? `
+      <a href="/auth/register" class="btn hero-btn">
+        <i class='bx bx-frame'></i> Get Started
+      </a>
+` : `
+      <a href="/frameworks" class="btn hero-btn">
+        <i class='bx bx-frame'></i> Explore Frameworks
+      </a>
+`) + `
+  </div>
+  
+  <!-- CAROUSEL -->
+  <div class="hero-carousel-wrapper">
+    <div class="hero-carousel" id="heroCarousel" role="region" aria-label="Framework examples carousel">
+      <img src="/images/sc.png" class="side" alt="Self-Consistency Framework" loading="lazy">
+      <img src="/images/tot.png" class="center" alt="Tree-of-Thought Framework">
+      <img src="/images/cot.png" class="side" alt="Chain-of-Thought Framework" loading="lazy">
     </div>
-  ` : `
-    <div class="hero-actions">
-      <a href="/frameworks" class="btn hero-btn">Explore Frameworks</a>
-    </div>
-  `}
+  </div>
+  
 </div>
 
-<div class="grid grid-auto-fit grid-gap-xl" style="margin: 3rem 0;">
-  <div class="feature-card">
-    <h3>🌳 Multiple Frameworks</h3>
-    <p>Choose from Tree-of-Thought, Chain-of-Thought, Self-Consistency, Role-Based, and Reflection prompting strategies.</p>
+<!-- FEATURE GRID -->
+<div class="feature-grid-wrapper">
+  <div class="feature-grid">
+    <div class="feature-card">
+      <i class='bx bx-trees icon' aria-hidden="true"></i>
+      <h3>Multiple Frameworks</h3>
+      <p>Choose from Tree-of-Thought, Chain-of-Thought, Self-Consistency, Role-Based, and Reflection prompting strategies.</p>
+    </div>
+    <div class="feature-card">
+      <i class='bx bx-edit icon' aria-hidden="true"></i>
+      <h3>Guided Forms</h3>
+      <p>Fill out simple forms tailored to each framework to generate professional, structured prompts.</p>
+    </div>
+    <div class="feature-card">
+      <i class='bx bx-book icon' aria-hidden="true"></i>
+      <h3>Prompt Library</h3>
+      <p>Save your prompts to a personal library for easy access and reuse.</p>
+    </div>
+    <div class="feature-card">
+      <i class='bx bx-bolt icon' aria-hidden="true"></i>
+      <h3>Real-Time Preview</h3>
+      <p>See your prompt generated in real-time as you fill out the form.</p>
+    </div>
+    <div class="feature-card">
+      <i class='bx bx-rocket icon' aria-hidden="true"></i>
+      <h3>Premium Features</h3>
+      <p>Upgrade for unlimited saved prompts and export capabilities.</p>
+    </div>
+    <div class="feature-card">
+      <i class='bx bx-lock icon' aria-hidden="true"></i>
+      <h3>Secure & Private</h3>
+      <p>Your prompts are private and secure, accessible only to you.</p>
+    </div>
   </div>
-  <div class="feature-card">
-    <h3>📝 Guided Forms</h3>
-    <p>Fill out simple forms tailored to each framework to generate professional, structured prompts.</p>
-  </div>
-  <div class="feature-card">
-    <h3>💾 Prompt Library</h3>
-    <p>Save your prompts to a personal library for easy access and reuse.</p>
-  </div>
-  <div class="feature-card">
-    <h3>⚡ Real-Time Preview</h3>
-    <p>See your prompt generated in real-time as you fill out the form.</p>
-  </div>
-  <div class="feature-card">
-    <h3>🚀 Premium Features</h3>
-    <p>Upgrade for unlimited saved prompts and export capabilities.</p>
-  </div>
-  <div class="feature-card">
-    <h3>🔒 Secure & Private</h3>
-    <p>Your prompts are private and secure, accessible only to you.</p>
-  </div>
+  
+  <!-- Decorative corner lines -->
+  <div class="corner top-left" aria-hidden="true"></div>
+  <div class="corner top-right" aria-hidden="true"></div>
+  <div class="corner bottom-left" aria-hidden="true"></div>
+  <div class="corner bottom-right" aria-hidden="true"></div>
 </div>
-` }) %>
+
+<script>
+  // ==========  CANVAS NODE SYSTEM  ==========
+  (function() {
+    // Respect reduced motion preference
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+    
+    class Node {
+      constructor(canvas, colors) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5);
+        this.vy = (Math.random() - 0.5);
+        this.radius = CONFIG.NODE.MIN_RADIUS + Math.random() * (CONFIG.NODE.MAX_RADIUS - CONFIG.NODE.MIN_RADIUS);
+        this.colors = colors;
+        this.color = this.colors[Math.floor(Math.random() * this.colors.length)];
+      }
+      
+      draw() {
+        this.ctx.beginPath();
+        this.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        this.ctx.fillStyle = this.color;
+        this.ctx.fill();
+      }
+      
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > this.canvas.width) this.vx = -this.vx;
+        if (this.y < 0 || this.y > this.canvas.height) this.vy = -this.vy;
+      }
+    }
+    
+    class NodeSystem {
+      constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        if (!this.canvas) {
+          console.warn(`Canvas element with id "${canvasId}" not found`);
+          return;
+        }
+        
+        // Try to get 2d context with error handling
+        try {
+          this.ctx = this.canvas.getContext('2d');
+          if (!this.ctx) {
+            console.error('Failed to get 2d context from canvas');
+            return;
+          }
+        } catch (error) {
+          console.error('Error getting canvas context:', error);
+          return;
+        }
+        
+        this.nodes = [];
+        this.colors = [CONFIG.COLORS.PRIMARY, CONFIG.COLORS.ACCENT, CONFIG.COLORS.NEUTRAL];
+        this.maxDistance = CONFIG.NODE.MAX_CONNECTION_DISTANCE;
+        this.mouseX = 0;
+        this.mouseY = 0;
+        this.mouseActive = false;
+        this.mouseTimer = null;
+        this.animationId = null;
+        this.isInitialized = true;
+        
+        // Optimize for mobile
+        this.isMobile = window.innerWidth < CONFIG.MOBILE_BREAKPOINT;
+        this.nodeCount = this.isMobile ? CONFIG.NODE.COUNT_MOBILE : CONFIG.NODE.COUNT_DESKTOP;
+        
+        // Bind methods to preserve context
+        this.handleResize = () => this.resizeCanvas();
+        this.handleMouseMove = (e) => this.onMouseMove(e);
+        
+        this.init();
+        window.addEventListener('resize', this.handleResize);
+        window.addEventListener('mousemove', this.handleMouseMove);
+      }
+      
+      init() {
+        this.resizeCanvas();
+        for (let i = 0; i < this.nodeCount; i++) {
+          this.nodes.push(new Node(this.canvas, this.colors));
+        }
+        this.animate();
+      }
+      
+      resizeCanvas() {
+        this.canvas.width = this.canvas.offsetWidth;
+        this.canvas.height = this.canvas.offsetHeight;
+      }
+      
+      onMouseMove(e) {
+        const rect = this.canvas.getBoundingClientRect();
+        this.mouseX = e.clientX - rect.left;
+        this.mouseY = e.clientY - rect.top;
+        this.mouseActive = true;
+        clearTimeout(this.mouseTimer);
+        this.mouseTimer = setTimeout(() => this.mouseActive = false, CONFIG.GLOW.TIMEOUT_MS);
+      }
+      
+      drawGlow() {
+        if (!this.mouseActive) return;
+        const gradient = this.ctx.createRadialGradient(
+          this.mouseX, this.mouseY, 0,
+          this.mouseX, this.mouseY, CONFIG.GLOW.RADIUS
+        );
+        gradient.addColorStop(0, CONFIG.GLOW.COLOR_START);
+        gradient.addColorStop(1, CONFIG.GLOW.COLOR_END);
+        this.ctx.beginPath();
+        this.ctx.fillStyle = gradient;
+        this.ctx.arc(this.mouseX, this.mouseY, CONFIG.GLOW.RADIUS, 0, Math.PI * 2);
+        this.ctx.fill();
+      }
+      
+      drawConnections() {
+        // Optimize by checking squared distance first (avoids sqrt)
+        const maxDistSquared = this.maxDistance * this.maxDistance;
+        
+        for (let i = 0; i < this.nodes.length; i++) {
+          const a = this.nodes[i];
+          
+          for (let j = i + 1; j < this.nodes.length; j++) {
+            const b = this.nodes[j];
+            const dx = a.x - b.x;
+            const dy = a.y - b.y;
+            const distSquared = dx * dx + dy * dy;
+            
+            // Early exit if too far (without expensive sqrt)
+            if (distSquared >= maxDistSquared) continue;
+            
+            // Only calculate actual distance when we know we'll draw
+            const dist = Math.sqrt(distSquared);
+            const opacity = 1 - dist / this.maxDistance;
+            
+            this.ctx.beginPath();
+            this.ctx.strokeStyle = CONFIG.COLORS.NEUTRAL.replace('0.5', opacity.toFixed(2));
+            this.ctx.lineWidth = 1;
+            this.ctx.moveTo(a.x, a.y);
+            this.ctx.lineTo(b.x, b.y);
+            this.ctx.stroke();
+          }
+        }
+      }
+      
+      animate() {
+        this.animationId = requestAnimationFrame(() => this.animate());
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.nodes.forEach(n => {
+          n.update();
+          n.draw();
+        });
+        this.drawConnections();
+        this.drawGlow();
+      }
+      
+      destroy() {
+        // Only clean up if properly initialized
+        if (!this.isInitialized) return;
+        
+        // Clean up event listeners
+        if (this.handleResize) {
+          window.removeEventListener('resize', this.handleResize);
+        }
+        if (this.handleMouseMove) {
+          window.removeEventListener('mousemove', this.handleMouseMove);
+        }
+        
+        // Cancel animation frame
+        if (this.animationId) {
+          cancelAnimationFrame(this.animationId);
+        }
+        
+        // Clear timer
+        if (this.mouseTimer) {
+          clearTimeout(this.mouseTimer);
+        }
+        
+        this.isInitialized = false;
+      }
+    }
+    
+    const nodeSystem = new NodeSystem('heroCanvas');
+    
+    // Clean up on page unload (optional but good practice)
+    window.addEventListener('beforeunload', () => {
+      if (nodeSystem && typeof nodeSystem.destroy === 'function') {
+        nodeSystem.destroy();
+      }
+    });
+  })();
+  
+  // ==========  CAROUSEL  ==========
+  (function() {
+    const carousel = document.getElementById('heroCarousel');
+    if (!carousel) return;
+    
+    // Configuration
+    const CAROUSEL_INTERVAL_MS = 3000;
+    
+    let imgs = Array.from(carousel.children);
+    let intervalId = null;
+    
+    // Respect reduced motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      return;
+    }
+    
+    function rotateCarousel() {
+      imgs.push(imgs.shift());
+      imgs.forEach(img => img.classList.remove('center', 'side'));
+      imgs[1].classList.add('center');
+      imgs[0].classList.add('side');
+      imgs[2].classList.add('side');
+      for (let i = 3; i < imgs.length; i++) {
+        imgs[i].classList.add('side');
+        imgs[i].style.opacity = '0';
+      }
+      imgs.forEach(img => carousel.appendChild(img));
+    }
+    
+    function startCarousel() {
+      if (intervalId) clearInterval(intervalId);
+      intervalId = setInterval(rotateCarousel, CAROUSEL_INTERVAL_MS);
+    }
+    
+    // Pause on hover
+    carousel.addEventListener('mouseenter', () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    });
+    
+    // Resume on mouse leave
+    carousel.addEventListener('mouseleave', () => {
+      startCarousel();
+    });
+    
+    // Start auto-rotation
+    startCarousel();
+  })();
+</script>
+`;
+%>
+<%- include('layout-wrapper', { body: bodyContent }) %>

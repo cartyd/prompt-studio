@@ -25,6 +25,7 @@ import authRoutes from './routes/auth';
 import frameworkRoutes from './routes/frameworks';
 import promptRoutes from './routes/prompts';
 import customCriteriaRoutes from './routes/custom-criteria';
+import adminRoutes from './routes/admin';
 
 const PORT = parseInt(process.env.PORT || '3000', 10);
 const HOST = process.env.HOST || '0.0.0.0';
@@ -62,8 +63,9 @@ async function start() {
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],
-          styleSrc: ["'self'", "'unsafe-inline'"],
+          styleSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://cdn.boxicons.com"],
           scriptSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com"],
+          fontSrc: ["'self'", "https://unpkg.com", "https://cdn.boxicons.com", "data:"],
           imgSrc: ["'self'", "data:"],
         },
       },
@@ -125,6 +127,7 @@ async function start() {
     await server.register(frameworkRoutes, { prefix: '/frameworks' });
     await server.register(promptRoutes, { prefix: '/prompts' });
     await server.register(customCriteriaRoutes, { prefix: '/api/custom-criteria' });
+    await server.register(adminRoutes, { prefix: '/admin' });
 
     // Start server
     await server.listen({ port: PORT, host: HOST });
