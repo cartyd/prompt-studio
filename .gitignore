@@ -12,3 +12,4 @@ coverage/
 *.sqlite-journal
 sessions.db
 sessions.db-journal
+docs/assets/layout/
