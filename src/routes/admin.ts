@@ -164,15 +164,21 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
     });
 
     // Daily event counts
-    const dailyEvents = await fastify.prisma.$queryRaw<Array<{ date: string; count: number }>>`
+    const dailyEvents = await fastify.prisma.$queryRaw<Array<{ date: string; count: bigint }>>`
       SELECT 
-        DATE(createdAt) as date,
+        date(createdAt/1000, 'unixepoch') as date,
         COUNT(*) as count
       FROM Event
-      WHERE createdAt >= ${since.toISOString()}
-      GROUP BY DATE(createdAt)
+      WHERE createdAt >= ${since.getTime()}
+      GROUP BY date(createdAt/1000, 'unixepoch')
       ORDER BY date DESC
     `;
+    
+    // Convert bigint count to number for display
+    const dailyEventsFormatted = dailyEvents.map(e => ({
+      date: e.date,
+      count: Number(e.count)
+    }));
 
     // Browser distribution
     const browserStats = await fastify.prisma.event.groupBy({
@@ -191,7 +197,7 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
       subscription: request.subscription,
       days,
       eventStats,
-      dailyEvents,
+      dailyEvents: dailyEventsFormatted,
       browserStats,
     });
   });
