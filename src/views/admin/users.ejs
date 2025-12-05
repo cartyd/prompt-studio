@@ -131,7 +131,7 @@
 
 <div class="pagination">
   ${pagination.currentPage > 1 
-    ? \`<a href="/admin/users?page=\${pagination.currentPage - 1}">&laquo; Previous</a>\` 
+    ? '<a href="/admin/users?page=' + (pagination.currentPage - 1) + '">&laquo; Previous</a>' 
     : '<span>&laquo; Previous</span>'}
   
   <span class="current">
@@ -140,7 +140,7 @@
   </span>
   
   ${pagination.currentPage < pagination.totalPages 
-    ? \`<a href="/admin/users?page=\${pagination.currentPage + 1}">Next &raquo;</a>\` 
+    ? '<a href="/admin/users?page=' + (pagination.currentPage + 1) + '">Next &raquo;</a>' 
     : '<span>Next &raquo;</span>'}
 </div>
 `, user, subscription }) %>
