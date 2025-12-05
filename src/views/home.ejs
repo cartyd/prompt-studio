@@ -216,6 +216,36 @@
     color: #3498db;
   }
   
+  /* Active state for touch devices */
+  .feature-card.active {
+    border-color: #F26631;
+  }
+  
+  .feature-card.active .icon {
+    color: #F26631;
+    transform: rotate(360deg);
+  }
+  
+  .feature-card.active h3 {
+    color: #3498db;
+  }
+  
+  /* On touch devices, disable hover and use active class */
+  @media (hover: none) and (pointer: coarse) {
+    .feature-card:hover {
+      border-color: #eee;
+    }
+    
+    .feature-card:hover .icon {
+      color: #555;
+      transform: none;
+    }
+    
+    .feature-card:hover h3 {
+      color: #333;
+    }
+  }
+  
   /* Decorative corners */
   .corner {
     position: absolute;
@@ -648,6 +678,33 @@
     
     // Start auto-rotation
     startCarousel();
+  })();
+  
+  // ==========  FEATURE CARD TOUCH SUPPORT  ==========
+  (function() {
+    // Only add touch handlers on touch devices
+    if (!('ontouchstart' in window)) return;
+    
+    const featureCards = document.querySelectorAll('.feature-card');
+    
+    featureCards.forEach(card => {
+      card.addEventListener('touchstart', function(e) {
+        // Remove active class from all other cards
+        featureCards.forEach(c => {
+          if (c !== this) c.classList.remove('active');
+        });
+        
+        // Toggle active class on this card
+        this.classList.toggle('active');
+      });
+    });
+    
+    // Remove active class when tapping outside
+    document.addEventListener('touchstart', function(e) {
+      if (!e.target.closest('.feature-card')) {
+        featureCards.forEach(card => card.classList.remove('active'));
+      }
+    });
   })();
 </script>
 `;
