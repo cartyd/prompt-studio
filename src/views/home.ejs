@@ -379,6 +379,29 @@ const bodyContent = `
       return;
     }
     
+    // Configuration object
+    const CONFIG = {
+      NODE: {
+        MIN_RADIUS: 2,
+        MAX_RADIUS: 4,
+        COUNT_DESKTOP: 40,
+        COUNT_MOBILE: 20,
+        MAX_CONNECTION_DISTANCE: 120
+      },
+      COLORS: {
+        PRIMARY: 'rgba(52, 152, 219, 0.5)',
+        ACCENT: 'rgba(216, 92, 40, 0.5)',
+        NEUTRAL: 'rgba(200, 200, 200, 0.5)'
+      },
+      GLOW: {
+        RADIUS: 100,
+        TIMEOUT_MS: 150,
+        COLOR_START: 'rgba(255, 223, 0, 0.25)',
+        COLOR_END: 'rgba(255, 223, 0, 0)'
+      },
+      MOBILE_BREAKPOINT: 768
+    };
+    
     class Node {
       constructor(canvas, colors) {
         this.canvas = canvas;
