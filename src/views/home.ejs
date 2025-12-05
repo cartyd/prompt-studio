@@ -216,34 +216,21 @@
     color: #3498db;
   }
   
-  /* Active state for touch devices */
-  .feature-card.active {
+  /* Make cards tappable on mobile with active/focus states */
+  .feature-card:active,
+  .feature-card:focus-within {
     border-color: #F26631;
   }
   
-  .feature-card.active .icon {
+  .feature-card:active .icon,
+  .feature-card:focus-within .icon {
     color: #F26631;
     transform: rotate(360deg);
   }
   
-  .feature-card.active h3 {
+  .feature-card:active h3,
+  .feature-card:focus-within h3 {
     color: #3498db;
-  }
-  
-  /* On touch devices, disable hover and use active class */
-  @media (hover: none) and (pointer: coarse) {
-    .feature-card:hover {
-      border-color: #eee;
-    }
-    
-    .feature-card:hover .icon {
-      color: #555;
-      transform: none;
-    }
-    
-    .feature-card:hover h3 {
-      color: #333;
-    }
   }
   
   /* Decorative corners */
@@ -374,32 +361,32 @@
 <!-- FEATURE GRID -->
 <div class="feature-grid-wrapper">
   <div class="feature-grid">
-    <div class="feature-card">
+    <div class="feature-card" tabindex="0">
       <i class='bx bx-trees icon' aria-hidden="true"></i>
       <h3>Multiple Frameworks</h3>
       <p>Choose from Tree-of-Thought, Chain-of-Thought, Self-Consistency, Role-Based, and Reflection prompting strategies.</p>
     </div>
-    <div class="feature-card">
+    <div class="feature-card" tabindex="0">
       <i class='bx bx-edit icon' aria-hidden="true"></i>
       <h3>Guided Forms</h3>
       <p>Fill out simple forms tailored to each framework to generate professional, structured prompts.</p>
     </div>
-    <div class="feature-card">
+    <div class="feature-card" tabindex="0">
       <i class='bx bx-book icon' aria-hidden="true"></i>
       <h3>Prompt Library</h3>
       <p>Save your prompts to a personal library for easy access and reuse.</p>
     </div>
-    <div class="feature-card">
+    <div class="feature-card" tabindex="0">
       <i class='bx bx-bolt icon' aria-hidden="true"></i>
       <h3>Real-Time Preview</h3>
       <p>See your prompt generated in real-time as you fill out the form.</p>
     </div>
-    <div class="feature-card">
+    <div class="feature-card" tabindex="0">
       <i class='bx bx-rocket icon' aria-hidden="true"></i>
       <h3>Premium Features</h3>
       <p>Upgrade for unlimited saved prompts and export capabilities.</p>
     </div>
-    <div class="feature-card">
+    <div class="feature-card" tabindex="0">
       <i class='bx bx-lock icon' aria-hidden="true"></i>
       <h3>Secure & Private</h3>
       <p>Your prompts are private and secure, accessible only to you.</p>
@@ -678,33 +665,6 @@
     
     // Start auto-rotation
     startCarousel();
-  })();
-  
-  // ==========  FEATURE CARD TOUCH SUPPORT  ==========
-  (function() {
-    // Only add touch handlers on touch devices
-    if (!('ontouchstart' in window)) return;
-    
-    const featureCards = document.querySelectorAll('.feature-card');
-    
-    featureCards.forEach(card => {
-      card.addEventListener('touchstart', function(e) {
-        // Remove active class from all other cards
-        featureCards.forEach(c => {
-          if (c !== this) c.classList.remove('active');
-        });
-        
-        // Toggle active class on this card
-        this.classList.toggle('active');
-      });
-    });
-    
-    // Remove active class when tapping outside
-    document.addEventListener('touchstart', function(e) {
-      if (!e.target.closest('.feature-card')) {
-        featureCards.forEach(card => card.classList.remove('active'));
-      }
-    });
   })();
 </script>
 `;
