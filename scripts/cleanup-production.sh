@@ -52,9 +52,9 @@ rm -f session.db  # empty duplicate
 echo "🔐 Removing .git directory..."
 rm -rf .git/
 
-# Remove scripts except create-admin (might be useful)
-echo "📦 Cleaning scripts directory..."
-find scripts/ -type f ! -name 'create-admin.ts' -delete 2>/dev/null || true
+# Remove all scripts (can be run remotely via SSH if needed)
+echo "📦 Removing scripts directory..."
+rm -rf scripts/
 
 echo "✅ Production cleanup complete!"
 echo ""
