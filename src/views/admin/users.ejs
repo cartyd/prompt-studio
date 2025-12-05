@@ -1,0 +1,146 @@
+<% const title = 'User Management'; %>
+<%- include('../layout-wrapper', { body: `
+<style>
+  .admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  
+  .users-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  
+  .users-table th {
+    text-align: left;
+    padding: 1rem;
+    background: #f5f5f5;
+    font-weight: 600;
+    border-bottom: 2px solid #e0e0e0;
+  }
+  
+  .users-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .users-table tr:hover {
+    background: #fafafa;
+  }
+  
+  .badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  
+  .badge-premium {
+    background: #f39c12;
+    color: white;
+  }
+  
+  .badge-admin {
+    background: #e74c3c;
+    color: white;
+  }
+  
+  .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  
+  .pagination a, .pagination span {
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    color: var(--color-primary);
+  }
+  
+  .pagination .current {
+    font-weight: bold;
+    color: var(--color-text);
+  }
+</style>
+
+<div class="admin-header">
+  <h1>User Management</h1>
+  <a href="/admin/dashboard" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+
+<table class="users-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Subscription</th>
+      <th>Prompts</th>
+      <th>Events</th>
+      <th>Joined</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    ${users.map(u => `
+      <tr>
+        <td>
+          ${u.name}
+          ${u.isAdmin ? '<span class="badge badge-admin ml-sm">Admin</span>' : ''}
+        </td>
+        <td>${u.email}</td>
+        <td>
+          ${u.subscriptionTier === 'premium' 
+            ? '<span class="badge badge-premium">Premium</span>' 
+            : 'Free'}
+        </td>
+        <td>${u._count.prompts}</td>
+        <td>${u._count.events}</td>
+        <td>${new Date(u.createdAt).toLocaleDateString()}</td>
+        <td>
+          <form action="/admin/users/${u.id}/toggle-premium" method="POST" style="display: inline;">
+            <input type="hidden" name="_csrf" value="${csrfToken}">
+            <button type="submit" class="btn btn-sm btn-secondary">
+              ${u.subscriptionTier === 'premium' ? 'Remove' : 'Make'} Premium
+            </button>
+          </form>
+          <form action="/admin/users/${u.id}/toggle-admin" method="POST" style="display: inline;">
+            <input type="hidden" name="_csrf" value="${csrfToken}">
+            <button type="submit" class="btn btn-sm ${u.isAdmin ? 'btn-danger' : ''}">
+              ${u.isAdmin ? 'Remove' : 'Make'} Admin
+            </button>
+          </form>
+        </td>
+      </tr>
+    `).join('')}
+  </tbody>
+</table>
+
+<div class="pagination">
+  ${pagination.currentPage > 1 
+    ? \`<a href="/admin/users?page=\${pagination.currentPage - 1}">&laquo; Previous</a>\` 
+    : '<span>&laquo; Previous</span>'}
+  
+  <span class="current">
+    Page ${pagination.currentPage} of ${pagination.totalPages}
+    (${pagination.totalUsers} total users)
+  </span>
+  
+  ${pagination.currentPage < pagination.totalPages 
+    ? \`<a href="/admin/users?page=\${pagination.currentPage + 1}">Next &raquo;</a>\` 
+    : '<span>Next &raquo;</span>'}
+</div>
+`, user, subscription }) %>
