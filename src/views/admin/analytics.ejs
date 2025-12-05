@@ -117,6 +117,27 @@
   </table>
 </div>
 
+<!-- Time of Day Distribution -->
+<div class="analytics-section">
+  <h2>Time of Day Distribution</h2>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Time Period</th>
+        <th>Events</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${timeOfDayStats.map(stat => `
+        <tr>
+          <td>${stat.period}</td>
+          <td>${stat.count}</td>
+        </tr>
+      `).join('')}
+    </tbody>
+  </table>
+</div>
+
 <!-- Browser Stats -->
 <div class="analytics-section">
   <h2>Browser Distribution</h2>

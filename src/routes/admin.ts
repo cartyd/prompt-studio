@@ -179,7 +179,35 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
       date: e.date,
       count: Number(e.count)
     }));
-
+    
+    // Time of day distribution (6-hour increments)
+    // Morning: 6-11, Afternoon: 12-17, Evening: 18-23, Night: 0-5
+    const timeOfDayQuery = await fastify.prisma.$queryRaw<Array<{ period: string; count: bigint }>>`
+      SELECT 
+        CASE 
+          WHEN CAST(strftime('%H', createdAt/1000, 'unixepoch', 'localtime') AS INTEGER) BETWEEN 6 AND 11 THEN 'Morning (6am-12pm)'
+          WHEN CAST(strftime('%H', createdAt/1000, 'unixepoch', 'localtime') AS INTEGER) BETWEEN 12 AND 17 THEN 'Afternoon (12pm-6pm)'
+          WHEN CAST(strftime('%H', createdAt/1000, 'unixepoch', 'localtime') AS INTEGER) BETWEEN 18 AND 23 THEN 'Evening (6pm-12am)'
+          ELSE 'Night (12am-6am)'
+        END as period,
+        COUNT(*) as count
+      FROM Event
+      WHERE createdAt >= ${since.getTime()}
+      GROUP BY period
+      ORDER BY 
+        CASE period
+          WHEN 'Morning (6am-12pm)' THEN 1
+          WHEN 'Afternoon (12pm-6pm)' THEN 2
+          WHEN 'Evening (6pm-12am)' THEN 3
+          WHEN 'Night (12am-6am)' THEN 4
+        END
+    `;
+    
+    const timeOfDayStats = timeOfDayQuery.map(t => ({
+      period: t.period,
+      count: Number(t.count)
+    }));
+    
     // Browser distribution
     const browserStats = await fastify.prisma.event.groupBy({
       by: ['browser'],
@@ -198,6 +226,7 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
       days,
       eventStats,
       dailyEvents: dailyEventsFormatted,
+      timeOfDayStats,
       browserStats,
     });
   });
