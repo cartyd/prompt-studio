@@ -129,6 +129,31 @@ async function start() {
     await server.register(customCriteriaRoutes, { prefix: '/api/custom-criteria' });
     await server.register(adminRoutes, { prefix: '/admin' });
 
+    // Custom error handler for production
+    server.setErrorHandler((error, request, reply) => {
+      const isProduction = process.env.NODE_ENV === 'production';
+      
+      // Log the full error
+      server.log.error(error);
+      
+      if (isProduction) {
+        // In production, hide sensitive error details
+        reply.status(error.statusCode || 500).send({
+          statusCode: error.statusCode || 500,
+          error: error.statusCode === 404 ? 'Not Found' : 'Internal Server Error',
+          message: error.statusCode === 404 ? error.message : 'An error occurred processing your request'
+        });
+      } else {
+        // In development, show full error details
+        reply.status(error.statusCode || 500).send({
+          statusCode: error.statusCode || 500,
+          error: error.name || 'Error',
+          message: error.message,
+          stack: error.stack
+        });
+      }
+    });
+
     // Start server
     await server.listen({ port: PORT, host: HOST });
     server.log.info(`Server listening on http://${HOST}:${PORT}`);

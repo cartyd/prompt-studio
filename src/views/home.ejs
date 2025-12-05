@@ -1,7 +1,19 @@
 <% const title = 'Home'; %>
-<%
-const bodyContent = `
+<% const bodyContent = String.raw`
 <style>
+  /* ==========  HOME PAGE SPECIFIC STYLES  ========== */
+  header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 999;
+  }
+  
+  main {
+    padding-top: 80px !important;
+  }
+  
   /* ==========  HERO SECTION  ========== */
   .hero {
     display: flex;
@@ -434,7 +446,7 @@ const bodyContent = `
       constructor(canvasId) {
         this.canvas = document.getElementById(canvasId);
         if (!this.canvas) {
-          console.warn(`Canvas element with id "${canvasId}" not found`);
+          console.warn('Canvas element with id "' + canvasId + '" not found');
           return;
         }
         
