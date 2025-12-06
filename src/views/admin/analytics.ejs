@@ -138,6 +138,31 @@
   </table>
 </div>
 
+<!-- Framework Usage Stats -->
+<div class="analytics-section">
+  <h2>Framework Usage</h2>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Framework</th>
+        <th>Views</th>
+        <th>Prompts Generated</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${frameworkStats.length > 0 ? frameworkStats.map(stat => `
+        <tr>
+          <td><strong>${stat.name}</strong></td>
+          <td>${stat.views}</td>
+          <td>${stat.generates}</td>
+          <td><strong>${stat.total}</strong></td>
+        </tr>
+      `).join('') : '<tr><td colspan="4" style="text-align: center; color: #7f8c8d;">No framework usage data available for this period</td></tr>'}
+    </tbody>
+  </table>
+</div>
+
 <!-- Browser Stats -->
 <div class="analytics-section">
   <h2>Browser Distribution</h2>

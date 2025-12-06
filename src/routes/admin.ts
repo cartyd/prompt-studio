@@ -220,6 +220,55 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
       take: 10,
     });
 
+    // Framework usage statistics (extract from metadata)
+    const frameworkEvents = await fastify.prisma.event.findMany({
+      where: {
+        createdAt: { gte: since },
+        eventType: { in: ['framework_view', 'prompt_generate'] },
+        metadata: { not: null },
+      },
+      select: {
+        eventType: true,
+        metadata: true,
+      },
+    });
+
+    // Parse metadata and aggregate framework stats
+    const frameworkStatsMap = new Map<string, { views: number; generates: number }>();
+    
+    for (const event of frameworkEvents) {
+      if (event.metadata) {
+        try {
+          const metadata = JSON.parse(event.metadata);
+          const frameworkName = metadata.frameworkName || metadata.frameworkType;
+          
+          if (frameworkName) {
+            const stats = frameworkStatsMap.get(frameworkName) || { views: 0, generates: 0 };
+            
+            if (event.eventType === 'framework_view') {
+              stats.views++;
+            } else if (event.eventType === 'prompt_generate') {
+              stats.generates++;
+            }
+            
+            frameworkStatsMap.set(frameworkName, stats);
+          }
+        } catch (e) {
+          // Skip invalid JSON
+        }
+      }
+    }
+
+    // Convert to array and sort by total usage
+    const frameworkStats = Array.from(frameworkStatsMap.entries())
+      .map(([name, stats]) => ({
+        name,
+        views: stats.views,
+        generates: stats.generates,
+        total: stats.views + stats.generates,
+      }))
+      .sort((a, b) => b.total - a.total);
+
     return reply.viewWithCsrf('admin/analytics', {
       user: request.user,
       subscription: request.subscription,
@@ -228,6 +277,7 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
       dailyEvents: dailyEventsFormatted,
       timeOfDayStats,
       browserStats,
+      frameworkStats,
     });
   });
 };
