@@ -16,7 +16,7 @@ import { TIME_CONSTANTS } from './constants';
 
 // Plugins
 import prismaPlugin from './plugins/prisma';
-import authPlugin from './plugins/auth';
+import authPlugin, { loadUserFromSession } from './plugins/auth';
 import csrfPlugin from './plugins/csrf';
 
 // Routes
@@ -129,43 +129,70 @@ async function start() {
     await server.register(customCriteriaRoutes, { prefix: '/api/custom-criteria' });
     await server.register(adminRoutes, { prefix: '/admin' });
 
-    // Custom error handler for production
-    server.setErrorHandler((error, _request, reply) => {
+    // 404 handler - must be registered after all routes
+    server.setNotFoundHandler(async (request, reply) => {
+      await loadUserFromSession(request);
+      return reply.status(404).viewWithCsrf('errors/404', {
+        user: request.user,
+        subscription: request.subscription,
+        message: `The page "${request.url}" could not be found.`,
+      });
+    });
+
+    // Custom error handler
+    server.setErrorHandler(async (error, request, reply) => {
       const isProduction = process.env.NODE_ENV === 'production';
-      
-      // Log the full error
-      server.log.error(error);
       
       // Type guard to check if error has expected properties
       const statusCode = typeof error === 'object' && error !== null && 'statusCode' in error 
         ? (error.statusCode as number) 
         : 500;
-      const errorName = typeof error === 'object' && error !== null && 'name' in error 
-        ? (error.name as string) 
-        : 'Error';
       const errorMessage = typeof error === 'object' && error !== null && 'message' in error 
         ? (error.message as string) 
         : 'Unknown error';
-      const errorStack = typeof error === 'object' && error !== null && 'stack' in error 
-        ? (error.stack as string) 
-        : undefined;
       
-      if (isProduction) {
-        // In production, hide sensitive error details
-        reply.status(statusCode).send({
-          statusCode,
-          error: statusCode === 404 ? 'Not Found' : 'Internal Server Error',
-          message: statusCode === 404 ? errorMessage : 'An error occurred processing your request'
-        });
-      } else {
-        // In development, show full error details
-        reply.status(statusCode).send({
-          statusCode,
-          error: errorName,
-          message: errorMessage,
-          stack: errorStack
+      // Log the full error with context
+      server.log.error({
+        error,
+        url: request.url,
+        method: request.method,
+        statusCode,
+        userId: request.session?.userId,
+      }, 'Error occurred');
+      
+      // Load user session for error pages
+      await loadUserFromSession(request);
+      
+      // Render appropriate error page based on status code
+      const errorPages: Record<number, string> = {
+        400: 'errors/400',
+        403: 'errors/403',
+        500: 'errors/500',
+      };
+      
+      const errorTemplate = errorPages[statusCode];
+      
+      if (errorTemplate) {
+        // Render branded error page for known error codes
+        const displayMessage = isProduction && statusCode === 500 
+          ? 'An error occurred processing your request' 
+          : errorMessage;
+        
+        return reply.status(statusCode).viewWithCsrf(errorTemplate, {
+          user: request.user,
+          subscription: request.subscription,
+          message: displayMessage,
         });
       }
+      
+      // For other errors, render 500 page as fallback
+      return reply.status(statusCode).viewWithCsrf('errors/500', {
+        user: request.user,
+        subscription: request.subscription,
+        message: isProduction 
+          ? 'An unexpected error occurred' 
+          : errorMessage,
+      });
     });
 
     // Start server

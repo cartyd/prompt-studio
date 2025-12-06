@@ -1,10 +1,165 @@
 <% const title = '404 - Not Found'; %>
-<%- include('../layout-wrapper', { body: `
-<div style="max-width: 600px; margin: 0 auto; text-align: center; padding: 3rem 0;">
-  <h2 style="margin-bottom: 1rem; color: #e74c3c;">404 - Not Found</h2>
-  <p style="font-size: 1.25rem; color: #7f8c8d; margin-bottom: 1.5rem;">${message || 'The page you are looking for does not exist.'}</p>
-  <div style="margin-top: 2rem;">
-    <a href="/" class="btn">Go Home</a>
+<% const bodyContent = `
+<style>
+  .error-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    text-align: center;
+    padding: 2rem 1rem;
+  }
+  
+  .error-icon {
+    font-size: 6rem;
+    color: #3498db;
+    margin-bottom: 1rem;
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  .error-code {
+    font-size: 8rem;
+    font-weight: 800;
+    color: #3498db;
+    background: linear-gradient(90deg, #3498db, #d85c28);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -moz-background-clip: text;
+    -moz-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    line-height: 1;
+  }
+  
+  @supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+    .error-code {
+      color: #3498db;
+      -webkit-text-fill-color: inherit;
+      -moz-text-fill-color: inherit;
+    }
+  }
+  
+  .error-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1rem;
+  }
+  
+  .error-message {
+    font-size: 1.25rem;
+    color: #7f8c8d;
+    margin-bottom: 2rem;
+    max-width: 600px;
+  }
+  
+  .error-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .error-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 1.125rem;
+    text-decoration: none;
+    border-radius: 50px;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .error-btn-primary {
+    background-color: #d85c28;
+    color: white;
+  }
+  
+  .error-btn-primary:hover {
+    background-color: #c04d20;
+    transform: translateY(-2px);
+  }
+  
+  .error-btn-secondary {
+    background-color: #3498db;
+    color: white;
+  }
+  
+  .error-btn-secondary:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+  }
+  
+  .error-btn i {
+    font-size: 1.2em;
+  }
+  
+  @media (max-width: 768px) {
+    .error-code {
+      font-size: 5rem;
+    }
+    
+    .error-title {
+      font-size: 1.5rem;
+    }
+    
+    .error-message {
+      font-size: 1rem;
+    }
+    
+    .error-actions {
+      flex-direction: column;
+      width: 100%;
+      max-width: 300px;
+    }
+    
+    .error-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .error-icon {
+      animation: none;
+    }
+  }
+</style>
+
+<div class="error-page">
+  <i class='bx bx-confused error-icon' aria-hidden="true"></i>
+  <div class="error-code">404</div>
+  <h1 class="error-title">Page Not Found</h1>
+  <p class="error-message">
+    ${message || "Oops! The page you're looking for doesn't exist. It might have been moved or deleted."}
+  </p>
+  <div class="error-actions">
+    <a href="/" class="error-btn error-btn-primary">
+      <i class='bx bx-home'></i>
+      Go Home
+    </a>
+` + (user ? `
+    <a href="/frameworks" class="error-btn error-btn-secondary">
+      <i class='bx bx-frame'></i>
+      Browse Frameworks
+    </a>
+` : `
+    <a href="/auth/register" class="error-btn error-btn-secondary">
+      <i class='bx bx-user-plus'></i>
+      Get Started
+    </a>
+`) + `
   </div>
 </div>
-` }) %>
+`;
+%>
+<%- include('../layout-wrapper', { body: bodyContent }) %>

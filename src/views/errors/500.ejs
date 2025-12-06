@@ -1,4 +1,4 @@
-<% const title = '400 - Bad Request'; %>
+<% const title = '500 - Internal Server Error'; %>
 <% const bodyContent = `
 <style>
   .error-page {
@@ -15,13 +15,12 @@
     font-size: 6rem;
     color: #e74c3c;
     margin-bottom: 1rem;
-    animation: shake 0.5s ease-in-out;
+    animation: blink 1.5s ease-in-out infinite;
   }
   
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-10px); }
-    75% { transform: translateX(10px); }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
   }
   
   .error-code {
@@ -137,11 +136,11 @@
 </style>
 
 <div class="error-page">
-  <i class='bx bx-error error-icon' aria-hidden="true"></i>
-  <div class="error-code">400</div>
-  <h1 class="error-title">Bad Request</h1>
+  <i class='bx bx-bug error-icon' aria-hidden="true"></i>
+  <div class="error-code">500</div>
+  <h1 class="error-title">Internal Server Error</h1>
   <p class="error-message">
-    ${message || "Your request could not be processed. Please check your input and try again."}
+    ${message || "Something went wrong on our end. We're working to fix it. Please try again later."}
   </p>
   <div class="error-actions">
     <a href="/" class="error-btn error-btn-primary">

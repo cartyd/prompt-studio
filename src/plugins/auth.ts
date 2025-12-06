@@ -4,7 +4,7 @@ import { SubscriptionInfo, AuthUser, SubscriptionTier } from '../types';
 
 export async function requireAuth(request: FastifyRequest, reply: FastifyReply) {
   if (!request.session.userId) {
-    return reply.status(401).redirect('/auth/login');
+    return reply.redirect('/auth/login');
   }
 
   const user = await request.server.prisma.user.findUnique({
@@ -13,7 +13,7 @@ export async function requireAuth(request: FastifyRequest, reply: FastifyReply) 
 
   if (!user) {
     await request.session.destroy();
-    return reply.status(401).redirect('/auth/login');
+    return reply.redirect('/auth/login');
   }
 
   request.user = {
