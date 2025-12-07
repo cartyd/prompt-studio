@@ -34,6 +34,7 @@
     <div style="text-align: center; padding: 2rem; background: #f8f9fa; border-radius: 8px;">
       <p style="margin-bottom: 1rem; color: #7f8c8d;">For testing purposes, you can upgrade to premium using the button below.</p>
       <form method="POST" action="/admin/make-premium">
+        <input type="hidden" name="_csrf" value="${csrfToken}">
         <button type="submit" class="btn" style="font-size: 1.125rem; padding: 0.75rem 2rem;">Upgrade to Premium (Test)</button>
       </form>
     </div>

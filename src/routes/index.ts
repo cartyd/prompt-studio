@@ -34,7 +34,9 @@ const indexRoutes: FastifyPluginAsync = async (fastify) => {
   });
 
   // Admin endpoint to make user premium (for testing)
-  fastify.post('/admin/make-premium', { preHandler: requireAuth }, async (request, reply) => {
+  fastify.post('/admin/make-premium', { 
+    preHandler: [requireAuth, fastify.csrfProtection] 
+  }, async (request, reply) => {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + TIME_CONSTANTS.PREMIUM_SUBSCRIPTION_DAYS);
 

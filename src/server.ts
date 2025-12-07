@@ -26,6 +26,7 @@ import frameworkRoutes from './routes/frameworks';
 import promptRoutes from './routes/prompts';
 import customCriteriaRoutes from './routes/custom-criteria';
 import adminRoutes from './routes/admin';
+import legalRoutes from './routes/legal';
 
 const PORT = parseInt(process.env.PORT || '3000', 10);
 const HOST = process.env.HOST || '0.0.0.0';
@@ -128,6 +129,7 @@ async function start() {
     await server.register(promptRoutes, { prefix: '/prompts' });
     await server.register(customCriteriaRoutes, { prefix: '/api/custom-criteria' });
     await server.register(adminRoutes, { prefix: '/admin' });
+    await server.register(legalRoutes, { prefix: '/legal' });
 
     // 404 handler - must be registered after all routes
     server.setNotFoundHandler(async (request, reply) => {
