@@ -1,0 +1,19 @@
+<% const title = 'Verification Failed'; %>
+<%- include('../layout-wrapper', { body: `
+<div style="max-width: 600px; margin: 0 auto; text-align: center;">
+  <div style="font-size: 48px; margin-bottom: 1rem;">❌</div>
+  <h2 style="margin-bottom: 1rem;">Verification Failed</h2>
+  
+  <div class="error">
+    <p>${error}</p>
+  </div>
+  
+  <p style="margin: 2rem 0;">
+    The verification link may have expired or is invalid. You can request a new verification email.
+  </p>
+  
+  <div style="margin: 2rem 0;">
+    <a href="/auth/login" class="btn btn-secondary">Back to Login</a>
+  </div>
+</div>
+`, user }) %>

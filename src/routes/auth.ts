@@ -3,11 +3,18 @@ import bcrypt from 'bcrypt';
 import { ERROR_MESSAGES } from '../constants';
 import { validateEmail, validatePassword, validateName } from '../validation';
 import { logEvent } from '../utils/analytics';
+import { createVerificationToken, validateAndConsumeToken } from '../utils/tokens';
+import { sendVerificationEmail, sendPasswordResetEmail, sendPasswordChangedNotification } from '../utils/email';
 
-async function renderAuthError(reply: FastifyReply, template: 'auth/register' | 'auth/login', error: string) {
-  return reply.viewWithCsrf(template, { 
+async function renderAuthError(
+  reply: FastifyReply,
+  template: 'auth/register' | 'auth/login' | 'auth/forgot-password',
+  error: string
+) {
+  return reply.viewWithCsrf(template, {
     error,
-    user: null 
+    user: null,
+    success: null,
   });
 }
 
@@ -69,20 +76,34 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       return renderAuthError(reply, 'auth/register', ERROR_MESSAGES.AUTH.EMAIL_ALREADY_REGISTERED);
     }
 
-    // Hash password and create user
+    // Hash password and create user (not verified by default)
     const passwordHash = await bcrypt.hash(password, 10);
     const user = await fastify.prisma.user.create({
       data: {
         name,
         email,
         passwordHash,
+        emailVerified: false,
       },
     });
 
-    // Set session
-    request.session.userId = user.id;
+    // Generate verification token
+    const token = await createVerificationToken(fastify.prisma, user.id, 'email_verification');
 
-    return reply.redirect('/frameworks');
+    // Send verification email
+    try {
+      await sendVerificationEmail(email, token, name);
+    } catch (err) {
+      fastify.log.error({ err }, 'Failed to send verification email');
+      // Continue anyway - user can resend later
+    }
+
+    // Do NOT set session - user must verify email first
+    // Redirect to verification sent page
+    return reply.viewWithCsrf('auth/verification-sent', {
+      email,
+      user: null,
+    });
   });
 
   // Login page
@@ -130,6 +151,15 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       return renderAuthError(reply, 'auth/login', ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS);
     }
 
+    // Check if email is verified
+    if (!user.emailVerified) {
+      // Redirect to verification required page with resend option
+      return reply.viewWithCsrf('auth/verification-required', {
+        email: user.email,
+        user: null,
+      });
+    }
+
     request.session.userId = user.id;
 
     // Log login event
@@ -148,6 +178,251 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
   }, async (request, reply) => {
     await request.session.destroy();
     return reply.redirect('/');
+  });
+
+  // ===== EMAIL VERIFICATION ROUTES =====
+
+  // Verify email with token
+  fastify.get('/verify-email', async (request, reply) => {
+    const { token } = request.query as { token?: string };
+
+    if (!token) {
+      return reply.viewWithCsrf('auth/verification-error', {
+        error: ERROR_MESSAGES.AUTH.INVALID_TOKEN,
+        user: null,
+      });
+    }
+
+    const userId = await validateAndConsumeToken(fastify.prisma, token, 'email_verification');
+
+    if (!userId) {
+      return reply.viewWithCsrf('auth/verification-error', {
+        error: ERROR_MESSAGES.AUTH.TOKEN_EXPIRED,
+        user: null,
+      });
+    }
+
+    // Mark user as verified
+    await fastify.prisma.user.update({
+      where: { id: userId },
+      data: {
+        emailVerified: true,
+        emailVerifiedAt: new Date(),
+      },
+    });
+
+    return reply.viewWithCsrf('auth/verification-success', {
+      user: null,
+    });
+  });
+
+  // Resend verification email
+  fastify.post('/resend-verification', {
+    config: {
+      rateLimit: isTest ? false : {
+        max: 3,
+        timeWindow: '15 minutes',
+      },
+    },
+  }, async (request, reply) => {
+    const { email } = request.body as { email: string };
+
+    if (!email) {
+      return reply.viewWithCsrf('auth/verification-sent', {
+        email: '',
+        user: null,
+        error: 'Email is required',
+      });
+    }
+
+    const user = await fastify.prisma.user.findUnique({
+      where: { email },
+    });
+
+    // Don't reveal if user exists or is already verified
+    if (user && !user.emailVerified) {
+      const token = await createVerificationToken(fastify.prisma, user.id, 'email_verification');
+      
+      try {
+        await sendVerificationEmail(email, token, user.name);
+      } catch (err) {
+        fastify.log.error({ err }, 'Failed to resend verification email');
+      }
+    }
+
+    return reply.viewWithCsrf('auth/verification-sent', {
+      email,
+      user: null,
+      fromResend: true,
+    });
+  });
+
+  // ===== PASSWORD RESET ROUTES =====
+
+  // Forgot password page
+  fastify.get('/forgot-password', async (_request, reply) => {
+    return reply.viewWithCsrf('auth/forgot-password', {
+      error: null,
+      success: null,
+      user: null,
+    });
+  });
+
+  // Forgot password handler
+  fastify.post('/forgot-password', {
+    config: {
+      rateLimit: isTest ? false : {
+        max: 3,
+        timeWindow: '15 minutes',
+      },
+    },
+  }, async (request, reply) => {
+    const { email } = request.body as { email: string };
+
+    if (!email) {
+      return reply.viewWithCsrf('auth/forgot-password', {
+        error: 'Email is required',
+        success: null,
+        user: null,
+      });
+    }
+
+    // Validate email format
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.isValid) {
+      return reply.viewWithCsrf('auth/forgot-password', {
+        error: emailValidation.error!,
+        success: null,
+        user: null,
+      });
+    }
+
+    const user = await fastify.prisma.user.findUnique({
+      where: { email },
+    });
+
+    // Always show the same message to prevent email enumeration
+    const successMessage = ERROR_MESSAGES.AUTH.PASSWORD_RESET_SENT;
+
+    if (user) {
+      const token = await createVerificationToken(fastify.prisma, user.id, 'password_reset');
+      
+      try {
+        await sendPasswordResetEmail(email, token, user.name);
+      } catch (err) {
+        fastify.log.error({ err }, 'Failed to send password reset email');
+      }
+    }
+
+    return reply.viewWithCsrf('auth/forgot-password', {
+      error: null,
+      success: successMessage,
+      user: null,
+    });
+  });
+
+  // Reset password page
+  fastify.get('/reset-password', async (request, reply) => {
+    const { token } = request.query as { token?: string };
+
+    if (!token) {
+      return reply.redirect('/auth/forgot-password');
+    }
+
+    return reply.viewWithCsrf('auth/reset-password', {
+      token,
+      error: null,
+      user: null,
+    });
+  });
+
+  // Reset password handler
+  fastify.post('/reset-password', {
+    config: {
+      rateLimit: isTest ? false : {
+        max: 5,
+        timeWindow: '15 minutes',
+      },
+    },
+  }, async (request, reply) => {
+    const { token, password, confirmPassword } = request.body as {
+      token: string;
+      password: string;
+      confirmPassword: string;
+    };
+
+    if (!token || !password || !confirmPassword) {
+      return reply.viewWithCsrf('auth/reset-password', {
+        token: token || '',
+        error: ERROR_MESSAGES.AUTH.ALL_FIELDS_REQUIRED,
+        user: null,
+      });
+    }
+
+    // Check passwords match
+    if (password !== confirmPassword) {
+      return reply.viewWithCsrf('auth/reset-password', {
+        token,
+        error: ERROR_MESSAGES.AUTH.PASSWORD_MISMATCH,
+        user: null,
+      });
+    }
+
+    // Validate password strength
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      return reply.viewWithCsrf('auth/reset-password', {
+        token,
+        error: passwordValidation.error!,
+        user: null,
+      });
+    }
+
+    // Validate and consume token
+    const userId = await validateAndConsumeToken(fastify.prisma, token, 'password_reset');
+
+    if (!userId) {
+      return reply.viewWithCsrf('auth/reset-password', {
+        token,
+        error: ERROR_MESSAGES.AUTH.TOKEN_EXPIRED,
+        user: null,
+      });
+    }
+
+    // Get user
+    const user = await fastify.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return reply.viewWithCsrf('auth/reset-password', {
+        token,
+        error: ERROR_MESSAGES.AUTH.INVALID_TOKEN,
+        user: null,
+      });
+    }
+
+    // Update password
+    const passwordHash = await bcrypt.hash(password, 10);
+    await fastify.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash },
+    });
+
+    // Destroy any existing sessions for this user (security measure)
+    // Note: This would require session management by userId, which we don't have
+    // The user will need to login again anyway
+
+    // Send confirmation email
+    try {
+      await sendPasswordChangedNotification(user.email, user.name);
+    } catch (err) {
+      fastify.log.error({ err }, 'Failed to send password changed notification');
+    }
+
+    return reply.viewWithCsrf('auth/reset-success', {
+      user: null,
+    });
   });
 };
 

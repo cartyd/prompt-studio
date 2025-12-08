@@ -1,0 +1,33 @@
+<% const title = 'Email Verification Required'; %>
+<%- include('../layout-wrapper', { body: `
+<div style="max-width: 600px; margin: 0 auto; text-align: center;">
+  <div style="font-size: 48px; margin-bottom: 1rem;">🔒</div>
+  <h2 style="margin-bottom: 1rem;">Email Verification Required</h2>
+  
+  <div class="error" style="text-align: left;">
+    <p><strong>Your email address has not been verified.</strong></p>
+    <p>To access your account, please verify your email address by clicking the link we sent to <strong>${email}</strong>.</p>
+  </div>
+  
+  <p style="margin: 2rem 0;">
+    If you didn't receive the verification email or it has expired, you can request a new one below.
+  </p>
+  
+  <div style="background: #ecf0f1; padding: 1.5rem; border-radius: 4px; margin: 2rem 0;">
+    <p style="margin: 0 0 1rem 0; font-size: 0.9rem;">Need a new verification email?</p>
+    <form method="POST" action="/auth/resend-verification" style="display: inline;">
+      <input type="hidden" name="_csrf" value="${csrfToken}">
+      <input type="hidden" name="email" value="${email}">
+      <button type="submit" class="btn">Resend Verification Email</button>
+    </form>
+  </div>
+  
+  <p style="margin-top: 2rem;">
+    <a href="/auth/login">Back to Login</a>
+  </p>
+  
+  <p style="color: #7f8c8d; font-size: 0.9rem; margin-top: 1rem;">
+    Check your spam folder if you don't see the email in your inbox.
+  </p>
+</div>
+`, user }) %>

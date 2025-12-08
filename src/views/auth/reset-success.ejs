@@ -1,0 +1,19 @@
+<% const title = 'Password Reset Successful'; %>
+<%- include('../layout-wrapper', { body: `
+<div style="max-width: 600px; margin: 0 auto; text-align: center;">
+  <div style="font-size: 48px; margin-bottom: 1rem;">🔒</div>
+  <h2 style="margin-bottom: 1rem;">Password Reset Successful</h2>
+  
+  <div class="success">
+    <p>Your password has been changed successfully.</p>
+  </div>
+  
+  <p style="margin: 2rem 0;">
+    You can now login with your new password. A confirmation email has been sent to your email address.
+  </p>
+  
+  <p style="margin: 2rem 0;">
+    <a href="/auth/login" class="btn" style="min-width: 200px;">Login to Your Account</a>
+  </p>
+</div>
+`, user }) %>
