@@ -4,15 +4,9 @@ import { ERROR_MESSAGES } from '../constants';
 import { validatePassword } from '../validation';
 import { sendPasswordChangedNotification } from '../utils/email';
 import { logEvent } from '../utils/analytics';
+import { requireAuth } from '../plugins/auth';
 
 const accountRoutes: FastifyPluginAsync = async (fastify) => {
-  // All routes require authentication
-  const requireAuth = async (request: any, reply: any) => {
-    if (!request.user) {
-      return reply.redirect('/auth/login');
-    }
-  };
-
   // Account settings page
   fastify.get('/settings', {
     preHandler: requireAuth,
