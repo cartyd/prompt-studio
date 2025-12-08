@@ -13,9 +13,12 @@ export interface AuthUser {
   id: string;
   name: string;
   email: string;
+  passwordHash: string;
+  lastPasswordChange: Date;
   isAdmin: boolean;
   subscriptionTier: SubscriptionTier;
   subscriptionExpiresAt: Date | null;
+  createdAt: Date;
 }
 
 declare module 'fastify' {

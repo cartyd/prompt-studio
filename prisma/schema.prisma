@@ -15,6 +15,7 @@ model User {
   name                  String
   email                 String    @unique
   passwordHash          String
+  lastPasswordChange    DateTime  @default(now())
   isAdmin               Boolean   @default(false)
   emailVerified         Boolean   @default(false)
   emailVerifiedAt       DateTime?
@@ -23,10 +24,11 @@ model User {
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
-  prompts            Prompt[]
-  customCriteria     CustomCriteria[]
-  events             Event[]
-  verificationTokens VerificationToken[]
+  prompts             Prompt[]
+  customCriteria      CustomCriteria[]
+  events              Event[]
+  verificationTokens  VerificationToken[]
+  emailChangeRequests EmailChangeRequest[]
 }
 
 model Prompt {
@@ -93,4 +95,22 @@ model VerificationToken {
 
   @@index([token])
   @@index([userId, type])
+}
+
+model EmailChangeRequest {
+  id             String   @id @default(cuid())
+  userId         String
+  oldEmail       String
+  newEmail       String
+  verifyToken    String   @unique
+  revokeToken    String   @unique
+  verified       Boolean  @default(false)
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([verifyToken])
+  @@index([revokeToken])
 }

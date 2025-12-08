@@ -23,6 +23,7 @@ import csrfPlugin from './plugins/csrf';
 // Routes
 import indexRoutes from './routes/index';
 import authRoutes from './routes/auth';
+import accountRoutes from './routes/account';
 import frameworkRoutes from './routes/frameworks';
 import promptRoutes from './routes/prompts';
 import customCriteriaRoutes from './routes/custom-criteria';
@@ -126,6 +127,7 @@ async function start() {
     // Register routes
     await server.register(indexRoutes, { prefix: '/' });
     await server.register(authRoutes, { prefix: '/auth' });
+    await server.register(accountRoutes, { prefix: '/account' });
     await server.register(frameworkRoutes, { prefix: '/frameworks' });
     await server.register(promptRoutes, { prefix: '/prompts' });
     await server.register(customCriteriaRoutes, { prefix: '/api/custom-criteria' });

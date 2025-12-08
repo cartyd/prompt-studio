@@ -20,12 +20,15 @@ export async function requireAuth(request: FastifyRequest, reply: FastifyReply) 
     id: user.id,
     name: user.name,
     email: user.email,
+    passwordHash: user.passwordHash,
+    lastPasswordChange: user.lastPasswordChange,
     isAdmin: user.isAdmin,
     subscriptionTier: user.subscriptionTier as SubscriptionTier,
     subscriptionExpiresAt: user.subscriptionExpiresAt,
+    createdAt: user.createdAt,
   };
 
-  request.subscription = getSubscriptionInfo(request.user);
+  request.subscription = getSubscriptionInfo(request.user!);
 }
 
 export async function requireAdmin(request: FastifyRequest, reply: FastifyReply) {
@@ -60,9 +63,12 @@ export async function loadUserFromSession(request: FastifyRequest): Promise<void
       id: user.id,
       name: user.name,
       email: user.email,
+      passwordHash: user.passwordHash,
+      lastPasswordChange: user.lastPasswordChange,
       isAdmin: user.isAdmin,
       subscriptionTier: user.subscriptionTier as SubscriptionTier,
       subscriptionExpiresAt: user.subscriptionExpiresAt,
+      createdAt: user.createdAt,
     };
     request.subscription = getSubscriptionInfo(request.user);
   }

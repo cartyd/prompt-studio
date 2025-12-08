@@ -1,0 +1,75 @@
+<% const title = 'Account Settings'; %>
+<%- include('../layout-wrapper', { body: `
+<div style="max-width: 800px; margin: 0 auto;">
+  <h2 style="margin-bottom: 2rem;">Account Settings</h2>
+
+  <!-- Account Information -->
+  <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 4px; margin-bottom: 2rem;">
+    <h3 style="margin: 0 0 1rem 0; font-size: 1.1rem;">Account Information</h3>
+    <div style="display: grid; grid-template-columns: 150px 1fr; gap: 0.75rem; font-size: 0.95rem;">
+      <div style="color: #7f8c8d; font-weight: 500;">Email:</div>
+      <div><strong>${user.email}</strong></div>
+      
+      <div style="color: #7f8c8d; font-weight: 500;">Name:</div>
+      <div>${user.name}</div>
+      
+      <div style="color: #7f8c8d; font-weight: 500;">Member Since:</div>
+      <div>${new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+      
+      <div style="color: #7f8c8d; font-weight: 500;">Last Password Change:</div>
+      <div>${new Date(user.lastPasswordChange).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+    </div>
+  </div>
+
+  <!-- Change Password Section -->
+  <div style="background: #ffffff; border: 1px solid #e0e0e0; border-radius: 4px; padding: 2rem; margin-bottom: 2rem;">
+    <h3 style="margin: 0 0 1rem 0; font-size: 1.1rem;">Change Password</h3>
+    <p style="color: #7f8c8d; margin-bottom: 1.5rem; font-size: 0.95rem;">
+      Choose a strong password that you don't use for other accounts. Your password must be at least 8 characters long.
+    </p>
+
+    ${passwordSuccess ? \`<div class="success" style="margin-bottom: 1.5rem;">\${passwordSuccess}</div>\` : ''}
+    ${passwordError ? \`<div class="error" style="margin-bottom: 1.5rem;">\${passwordError}</div>\` : ''}
+
+    <form method="POST" action="/account/change-password">
+      <input type="hidden" name="_csrf" value="${csrfToken}">
+      
+      <div class="form-group">
+        <label for="currentPassword">Current Password</label>
+        <input type="password" id="currentPassword" name="currentPassword" required>
+      </div>
+
+      <div class="form-group">
+        <label for="newPassword">New Password</label>
+        <input type="password" id="newPassword" name="newPassword" required minlength="8">
+        <small style="color: #7f8c8d; font-size: 0.85rem;">
+          Must be at least 8 characters long
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirm New Password</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" required minlength="8">
+      </div>
+
+      <button type="submit" class="btn">Change Password</button>
+    </form>
+  </div>
+
+  <!-- Security Notice -->
+  <div style="background: #fff8dc; border-left: 4px solid #f39c12; padding: 1rem 1.5rem; border-radius: 4px; margin-bottom: 2rem;">
+    <p style="margin: 0; font-size: 0.9rem; color: #8b6914;">
+      <strong>🔒 Security Tip:</strong> After changing your password, you'll receive a confirmation email. 
+      If you didn't make this change, please contact support immediately.
+    </p>
+  </div>
+
+  <!-- Email Change Coming Soon -->
+  <div style="background: #ffffff; border: 1px solid #e0e0e0; border-radius: 4px; padding: 2rem;">
+    <h3 style="margin: 0 0 1rem 0; font-size: 1.1rem; color: #95a5a6;">Change Email Address</h3>
+    <p style="color: #7f8c8d; margin: 0; font-size: 0.95rem;">
+      Email change functionality is coming soon. For now, please contact support if you need to change your email address.
+    </p>
+  </div>
+</div>
+`, user }) %>

@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { FastifyRequest } from 'fastify';
 import { extractRequestMetadata } from './analytics-helpers';
 
-export type EventType = 'login' | 'framework_view' | 'prompt_generate' | 'prompt_save';
+export type EventType = 'login' | 'framework_view' | 'prompt_generate' | 'prompt_save' | 'password_changed';
 
 export interface EventMetadata {
   frameworkId?: string;

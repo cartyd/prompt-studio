@@ -295,3 +295,194 @@ ${config.APP_URL}
   
   await sendEmail(email, 'Password Changed - Prompt Framework Studio', htmlBody, textContent);
 }
+
+/**
+ * Send email change request notification to old email
+ */
+export async function sendEmailChangeNotification(oldEmail: string, newEmail: string, name: string, revokeToken: string): Promise<void> {
+  const config = getConfig();
+  const revokeUrl = `${config.APP_URL}/account/revoke-email-change?token=${revokeToken}`;
+  
+  const htmlContent = `
+    <h2>Email Change Request</h2>
+    <p>Hi ${name},</p>
+    <p>We received a request to change your email address from <strong>${oldEmail}</strong> to <strong>${newEmail}</strong>.</p>
+    <p>If you made this request, no action is needed. The change will complete once the new email address is verified.</p>
+    <p style="background-color: #fadbd8; padding: 15px; border-left: 4px solid #e74c3c; margin: 20px 0;">
+      <strong>Security Alert:</strong> If you didn't request this change, click the button below immediately to cancel it:
+    </p>
+    <p style="text-align: center;">
+      <a href="${revokeUrl}" class="button" style="background-color: #e74c3c;">Cancel Email Change</a>
+    </p>
+    <p style="color: #7f8c8d; font-size: 14px;">This cancellation link will expire in 24 hours.</p>
+  `;
+
+  const textContent = `
+Email Change Request
+
+Hi ${name},
+
+We received a request to change your email address from ${oldEmail} to ${newEmail}.
+
+If you made this request, no action is needed. The change will complete once the new email address is verified.
+
+SECURITY ALERT: If you didn't request this change, cancel it immediately by visiting:
+
+${revokeUrl}
+
+This link will expire in 24 hours.
+
+---
+Prompt Framework Studio by Simplicate AI
+${config.APP_URL}
+  `.trim();
+
+  const htmlBody = generateEmailTemplate(htmlContent, 'Email change request on your account');
+  
+  await sendEmail(oldEmail, 'Email Change Request - Prompt Framework Studio', htmlBody, textContent);
+}
+
+/**
+ * Send email verification to new email address
+ */
+export async function sendEmailChangeVerification(newEmail: string, name: string, verifyToken: string): Promise<void> {
+  const config = getConfig();
+  const verifyUrl = `${config.APP_URL}/account/verify-email-change?token=${verifyToken}`;
+  
+  const htmlContent = `
+    <h2>Verify Your New Email Address</h2>
+    <p>Hi ${name},</p>
+    <p>We received a request to change your Prompt Framework Studio email address to <strong>${newEmail}</strong>.</p>
+    <p>To complete this change, please verify your new email address by clicking the button below:</p>
+    <p style="text-align: center;">
+      <a href="${verifyUrl}" class="button">Verify New Email Address</a>
+    </p>
+    <p>Or copy and paste this link into your browser:</p>
+    <p style="word-break: break-all; color: #7f8c8d; font-size: 14px;">${verifyUrl}</p>
+    <p><strong>This link will expire in 24 hours.</strong></p>
+    <p style="color: #7f8c8d; font-size: 14px;">If you didn't request this change, you can safely ignore this email.</p>
+  `;
+
+  const textContent = `
+Verify Your New Email Address
+
+Hi ${name},
+
+We received a request to change your Prompt Framework Studio email address to ${newEmail}.
+
+To complete this change, please verify your new email address by visiting:
+
+${verifyUrl}
+
+This link will expire in 24 hours.
+
+If you didn't request this change, you can safely ignore this email.
+
+---
+Prompt Framework Studio by Simplicate AI
+${config.APP_URL}
+  `.trim();
+
+  const htmlBody = generateEmailTemplate(htmlContent, 'Verify your new email address');
+  
+  await sendEmail(newEmail, 'Verify Your New Email - Prompt Framework Studio', htmlBody, textContent);
+}
+
+/**
+ * Send email change completed notification
+ */
+export async function sendEmailChangeCompleted(newEmail: string, oldEmail: string, name: string): Promise<void> {
+  const config = getConfig();
+  const htmlContent = `
+    <h2>Email Address Changed Successfully</h2>
+    <p>Hi ${name},</p>
+    <p>Your email address has been successfully changed from <strong>${oldEmail}</strong> to <strong>${newEmail}</strong>.</p>
+    <p>You can now use this email address to log in to your account.</p>
+    <p style="background-color: #d5f4e6; padding: 15px; border-left: 4px solid #27ae60; margin: 20px 0;">
+      <strong>Success:</strong> Your email has been updated and all future communications will be sent to this address.
+    </p>
+    <p style="text-align: center;">
+      <a href="${config.APP_URL}/auth/login" class="button">Login to Your Account</a>
+    </p>
+  `;
+
+  const textContent = `
+Email Address Changed Successfully
+
+Hi ${name},
+
+Your email address has been successfully changed from ${oldEmail} to ${newEmail}.
+
+You can now use this email address to log in to your account.
+
+Login to your account: ${config.APP_URL}/auth/login
+
+---
+Prompt Framework Studio by Simplicate AI
+${config.APP_URL}
+  `.trim();
+
+  const htmlBody = generateEmailTemplate(htmlContent, 'Your email address has been updated');
+  
+  await sendEmail(newEmail, 'Email Changed - Prompt Framework Studio', htmlBody, textContent);
+}
+
+/**
+ * Send email change revoked notification
+ */
+export async function sendEmailChangeRevoked(oldEmail: string, newEmail: string, name: string): Promise<void> {
+  const config = getConfig();
+  
+  // Notify old email
+  const htmlContentOld = `
+    <h2>Email Change Cancelled</h2>
+    <p>Hi ${name},</p>
+    <p>The request to change your email address from <strong>${oldEmail}</strong> to <strong>${newEmail}</strong> has been cancelled.</p>
+    <p>Your email address remains unchanged and your account is secure.</p>
+    <p style="background-color: #d5f4e6; padding: 15px; border-left: 4px solid #27ae60; margin: 20px 0;">
+      <strong>No Action Required:</strong> Your email address is still ${oldEmail}.
+    </p>
+  `;
+
+  const textContentOld = `
+Email Change Cancelled
+
+Hi ${name},
+
+The request to change your email address from ${oldEmail} to ${newEmail} has been cancelled.
+
+Your email address remains unchanged and your account is secure.
+
+---
+Prompt Framework Studio by Simplicate AI
+${config.APP_URL}
+  `.trim();
+
+  const htmlBodyOld = generateEmailTemplate(htmlContentOld, 'Email change request cancelled');
+  await sendEmail(oldEmail, 'Email Change Cancelled - Prompt Framework Studio', htmlBodyOld, textContentOld);
+  
+  // Notify new email
+  const htmlContentNew = `
+    <h2>Email Change Request Cancelled</h2>
+    <p>Hi ${name},</p>
+    <p>The request to change an email address to <strong>${newEmail}</strong> has been cancelled by the account owner.</p>
+    <p>If you were expecting this change, please contact the account owner.</p>
+  `;
+
+  const textContentNew = `
+Email Change Request Cancelled
+
+Hi ${name},
+
+The request to change an email address to ${newEmail} has been cancelled by the account owner.
+
+If you were expecting this change, please contact the account owner.
+
+---
+Prompt Framework Studio by Simplicate AI
+${config.APP_URL}
+  `.trim();
+
+  const htmlBodyNew = generateEmailTemplate(htmlContentNew, 'Email change request cancelled');
+  await sendEmail(newEmail, 'Email Change Cancelled - Prompt Framework Studio', htmlBodyNew, textContentNew);
+}

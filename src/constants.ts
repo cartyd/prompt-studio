@@ -6,6 +6,7 @@ export const TIME_CONSTANTS = {
 export const TOKEN_CONSTANTS = {
   EMAIL_VERIFICATION_EXPIRY_HOURS: 24,
   PASSWORD_RESET_EXPIRY_HOURS: 1,
+  EMAIL_CHANGE_EXPIRY_HOURS: 24,
   TOKEN_BYTE_LENGTH: 32, // 64 hex characters
 } as const;
 
@@ -22,6 +23,22 @@ export const ERROR_MESSAGES = {
     PASSWORD_RESET_SENT: 'If an account exists with that email, password reset instructions have been sent.',
     PASSWORD_MISMATCH: 'Passwords do not match',
     VERIFICATION_EMAIL_SENT: 'A verification email has been sent to your email address.',
+  },
+  ACCOUNT: {
+    CURRENT_PASSWORD_REQUIRED: 'Current password is required',
+    CURRENT_PASSWORD_INCORRECT: 'Current password is incorrect',
+    NEW_PASSWORD_REQUIRED: 'New password is required',
+    NEW_PASSWORD_SAME: 'New password must be different from current password',
+    PASSWORD_CHANGED: 'Password changed successfully',
+    EMAIL_REQUIRED: 'Email address is required',
+    EMAIL_SAME: 'New email must be different from current email',
+    EMAIL_ALREADY_IN_USE: 'This email address is already in use',
+    EMAIL_CHANGE_REQUESTED: 'Email change request sent. Please check both email addresses.',
+    EMAIL_CHANGE_VERIFIED: 'Email address verified. Your email has been updated.',
+    EMAIL_CHANGE_REVOKED: 'Email change request has been cancelled.',
+    EMAIL_CHANGE_EXPIRED: 'This email change request has expired. Please start a new request.',
+    EMAIL_CHANGE_INVALID: 'Invalid email change request.',
+    PENDING_EMAIL_CHANGE: 'You have a pending email change request. Please complete or cancel it first.',
   },
   PROMPTS: {
     NOT_FOUND: 'Prompt not found',
