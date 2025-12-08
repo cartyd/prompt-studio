@@ -28,8 +28,8 @@
       Choose a strong password that you don't use for other accounts. Your password must be at least 8 characters long.
     </p>
 
-    ${passwordSuccess ? \`<div class="success" style="margin-bottom: 1.5rem;">\${passwordSuccess}</div>\` : ''}
-    ${passwordError ? \`<div class="error" style="margin-bottom: 1.5rem;">\${passwordError}</div>\` : ''}
+    ${passwordSuccess ? `<div class="success" style="margin-bottom: 1.5rem;">${passwordSuccess}</div>` : ''}
+    ${passwordError ? `<div class="error" style="margin-bottom: 1.5rem;">${passwordError}</div>` : ''}
 
     <form method="POST" action="/account/change-password">
       <input type="hidden" name="_csrf" value="${csrfToken}">
