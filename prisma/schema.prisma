@@ -5,6 +5,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// DATABASE_URL configuration notes:
+// - Development: Use relative paths (e.g., "file:./dev.db")
+// - Production: Use absolute paths to avoid path resolution issues
+//   Example: "file:/var/www/prompt-studio/prisma/data/prod.db"
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
