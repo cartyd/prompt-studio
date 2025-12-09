@@ -483,7 +483,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (matches) visibleCount++;
     });
     
-    document.getElementById('pagination-info').textContent = `Total users: ${visibleCount}`;
+    document.getElementById('pagination-info').textContent = 'Total users: ' + visibleCount;
   });
   
   // Filter dropdown
@@ -503,7 +503,7 @@ document.addEventListener('DOMContentLoaded', function() {
   filterItems.forEach(item => {
     item.addEventListener('click', function() {
       const value = this.getAttribute('data-value');
-      filterBtn.innerHTML = `Filter: ${this.textContent} <i class="fas fa-caret-down"></i>`;
+      filterBtn.innerHTML = 'Filter: ' + this.textContent + ' <i class="fas fa-caret-down"></i>';
       filterMenu.setAttribute('hidden', '');
       
       let visibleCount = 0;
@@ -514,7 +514,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (matches) visibleCount++;
       });
       
-      document.getElementById('pagination-info').textContent = `Total users: ${visibleCount}`;
+      document.getElementById('pagination-info').textContent = 'Total users: ' + visibleCount;
     });
   });
   
