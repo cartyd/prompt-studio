@@ -1,87 +1,384 @@
 <% const title = 'User Management'; %>
 <%- include('../layout-wrapper', { body: `
 <style>
-  .admin-header {
-    display: flex;
+/* Admin Header */
+.admin-header {
+  width: 100%;
+  background: none;
+  margin: 0 0 2rem;
+}
+
+.admin-header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.admin-header-container h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--color-dark);
+  margin: 0;
+}
+
+.quick-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+/* Users Control Bar */
+.users-control-bar {
+  margin: 20px 0 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.left-controls {
+  flex: 1;
+  min-width: 200px;
+}
+
+.search-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+.search-wrapper i {
+  position: absolute;
+  left: 12px;
+  font-size: 14px;
+  color: #6c757d;
+  pointer-events: none;
+}
+
+.user-search {
+  width: 100%;
+  padding: 10px 12px 10px 36px;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  transition: 0.2s;
+}
+
+.user-search:focus {
+  border-color: #94b5ff;
+  box-shadow: 0 0 0 3px rgba(148, 181, 255, 0.25);
+  outline: none;
+}
+
+.right-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+/* Filter Dropdown */
+.filter-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.filter-btn {
+  padding: 10px 14px;
+  background: #fff;
+  border: 1px solid #dfe3e6;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: 0.2s;
+}
+
+.filter-btn:hover {
+  background: #f5f7f9;
+}
+
+.filter-menu {
+  position: absolute;
+  right: 0;
+  top: 105%;
+  background: #fff;
+  width: 180px;
+  padding: 8px 0;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+  z-index: 1000;
+}
+
+.filter-item {
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.filter-item:hover {
+  background: #f3f4f6;
+}
+
+/* Users Table */
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.users-table thead th {
+  background: #f4f6f8;
+  padding: 12px 14px;
+  font-weight: 600;
+  text-align: left;
+  border-bottom: 2px solid #e0e5e9;
+}
+
+.users-table tbody tr {
+  background: #fff;
+  border-bottom: 1px solid #ececec;
+}
+
+.users-table tbody tr:hover {
+  background: #f9fbfc;
+  transition: 0.15s;
+}
+
+.users-table tbody td {
+  padding: 12px 14px;
+  vertical-align: middle;
+  position: relative;
+  overflow: visible;
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-admin {
+  background: #3498db;
+  color: #fff;
+}
+
+.badge-premium {
+  background: #d85c28;
+  color: #fff;
+}
+
+/* Action Dropdown */
+.action-dropdown {
+  position: relative;
+  overflow: visible;
+}
+
+.action-btn {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.action-btn:hover {
+  background: #2980b9;
+}
+
+.action-menu {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  padding: 6px 0;
+  min-width: 150px;
+  z-index: 9999;
+}
+
+.action-item {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 10px 14px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #34495e;
+}
+
+.action-item:hover {
+  background: #f0f4f8;
+}
+
+/* Pagination */
+.pagination-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-top: 1rem;
+}
+
+.pagination-left {
+  font-size: 0.95rem;
+}
+
+.pagination.modern {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.pagination.modern .pag-btn,
+.pagination.modern .page-number {
+  padding: 6px 12px;
+  border: 1px solid #dcdcdc;
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 0.9rem;
+  text-decoration: none;
+  color: #333;
+  display: inline-block;
+}
+
+.pagination.modern .pag-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination.modern .page-number.active {
+  background: #3498db;
+  color: white;
+  border-color: #3498db;
+}
+
+.pagination.modern .pag-btn:hover:not(.disabled),
+.pagination.modern .page-number:hover:not(.active) {
+  background: #f4f6f6;
+}
+
+.pagination-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.pagination-right select {
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  border: 1px solid #dcdcdc;
+  background: white;
+  cursor: pointer;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .admin-header-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .admin-header-container h1 {
+    font-size: 1.5rem;
+  }
+  
+  .users-control-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .left-controls,
+  .right-controls {
+    width: 100%;
+  }
+  
+  .right-controls {
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
+  }
+  
+  .search-wrapper {
+    max-width: 100%;
   }
   
   .users-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    display: block;
+    overflow-x: auto;
   }
   
-  .users-table th {
-    text-align: left;
-    padding: 1rem;
-    background: #f5f5f5;
-    font-weight: 600;
-    border-bottom: 2px solid #e0e0e0;
-  }
-  
-  .users-table td {
-    padding: 1rem;
-    border-bottom: 1px solid #e0e0e0;
-  }
-  
-  .users-table tr:hover {
-    background: #fafafa;
-  }
-  
-  .badge {
-    display: inline-block;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-  
-  .badge-premium {
-    background: #f39c12;
-    color: white;
-  }
-  
-  .badge-admin {
-    background: #e74c3c;
-    color: white;
-  }
-  
-  .btn-sm {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-  }
-  
-  .pagination {
-    display: flex;
-    justify-content: center;
+  .pagination-wrapper {
+    flex-direction: column;
     align-items: center;
-    gap: 1rem;
-    margin-top: 2rem;
   }
-  
-  .pagination a, .pagination span {
-    padding: 0.5rem 1rem;
-    text-decoration: none;
-    color: var(--color-primary);
-  }
-  
-  .pagination .current {
-    font-weight: bold;
-    color: var(--color-text);
-  }
+}
 </style>
 
+<!-- Admin Header -->
 <div class="admin-header">
-  <h1>User Management</h1>
-  <a href="/admin/dashboard" class="btn btn-secondary">Back to Dashboard</a>
+  <div class="admin-header-container">
+    <h1>User Management</h1>
+    <div class="quick-actions">
+      <a href="/admin/dashboard" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+      </a>
+    </div>
+  </div>
 </div>
 
+<!-- Control Bar -->
+<div class="users-control-bar">
+  <div class="left-controls">
+    <div class="search-wrapper">
+      <i class="fas fa-search"></i>
+      <input type="text" class="user-search" placeholder="Search user..." id="user-search">
+    </div>
+  </div>
+  <div class="right-controls">
+    <!-- Filter Dropdown -->
+    <div class="filter-dropdown">
+      <button class="filter-btn" id="filter-btn">
+        Filter: All Users <i class="fas fa-caret-down"></i>
+      </button>
+      <div class="filter-menu" id="filter-menu" hidden>
+        <div class="filter-item" data-value="">All Users</div>
+        <div class="filter-item" data-value="admin">Admin</div>
+        <div class="filter-item" data-value="premium">Premium</div>
+        <div class="filter-item" data-value="free">Free</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Users Table -->
 <table class="users-table">
   <thead>
     <tr>
@@ -94,9 +391,9 @@
       <th>Actions</th>
     </tr>
   </thead>
-  <tbody>
+  <tbody id="users-table-body">
     ${users.map(u => `
-      <tr>
+      <tr data-user-type="${u.isAdmin ? 'admin' : u.subscriptionTier}">
         <td>
           ${u.name}
           ${u.isAdmin ? '<span class="badge badge-admin ml-sm">Admin</span>' : ''}
@@ -111,36 +408,142 @@
         <td>${u._count.events}</td>
         <td>${new Date(u.createdAt).toLocaleDateString()}</td>
         <td>
-          <form action="/admin/users/${u.id}/toggle-premium" method="POST" style="display: inline;">
-            <input type="hidden" name="_csrf" value="${csrfToken}">
-            <button type="submit" class="btn btn-sm btn-secondary">
-              ${u.subscriptionTier === 'premium' ? 'Remove' : 'Make'} Premium
+          <div class="action-dropdown">
+            <button class="action-btn">
+              Actions <i class="fas fa-caret-down"></i>
             </button>
-          </form>
-          <form action="/admin/users/${u.id}/toggle-admin" method="POST" style="display: inline;">
-            <input type="hidden" name="_csrf" value="${csrfToken}">
-            <button type="submit" class="btn btn-sm ${u.isAdmin ? 'btn-danger' : ''}">
-              ${u.isAdmin ? 'Remove' : 'Make'} Admin
-            </button>
-          </form>
+            <div class="action-menu" hidden>
+              <form action="/admin/users/${u.id}/toggle-premium" method="POST">
+                <input type="hidden" name="_csrf" value="${csrfToken}">
+                <button type="submit" class="action-item">
+                  ${u.subscriptionTier === 'premium' ? 'Remove' : 'Make'} Premium
+                </button>
+              </form>
+              <form action="/admin/users/${u.id}/toggle-admin" method="POST">
+                <input type="hidden" name="_csrf" value="${csrfToken}">
+                <button type="submit" class="action-item">
+                  ${u.isAdmin ? 'Remove' : 'Make'} Admin
+                </button>
+              </form>
+            </div>
+          </div>
         </td>
       </tr>
     `).join('')}
   </tbody>
 </table>
 
-<div class="pagination">
-  ${pagination.currentPage > 1 
-    ? '<a href="/admin/users?page=' + (pagination.currentPage - 1) + '">&laquo; Previous</a>' 
-    : '<span>&laquo; Previous</span>'}
-  
-  <span class="current">
-    Page ${pagination.currentPage} of ${pagination.totalPages}
-    (${pagination.totalUsers} total users)
-  </span>
-  
-  ${pagination.currentPage < pagination.totalPages 
-    ? '<a href="/admin/users?page=' + (pagination.currentPage + 1) + '">Next &raquo;</a>' 
-    : '<span>Next &raquo;</span>'}
+<!-- Pagination -->
+<div class="pagination-wrapper">
+  <div class="pagination-left" id="pagination-info">
+    Total users: ${pagination.totalUsers}
+  </div>
+  <div class="pagination modern">
+    ${pagination.currentPage > 1 
+      ? `<a href="/admin/users?page=${pagination.currentPage - 1}" class="pag-btn">←</a>`
+      : '<span class="pag-btn disabled">←</span>'}
+    
+    ${Array.from({length: Math.min(5, pagination.totalPages)}, (_, i) => {
+      const pageNum = i + 1;
+      const isActive = pageNum === pagination.currentPage;
+      return isActive 
+        ? `<span class="page-number active">${pageNum}</span>`
+        : `<a href="/admin/users?page=${pageNum}" class="page-number">${pageNum}</a>`;
+    }).join('')}
+    
+    ${pagination.currentPage < pagination.totalPages 
+      ? `<a href="/admin/users?page=${pagination.currentPage + 1}" class="pag-btn">→</a>`
+      : '<span class="pag-btn disabled">→</span>'}
+  </div>
+  <div class="pagination-right">
+    <span>Show per page:</span>
+    <select class="page-size-select">
+      <option value="10" selected>10</option>
+      <option value="25">25</option>
+      <option value="50">50</option>
+    </select>
+  </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Search functionality
+  const searchInput = document.getElementById('user-search');
+  const tableRows = document.querySelectorAll('#users-table-body tr');
+  
+  searchInput.addEventListener('input', function() {
+    const query = this.value.toLowerCase().trim();
+    let visibleCount = 0;
+    
+    tableRows.forEach(row => {
+      const name = row.querySelector('td:first-child').textContent.toLowerCase();
+      const email = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+      const matches = name.includes(query) || email.includes(query);
+      row.style.display = matches ? '' : 'none';
+      if (matches) visibleCount++;
+    });
+    
+    document.getElementById('pagination-info').textContent = `Total users: ${visibleCount}`;
+  });
+  
+  // Filter dropdown
+  const filterBtn = document.getElementById('filter-btn');
+  const filterMenu = document.getElementById('filter-menu');
+  const filterItems = document.querySelectorAll('.filter-item');
+  
+  filterBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    filterMenu.toggleAttribute('hidden');
+  });
+  
+  document.body.addEventListener('click', function() {
+    filterMenu.setAttribute('hidden', '');
+  });
+  
+  filterItems.forEach(item => {
+    item.addEventListener('click', function() {
+      const value = this.getAttribute('data-value');
+      filterBtn.innerHTML = `Filter: ${this.textContent} <i class="fas fa-caret-down"></i>`;
+      filterMenu.setAttribute('hidden', '');
+      
+      let visibleCount = 0;
+      tableRows.forEach(row => {
+        const userType = row.getAttribute('data-user-type');
+        const matches = !value || userType === value;
+        row.style.display = matches ? '' : 'none';
+        if (matches) visibleCount++;
+      });
+      
+      document.getElementById('pagination-info').textContent = `Total users: ${visibleCount}`;
+    });
+  });
+  
+  // Action dropdowns
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.action-btn')) {
+      const btn = e.target.closest('.action-btn');
+      const menu = btn.parentElement.querySelector('.action-menu');
+      
+      // Close all other dropdowns
+      document.querySelectorAll('.action-menu:not([hidden])').forEach(m => {
+        if (m !== menu) m.setAttribute('hidden', '');
+      });
+      
+      // Toggle this dropdown
+      if (menu.hasAttribute('hidden')) {
+        menu.removeAttribute('hidden');
+      } else {
+        menu.setAttribute('hidden', '');
+      }
+      e.stopPropagation();
+      return;
+    }
+    
+    // Close all dropdowns when clicking outside
+    document.querySelectorAll('.action-menu').forEach(menu => {
+      menu.setAttribute('hidden', '');
+    });
+  });
+});
+</script>
 `, user, subscription }) %>
