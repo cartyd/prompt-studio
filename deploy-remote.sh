@@ -31,6 +31,8 @@ pm2 save
 
 # Basic health check (best-effort)
 if command -v curl >/dev/null; then
+  echo "Waiting for app to start..."
+  sleep 5
   if curl -fsS -o /dev/null http://localhost:3000; then
     echo "Health check OK"
   else
