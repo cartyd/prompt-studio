@@ -38,11 +38,14 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       },
     },
   }, async (request, reply) => {
-    const { name, email, password } = request.body as { 
+    let { name, email, password } = request.body as { 
       name: string; 
       email: string; 
       password: string 
     };
+
+    // Normalize email for consistent storage and lookups
+    if (email) email = email.trim().toLowerCase();
 
     // Validation
     if (!name || !email || !password) {
@@ -123,10 +126,13 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       },
     },
   }, async (request, reply) => {
-    const { email, password } = request.body as { 
+    let { email, password } = request.body as { 
       email: string; 
       password: string 
     };
+
+    // Normalize email for consistent lookups
+    if (email) email = email.trim().toLowerCase();
 
     if (!email || !password) {
       return renderAuthError(reply, 'auth/login', ERROR_MESSAGES.AUTH.EMAIL_PASSWORD_REQUIRED);
@@ -225,7 +231,10 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       },
     },
   }, async (request, reply) => {
-    const { email } = request.body as { email: string };
+    let { email } = request.body as { email: string };
+
+    // Normalize email for consistent lookups
+    if (email) email = email.trim().toLowerCase();
 
     if (!email) {
       return reply.viewWithCsrf('auth/verification-sent', {
@@ -277,7 +286,13 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       },
     },
   }, async (request, reply) => {
-    const { email } = request.body as { email: string };
+    let { email } = request.body as { email: string };
+
+    // Normalize email for consistent lookups
+    if (email) email = email.trim().toLowerCase();
+
+    // Debug logging to help diagnose delivery issues
+    fastify.log.info({ email, cwd: process.cwd(), db: process.env.DATABASE_URL }, 'forgot-password requested');
 
     if (!email) {
       return reply.viewWithCsrf('auth/forgot-password', {
@@ -297,21 +312,38 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       });
     }
 
-    const user = await fastify.prisma.user.findUnique({
+    let user = await fastify.prisma.user.findUnique({
       where: { email },
     });
+
+    // Fallback for SQLite collation issues: case-insensitive match via raw SQL
+    if (!user) {
+      try {
+        const rows = await fastify.prisma.$queryRaw<any[]>`SELECT id, name, email FROM User WHERE lower(email) = lower(${email}) LIMIT 1`;
+        if (rows && rows.length > 0) {
+          user = rows[0] as any;
+          fastify.log.info({ email, matched: (user as any).email }, 'forgot-password fallback match via lower(email)');
+        }
+      } catch (e) {
+        fastify.log.error({ err: e, email }, 'forgot-password fallback lookup failed');
+      }
+    }
 
     // Always show the same message to prevent email enumeration
     const successMessage = ERROR_MESSAGES.AUTH.PASSWORD_RESET_SENT;
 
     if (user) {
+      fastify.log.info({ email }, 'forgot-password user found; generating token');
       const token = await createVerificationToken(fastify.prisma, user.id, 'password_reset');
-      
+      fastify.log.info({ email }, 'forgot-password token created; sending email');
       try {
-        await sendPasswordResetEmail(email, token, user.name);
+        await sendPasswordResetEmail(user.email, token, (user as any).name || '');
+        fastify.log.info({ email: user.email }, 'forgot-password email send attempted');
       } catch (err) {
-        fastify.log.error({ err }, 'Failed to send password reset email');
+        fastify.log.error({ err, email: user.email }, 'Failed to send password reset email');
       }
+    } else {
+      fastify.log.info({ email }, 'forgot-password user not found');
     }
 
     return reply.viewWithCsrf('auth/forgot-password', {

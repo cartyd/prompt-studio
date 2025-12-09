@@ -1,42 +1,39 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-# Configuration
-SERVER="root@45.55.131.181"
+# This script runs on the server after rsync. It installs prod deps and reloads PM2.
+
 APP_DIR="/var/www/prompt-studio"
+cd "$APP_DIR"
 
-echo "🔍 Checking for uncommitted changes..."
-if [[ -n $(git status -s) ]]; then
-  echo "⚠️  You have uncommitted changes:"
-  git status -s
-  read -p "Continue anyway? (y/n) " -n 1 -r
-  echo
-  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    exit 1
-  fi
+# Ensure required files exist
+[ -f package.json ] || { echo "package.json missing"; exit 1; }
+[ -f ecosystem.config.js ] || { echo "ecosystem.config.js missing"; exit 1; }
+
+# Stop app to avoid issues while replacing node_modules
+pm2 stop ecosystem.config.js || true
+
+# Install production dependencies only
+npm ci --omit=dev
+
+# Optional Prisma migrations if present
+if [ -d prisma ]; then
+  npx prisma generate || true
+  npx prisma migrate deploy || true
 fi
 
-echo "📤 Pushing to git..."
-git push origin main
+# Ensure logs directory exists
+mkdir -p logs
 
-echo "🔗 Connecting to production server: $SERVER"
-ssh $SERVER <<'ENDSSH'
-set -e
-cd /var/www/prompt-studio
+# Start or reload app
+pm2 startOrReload ecosystem.config.js --update-env
+pm2 save
 
-echo "🚀 Running deployment on production..."
-./deploy.sh
-
-echo ""
-echo "✅ Deployment complete!"
-echo "📊 Application status:"
-pm2 status prompt-studio
-
-echo ""
-echo "📜 Recent logs:"
-pm2 logs prompt-studio --lines 10 --nostream
-ENDSSH
-
-echo ""
-echo "🎉 Remote deployment complete!"
-echo "🌐 Visit http://45.55.131.181 to verify"
+# Basic health check (best-effort)
+if command -v curl >/dev/null; then
+  if curl -fsS -o /dev/null http://localhost:3000; then
+    echo "Health check OK"
+  else
+    echo "Health check failed (HTTP)"
+  fi
+fi

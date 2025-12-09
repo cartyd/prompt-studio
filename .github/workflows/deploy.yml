@@ -1,0 +1,86 @@
+name: deploy
+
+on:
+  # Enable manual runs. You can add push/tag triggers later.
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Git ref to deploy (default: main)
+        required: false
+        default: main
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to production
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Validate required secrets
+        if: ${{ !secrets.SSH_HOST || !secrets.SSH_USER || !secrets.SSH_KEY }}
+        run: |
+          echo "::error::Missing one or more required secrets (SSH_HOST, SSH_USER, SSH_KEY). Add them in Settings > Secrets and variables > Actions.";
+          exit 1
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || 'main' }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Stage minimal release
+        run: |
+          rm -rf release && mkdir -p release
+          cp -r dist package.json package-lock.json ecosystem.config.js release/
+          [ -d public ] && cp -r public release/
+          [ -d prisma ] && cp -r prisma release/
+
+      - name: Prepare SSH
+        run: |
+          install -m 700 -d ~/.ssh
+          install -m 600 /dev/null ~/.ssh/id_deploy
+          printf "%s" "${{ secrets.SSH_KEY }}" > ~/.ssh/id_deploy
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Upload server-side deploy script
+        run: |
+          scp -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes \
+            ./deploy-remote.sh \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/prompt-studio/remote-deploy.sh"
+
+      - name: Rsync release to server (with deletes)
+        run: |
+          rsync -az --delete \
+            --exclude '.env' --exclude 'logs' --exclude 'sessions.db' \
+            -e "ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes" \
+            release/ "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/prompt-studio/"
+
+      - name: Run remote deploy
+        run: |
+          ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+            "bash /var/www/prompt-studio/remote-deploy.sh"
+
+      - name: Health check
+        run: |
+          ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+            "curl -fsS -o /dev/null -w '%{http_code}\n' http://localhost:3000"
