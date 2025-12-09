@@ -89,7 +89,7 @@ pm2 save
 
 # Configure nginx
 echo "🌐 Configuring nginx..."
-cp nginx-config /etc/nginx/sites-available/prompt-studio
+cp nginx.conf /etc/nginx/sites-available/prompt-studio
 ln -sf /etc/nginx/sites-available/prompt-studio /etc/nginx/sites-enabled/
 rm -f /etc/nginx/sites-enabled/default
 

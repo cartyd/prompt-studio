@@ -33,7 +33,7 @@ Copy the setup script to your Droplet:
 
 ```bash
 # On your local machine
-scp setup-droplet.sh nginx-config ecosystem.config.js root@YOUR_DROPLET_IP:/root/
+scp setup-droplet.sh nginx.conf ecosystem.config.js root@YOUR_DROPLET_IP:/root/
 ```
 
 Or clone the repository and run the setup script:
