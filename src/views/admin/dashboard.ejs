@@ -1,94 +1,174 @@
 <% const title = 'Admin Dashboard'; %>
 <%- include('../layout-wrapper', { body: `
 <style>
-  .admin-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
+/* Admin Header */
+.admin-header {
+  width: 100%;
+  background: none;
+  margin: 0 0 2rem;
+}
+
+.admin-header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.admin-header-container h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--color-dark);
+  margin: 0;
+}
+
+.quick-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.stat-card h3 {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.stat-card .value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.stat-card .subtext {
+  font-size: 0.85rem;
+  color: #999;
+  margin-top: 0.5rem;
+}
+
+/* Dashboard Columns */
+.dashboard-columns {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.admin-section {
+  flex: 1;
+  min-width: 300px;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  margin-bottom: 1.5rem;
+}
+
+.admin-section h3 {
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+/* Data Tables */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.data-table thead th {
+  text-align: left;
+  padding: 0.75rem;
+  background: #f5f5f5;
+  font-weight: 600;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.data-table thead th.col-count {
+  text-align: right;
+}
+
+.data-table tbody td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.data-table tbody td.col-count {
+  text-align: right;
+}
+
+.data-table tr:hover {
+  background: #fafafa;
+}
+
+/* Charts */
+canvas {
+  max-width: 200px;
+  height: 200px;
+  margin: auto;
+  display: block;
+}
+
+/* Country Flags */
+.country-flag {
+  width: 18px;
+  height: 12px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .admin-header-container {
+    flex-direction: column;
+    align-items: flex-start;
   }
   
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-  }
-  
-  .stat-card {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  }
-  
-  .stat-card h3 {
-    font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 0.5rem;
-    text-transform: uppercase;
-  }
-  
-  .stat-card .value {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #333;
-  }
-  
-  .stat-card .subtext {
-    font-size: 0.85rem;
-    color: #999;
-    margin-top: 0.5rem;
-  }
-  
-  .admin-section {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-    margin-bottom: 1.5rem;
-  }
-  
-  .admin-section h2 {
-    margin-bottom: 1rem;
-    font-size: 1.25rem;
-  }
-  
-  .data-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .data-table th {
-    text-align: left;
-    padding: 0.75rem;
-    background: #f5f5f5;
-    font-weight: 600;
-    border-bottom: 2px solid #e0e0e0;
-  }
-  
-  .data-table td {
-    padding: 0.75rem;
-    border-bottom: 1px solid #e0e0e0;
-  }
-  
-  .data-table tr:hover {
-    background: #fafafa;
+  .admin-header-container h1 {
+    font-size: 1.5rem;
   }
   
   .quick-actions {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
+    width: 100%;
+    flex-direction: column;
   }
+  
+  .dashboard-columns {
+    flex-direction: column;
+  }
+  
+  .admin-section {
+    min-width: 100%;
+  }
+}
 </style>
 
+<!-- Admin Header -->
 <div class="admin-header">
-  <h1>Admin Dashboard</h1>
-  <div class="quick-actions">
-    <a href="/admin/users" class="btn">Manage Users</a>
-    <a href="/admin/analytics" class="btn btn-secondary">View Analytics</a>
+  <div class="admin-header-container">
+    <h1>Admin Dashboard</h1>
+    <div class="quick-actions">
+      <a href="/admin/users" class="btn"><i class="fas fa-users" style="margin-right:8px;"></i> Manage Users</a>
+      <a href="/admin/analytics" class="btn btn-secondary"><i class="fas fa-chart-line" style="margin-right:8px;"></i> View Analytics</a>
+    </div>
   </div>
 </div>
 
@@ -112,45 +192,231 @@
   </div>
 </div>
 
-<!-- Device Stats -->
-<div class="admin-section">
-  <h2>Device Distribution</h2>
-  <table class="data-table">
-    <thead>
-      <tr>
-        <th>Device Type</th>
-        <th>Count</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${deviceStats.map(stat => `
-        <tr>
-          <td>${stat.deviceType || 'Unknown'}</td>
-          <td>${stat._count}</td>
-        </tr>
-      `).join('')}
-    </tbody>
-  </table>
+<!-- Two Columns: Device & Country Stats -->
+<div class="dashboard-columns">
+
+  <!-- Device Distribution -->
+  <div class="admin-section">
+    <h3>Device Distribution</h3>
+    <canvas id="deviceChart"></canvas>
+    <table class="data-table" id="device-table">
+      <thead>
+        <tr><th>Device</th><th class="col-count">Users</th></tr>
+      </thead>
+      <tbody>
+        ${deviceStats.map(stat => `
+          <tr data-device="${(stat.deviceType || 'unknown').toLowerCase()}">
+            <td>${stat.deviceType || 'Unknown'}</td>
+            <td class="col-count">${stat._count}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Top Countries -->
+  <div class="admin-section">
+    <h3>Top Countries</h3>
+    <canvas id="countryChart"></canvas>
+    <table class="data-table" id="country-table">
+      <thead>
+        <tr><th>Country</th><th class="col-count">Events</th></tr>
+      </thead>
+      <tbody>
+        ${countryStats.map(stat => `
+          <tr data-country="${stat.countryCode || ''}">
+            <td class="country-cell">${stat.country || 'Unknown'}</td>
+            <td class="col-count">${stat._count}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  </div>
+
 </div>
 
-<!-- Country Stats -->
-<div class="admin-section">
-  <h2>Top Countries</h2>
-  <table class="data-table">
-    <thead>
-      <tr>
-        <th>Country</th>
-        <th>Events</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${countryStats.map(stat => `
-        <tr>
-          <td>${stat.country || 'Unknown'}</td>
-          <td>${stat._count}</td>
-        </tr>
-      `).join('')}
-    </tbody>
-  </table>
-</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Device Chart
+  const deviceRows = document.querySelectorAll('#device-table tbody tr');
+  const deviceLabels = [], deviceValues = [];
+  const deviceColors = ['#3498db', '#2ecc71', '#f1c40f', '#e74c3c'];
+  const faIcons = {
+    mobile: 'fas fa-mobile-alt',
+    desktop: 'fas fa-desktop',
+    tablet: 'fas fa-tablet-alt',
+    smartwatch: 'fas fa-clock',
+    unknown: 'fas fa-question-circle'
+  };
+  
+  deviceRows.forEach((row, index) => {
+    const device = row.dataset.device.toLowerCase();
+    const count = parseInt(row.cells[1].textContent);
+    deviceLabels.push(device.charAt(0).toUpperCase() + device.slice(1));
+    deviceValues.push(count);
+  });
+  
+  // Add icons and progress bars to device table
+  const maxDeviceValue = Math.max(...deviceValues);
+  deviceRows.forEach((row, index) => {
+    const device = row.dataset.device.toLowerCase();
+    const count = parseInt(row.cells[1].textContent);
+    const icon = faIcons[device] || faIcons.unknown;
+    
+    const wrapper = document.createElement('div');
+    wrapper.style.display = 'flex';
+    wrapper.style.flexDirection = 'column';
+    wrapper.style.marginBottom = '4px';
+    
+    const textDiv = document.createElement('div');
+    textDiv.style.whiteSpace = 'nowrap';
+    textDiv.style.marginBottom = '4px';
+    textDiv.innerHTML = '<i class="' + icon + '" style="margin-right:4px;"></i>' + device.charAt(0).toUpperCase() + device.slice(1);
+    
+    const barWrapper = document.createElement('div');
+    barWrapper.style.background = '#e0e0e0';
+    barWrapper.style.borderRadius = '5px';
+    barWrapper.style.height = '10px';
+    barWrapper.style.width = '100%';
+    
+    const barFill = document.createElement('div');
+    barFill.style.width = (count / maxDeviceValue * 100) + '%';
+    barFill.style.background = deviceColors[index % deviceColors.length];
+    barFill.style.height = '100%';
+    barFill.style.borderRadius = '5px';
+    
+    barWrapper.appendChild(barFill);
+    wrapper.appendChild(textDiv);
+    wrapper.appendChild(barWrapper);
+    row.cells[0].innerHTML = '';
+    row.cells[0].appendChild(wrapper);
+  });
+  
+  // Render device chart
+  new Chart(document.getElementById('deviceChart').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: deviceLabels,
+      datasets: [{
+        data: deviceValues,
+        backgroundColor: deviceColors.slice(0, deviceValues.length),
+        borderWidth: 1,
+        borderRadius: 0,
+        borderAlign: 'inner'
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: '50%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return context.label + ': ' + context.raw;
+            }
+          }
+        }
+      }
+    }
+  });
+  
+  // Country Chart
+  const countryRows = document.querySelectorAll('#country-table tbody tr');
+  const countryLabels = [], countryValues = [];
+  const countryColors = ['#3498db', '#d85c28'];
+  
+  countryRows.forEach((row, index) => {
+    const countryCode = row.getAttribute('data-country');
+    const cell = row.querySelector('.country-cell');
+    const count = parseInt(row.cells[1].innerText);
+    countryLabels.push(cell.innerText);
+    countryValues.push(count);
+    
+    // Fetch country flag
+    if (countryCode) {
+      fetch('https://restcountries.com/v3.1/alpha/' + countryCode)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data[0] && data[0].flags && data[0].flags.png) {
+            const flagImg = document.createElement('img');
+            flagImg.src = data[0].flags.png;
+            flagImg.alt = countryCode + ' Flag';
+            flagImg.className = 'country-flag';
+            cell.prepend(flagImg);
+          }
+        })
+        .catch(err => console.error('Failed to load flag for', countryCode, err));
+    }
+  });
+  
+  // Add progress bars to country table
+  const maxCountryValue = Math.max(...countryValues);
+  countryRows.forEach((row, index) => {
+    const cell = row.querySelector('.country-cell');
+    const count = parseInt(row.cells[1].innerText);
+    const originalText = cell.innerText;
+    
+    const wrapper = document.createElement('div');
+    wrapper.style.display = 'flex';
+    wrapper.style.flexDirection = 'column';
+    
+    const textDiv = document.createElement('div');
+    textDiv.style.display = 'flex';
+    textDiv.style.alignItems = 'center';
+    textDiv.style.justifyContent = 'flex-start';
+    textDiv.style.whiteSpace = 'nowrap';
+    textDiv.style.marginBottom = '4px';
+    textDiv.textContent = originalText;
+    
+    const barWrapper = document.createElement('div');
+    barWrapper.style.background = '#e0e0e0';
+    barWrapper.style.borderRadius = '5px';
+    barWrapper.style.height = '10px';
+    barWrapper.style.width = '100%';
+    
+    const barFill = document.createElement('div');
+    barFill.style.width = (count / maxCountryValue * 100) + '%';
+    barFill.style.background = countryColors[index % countryColors.length];
+    barFill.style.height = '100%';
+    barFill.style.borderRadius = '5px';
+    
+    barWrapper.appendChild(barFill);
+    wrapper.appendChild(textDiv);
+    wrapper.appendChild(barWrapper);
+    cell.innerHTML = '';
+    cell.appendChild(wrapper);
+  });
+  
+  // Render country chart
+  new Chart(document.getElementById('countryChart').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: countryLabels,
+      datasets: [{
+        data: countryValues,
+        backgroundColor: countryColors,
+        borderWidth: 1,
+        borderRadius: 0,
+        borderAlign: 'inner'
+      }]
+    },
+    options: {
+      responsive: true,
+      cutout: '50%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return context.label + ': ' + context.raw;
+            }
+          }
+        }
+      }
+    }
+  });
+});
+</script>
 `, user, subscription }) %>

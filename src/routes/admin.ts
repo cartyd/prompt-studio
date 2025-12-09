@@ -27,13 +27,38 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
     });
 
     // Top countries
-    const countryStats = await fastify.prisma.event.groupBy({
+    const countryStatsRaw = await fastify.prisma.event.groupBy({
       by: ['country'],
       _count: true,
       where: { country: { not: null } },
       orderBy: { _count: { country: 'desc' } },
       take: 10,
     });
+
+    // Map country codes to names
+    const countryNameMap: Record<string, string> = {
+      'US': 'United States',
+      'GB': 'United Kingdom',
+      'CA': 'Canada',
+      'AU': 'Australia',
+      'DE': 'Germany',
+      'FR': 'France',
+      'IN': 'India',
+      'JP': 'Japan',
+      'CN': 'China',
+      'BR': 'Brazil',
+      'ID': 'Indonesia',
+      'MX': 'Mexico',
+      'ES': 'Spain',
+      'IT': 'Italy',
+      'NL': 'Netherlands',
+    };
+
+    const countryStats = countryStatsRaw.map(stat => ({
+      country: countryNameMap[stat.country || ''] || stat.country || 'Unknown',
+      countryCode: stat.country,
+      _count: stat._count,
+    }));
 
     return reply.viewWithCsrf('admin/dashboard', {
       user: request.user,
