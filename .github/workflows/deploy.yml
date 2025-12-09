@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: Git ref to deploy (default: main)
+        description: 'Git ref to deploy (default: main)'
         required: false
         default: main
 
@@ -24,7 +24,7 @@ jobs:
 
     steps:
       - name: Validate required secrets
-        if: ${{ !secrets.SSH_HOST || !secrets.SSH_USER || !secrets.SSH_KEY }}
+        if: ${{ secrets.SSH_HOST == '' || secrets.SSH_USER == '' || secrets.SSH_KEY == '' }}
         run: |
           echo "::error::Missing one or more required secrets (SSH_HOST, SSH_USER, SSH_KEY). Add them in Settings > Secrets and variables > Actions.";
           exit 1
@@ -70,6 +70,7 @@ jobs:
         run: |
           rsync -az --delete \
             --exclude '.env' --exclude 'logs' --exclude 'sessions.db' \
+            --exclude 'prisma/*.db' --exclude 'prisma/*.db-journal' --exclude 'prisma/data/' \
             -e "ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes" \
             release/ "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/prompt-studio/"
 
