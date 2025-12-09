@@ -26,6 +26,7 @@ log "Stage minimal runtime files"
 cp -r dist package.json package-lock.json ecosystem.config.js "$RELEASE_DIR"/
 [ -d public ] && cp -r public "$RELEASE_DIR"/
 [ -d prisma ] && cp -r prisma "$RELEASE_DIR"/
+[ -d scripts ] && cp -r scripts "$RELEASE_DIR"/
 
 log "Create server backup before deploy"
 ssh "$SERVER" "set -e; ts=\$(date -u +%Y%m%d-%H%M%S); tar zcf /root/prompt-studio-backup-\$ts.tgz -C /var/www prompt-studio || true"
