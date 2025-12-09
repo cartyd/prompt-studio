@@ -15,3 +15,4 @@ sessions.db-journal
 docs/assets/layout/
 prisma/prod.db
 release/
+.env.production
