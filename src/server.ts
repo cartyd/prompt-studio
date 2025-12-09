@@ -66,10 +66,11 @@ async function start() {
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],
-          styleSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://cdn.boxicons.com"],
-          scriptSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com"],
-          fontSrc: ["'self'", "https://unpkg.com", "https://cdn.boxicons.com", "data:"],
-          imgSrc: ["'self'", "data:"],
+          styleSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://cdn.boxicons.com", "https://cdnjs.cloudflare.com"],
+          scriptSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://cdn.jsdelivr.net"],
+          fontSrc: ["'self'", "https://unpkg.com", "https://cdn.boxicons.com", "https://cdnjs.cloudflare.com", "data:"],
+          imgSrc: ["'self'", "data:", "https://restcountries.com", "https://flagcdn.com"],
+          connectSrc: ["'self'", "https://restcountries.com"],
         },
       },
     });
