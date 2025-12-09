@@ -1,48 +1,207 @@
 <% const title = 'Frameworks'; %>
+
+<% 
+// Map framework IDs to Boxicon classes
+const frameworkIcons = {
+  'tot': 'bx-network-chart',
+  'self-consistency': 'bx-refresh-cw-dot',
+  'cot': 'bx-link',
+  'role': 'bx-file-code',
+  'reflection': 'bx-edit'
+};
+%>
+
 <%- include('../layout-wrapper', { body: `
 <style>
-  .frameworks-header {
-    margin-bottom: 2rem;
+  .admin-header {
+    width: 100%;
+    background: none;
+    margin: 0 0 2rem;
   }
   
-  .framework-card {
-    padding: 1.5rem;
-    border: 2px solid var(--color-primary);
-    border-radius: 8px;
-    transition: transform 0.2s, box-shadow 0.2s;
+  .admin-header-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .admin-header-container h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-dark);
+  }
+  
+  .frameworks-wrapper {
+    position: relative;
+    margin: 3rem 0;
+  }
+  
+  .feature-grid-frameworks {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: nowrap;
+    margin-bottom: 1.5rem;
+  }
+  
+  .feature-grid-frameworks.row-1 {
+    justify-content: center;
+  }
+  
+  .feature-grid-frameworks.row-2 {
+    justify-content: center;
+  }
+  
+  .feature-card {
+    width: 100%;
+    max-width: 386px;
+    min-height: 300px;
+    background: #fff;
     display: flex;
     flex-direction: column;
+    justify-content: flex-start;
+    padding: 2rem;
+    border: 1px solid #eee;
+    text-align: left;
+    transition: border-color 0.3s;
   }
   
-  .framework-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
-  }
-  
-  .framework-card h3 {
-    margin-bottom: 0.5rem;
-  }
-  
-  .framework-card p {
+  .feature-card .icon {
+    font-size: 2.5rem;
+    color: #555;
     margin-bottom: 1rem;
-    color: var(--color-text-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    transform-origin: center;
+    transition: color 0.3s ease, transform 0.6s ease;
+    will-change: transform;
+  }
+  
+  .feature-card h3 {
+    font-size: 1.4rem;
+    margin: 0.5rem 0;
+    color: #333;
+    transition: color 0.3s;
+  }
+  
+  .feature-card p {
+    color: #555;
+    line-height: 1.6;
     flex: 1;
   }
   
-  .framework-card .btn {
-    min-height: var(--touch-target-min);
+  .feature-card:hover {
+    border-color: #F26631;
+  }
+  
+  .feature-card:hover .icon {
+    color: #F26631;
+    transform: rotate(360deg);
+  }
+  
+  .feature-card a.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    margin-top: 1rem;
+    background: #fff;
+    color: var(--color-dark);
+    border: 2px solid #d85c28;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: auto;
+    max-width: 180px;
+    text-decoration: none;
+    justify-content: center;
+  }
+  
+  .feature-card a.btn:hover {
+    background: #d85c28;
+    color: #fff;
+    border: 2px solid #d85c28;
+  }
+  
+  /* Mobile responsive */
+  @media (max-width: 1240px) {
+    .feature-grid-frameworks {
+      flex-wrap: wrap;
+    }
+  }
+  
+  @media (max-width: 992px) {
+    .feature-grid-frameworks {
+      flex-direction: column;
+      align-items: center;
+      flex-wrap: nowrap;
+    }
+    
+    .feature-card {
+      max-width: 100%;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .admin-header-container h1 {
+      font-size: 1.5rem;
+    }
+    
+    .feature-card {
+      padding: 1.5rem;
+      min-height: 250px;
+    }
+    
+    .feature-card .icon {
+      font-size: 2rem;
+      width: 2rem;
+      height: 2rem;
+    }
+    
+    .feature-card h3 {
+      font-size: 1.2rem;
+    }
   }
 </style>
 
-<h2 class="frameworks-header">Prompting Frameworks</h2>
+<!-- Frameworks Header -->
+<div class="admin-header">
+  <div class="admin-header-container">
+    <h1>Prompting Frameworks</h1>
+  </div>
+</div>
 
-<div class="grid grid-lg-auto-fit grid-gap-lg">
-  ${frameworks.map(f => `
-    <div class="framework-card">
-      <h3>${f.name}</h3>
-      <p>${f.description}</p>
-      <a href="/frameworks/${f.id}" class="btn">Create Prompt</a>
-    </div>
-  `).join('')}
+<!-- Grid of framework cards -->
+<div class="frameworks-wrapper">
+  <!-- Row 1: First 3 frameworks -->
+  <div class="feature-grid-frameworks row-1">
+    ${frameworks.slice(0, 3).map(f => `
+      <div class="feature-card">
+        <i class='bx ${frameworkIcons[f.id] || 'bx-code-alt'} icon'></i>
+        <h3>${f.name}</h3>
+        <p>${f.description}</p>
+        <a href="/frameworks/${f.id}" class="btn"><i class='bx bx-frame'></i> Create Prompt</a>
+      </div>
+    `).join('')}
+  </div>
+  
+  <!-- Row 2: Remaining frameworks -->
+  ${frameworks.length > 3 ? `
+  <div class="feature-grid-frameworks row-2">
+    ${frameworks.slice(3).map(f => `
+      <div class="feature-card">
+        <i class='bx ${frameworkIcons[f.id] || 'bx-code-alt'} icon'></i>
+        <h3>${f.name}</h3>
+        <p>${f.description}</p>
+        <a href="/frameworks/${f.id}" class="btn"><i class='bx bx-frame'></i> Create Prompt</a>
+      </div>
+    `).join('')}
+  </div>
+  ` : ''}
 </div>
 `, user, subscription }) %>
