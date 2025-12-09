@@ -20,7 +20,9 @@
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:generate": "prisma generate",
     "prisma:studio": "prisma studio",
-    "reset-dev-users": "tsx scripts/reset-dev-users.ts"
+    "reset-dev-users": "tsx scripts/reset-dev-users.ts",
+    "view:users": "node scripts/view-users.js",
+    "ops:verify-existing-users": "tsx scripts/verify-existing-users.ts"
   },
   "keywords": [
     "fastify",
