@@ -80,10 +80,10 @@ main {
 .hero-btn {
   font-size: 1.125rem;
   padding: 0.75rem 1.5rem;
-  background-color: #d85c28;
-  color: white;
+  background: linear-gradient(90deg, #d85c28, #f29964) !important;
+  color: #fff !important;
   border: none;
-  border-radius: 50px;
+  border-radius: 50px !important;
   cursor: pointer;
   text-decoration: none;
   display: inline-flex;
@@ -93,7 +93,7 @@ main {
 }
 
 .hero-btn:hover {
-  background-color: #c04d20;
+  background: linear-gradient(90deg, #c04d20, #d88555) !important;
   transform: translateY(-2px);
 }
 
