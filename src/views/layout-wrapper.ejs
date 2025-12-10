@@ -1,1 +1,7 @@
-<%- include('layout', { body, user, title: typeof title !== 'undefined' ? title : '', subscription: typeof subscription !== 'undefined' ? subscription : null }) %>
+<%- include('layout', { 
+  body, 
+  user, 
+  title: typeof title !== 'undefined' ? title : '', 
+  subscription: typeof subscription !== 'undefined' ? subscription : null,
+  additionalStyles: typeof additionalStyles !== 'undefined' ? additionalStyles : ''
+}) %>

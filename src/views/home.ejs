@@ -1,22 +1,18 @@
 <% const title = 'Home'; %>
-<%- include('layout-wrapper', { body: `
-<link rel="stylesheet" href="/css/home.css">
+<% const additionalStyles = '<link rel="stylesheet" href="/css/home.css">'; %>
+<%
+const getStartedBtn = !user 
+  ? '<a href="/auth/register" class="btn hero-btn"><i class="bx bx-frame"></i> Get Started</a>'
+  : '<a href="/frameworks" class="btn hero-btn"><i class="bx bx-frame"></i> Explore Frameworks</a>';
 
+const bodyContent = String.raw`
 <!-- HERO SECTION -->
 <div class="hero">
   <canvas id="heroCanvas" class="hero-canvas" aria-hidden="true"></canvas>
   <div class="hero-content">
     <h1 class="hero-title">Prompt Framework Studio</h1>
     <p>Create structured, effective prompts using proven LLM prompting frameworks</p>
-    ${ !user ? `
-      <a href="/auth/register" class="btn hero-btn">
-        <i class='bx bx-frame'></i> Get Started
-      </a>
-    ` : `
-      <a href="/frameworks" class="btn hero-btn">
-        <i class='bx bx-frame'></i> Explore Frameworks
-      </a>
-    ` }
+    ${getStartedBtn}
   </div>
   
   <!-- CAROUSEL -->
@@ -74,4 +70,6 @@
 
 <script src="/js/canvas-node-system.js"></script>
 <script src="/js/carousel.js"></script>
-` }) %>
+`;
+%>
+<%- include('layout-wrapper', { body: bodyContent }) %>

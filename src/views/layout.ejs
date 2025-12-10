@@ -34,6 +34,11 @@
   <!-- Component Utilities -->
   <link rel="stylesheet" href="/css/components.css">
   
+  <!-- Page-specific styles -->
+  <% if (typeof additionalStyles !== 'undefined' && additionalStyles) { %>
+    <%- additionalStyles %>
+  <% } %>
+  
   <title><%= typeof title !== 'undefined' ? title : '' %>Prompt Framework Studio</title>
   <script src="https://unpkg.com/htmx.org@1.9.10"></script>
   <style>
