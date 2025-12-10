@@ -1,5 +1,5 @@
 <% const title = 'Home'; %>
-<% const bodyContent = String.raw`
+<%- include('layout-wrapper', { body: `
 <link rel="stylesheet" href="/css/home.css">
 
 <!-- HERO SECTION -->
@@ -8,15 +8,15 @@
   <div class="hero-content">
     <h1 class="hero-title">Prompt Framework Studio</h1>
     <p>Create structured, effective prompts using proven LLM prompting frameworks</p>
-    <% if (!user) { %>
+    ${ !user ? `
       <a href="/auth/register" class="btn hero-btn">
         <i class='bx bx-frame'></i> Get Started
       </a>
-    <% } else { %>
+    ` : `
       <a href="/frameworks" class="btn hero-btn">
         <i class='bx bx-frame'></i> Explore Frameworks
       </a>
-    <% } %>
+    ` }
   </div>
   
   <!-- CAROUSEL -->
@@ -74,6 +74,4 @@
 
 <script src="/js/canvas-node-system.js"></script>
 <script src="/js/carousel.js"></script>
-`;
-%>
-<%- include('layout-wrapper', { body: bodyContent }) %>
+` }) %>
