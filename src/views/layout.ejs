@@ -31,6 +31,9 @@
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
   
+  <!-- Component Utilities -->
+  <link rel="stylesheet" href="/css/components.css">
+  
   <title><%= typeof title !== 'undefined' ? title : '' %>Prompt Framework Studio</title>
   <script src="https://unpkg.com/htmx.org@1.9.10"></script>
   <style>
@@ -86,6 +89,14 @@
       
       /* Touch-friendly sizes */
       --touch-target-min: 44px;
+      
+      /* Component sizes */
+      --avatar-size: 36px;
+      --logo-height: 60px;
+      --dropdown-top-offset: 48px;
+      --dropdown-width: 170px;
+      --footer-height: 200px;
+      --container-max-width: 1200px;
     }
 
     /* ==========  BASE STYLES  ========== */
@@ -98,7 +109,7 @@
       overflow-x: hidden; /* Prevent horizontal scroll */
     }
     .container { 
-      max-width: 1200px; 
+      max-width: var(--container-max-width); 
       margin: 0 auto; 
       padding: 0 var(--spacing-md);
       width: 100%;
@@ -127,7 +138,7 @@
     }
 
     .nav-left .logo { 
-      height: 60px; 
+      height: var(--logo-height); 
       object-fit: contain; 
     }
 
@@ -200,7 +211,8 @@
     }
     
     .avatar {
-      width: 36px; height: 36px;
+      width: var(--avatar-size);
+      height: var(--avatar-size);
       background: var(--color-primary); 
       color: var(--color-white);
       border-radius: 50%;
@@ -211,9 +223,9 @@
     /* ==========  DROPDOWN MENU  ========== */
     .dropdown-menu {
       position: absolute;
-      top: 48px;
+      top: var(--dropdown-top-offset);
       right: 0;
-      width: 170px;
+      width: var(--dropdown-width);
       background: var(--color-white);
       border-radius: 6px;
       box-shadow: 0 5px 15px rgba(0,0,0,0.15);
@@ -275,9 +287,9 @@
 
     /* ==========  LAYOUT  ========== */
     main { 
-      min-height: calc(100vh - 200px);
-      padding-top: 2rem;
-      padding-bottom: 2rem;
+      min-height: calc(100vh - var(--footer-height));
+      padding-top: var(--spacing-xl);
+      padding-bottom: var(--spacing-xl);
     }
     
     footer { 

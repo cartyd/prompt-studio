@@ -1,16 +1,16 @@
 <% const title = 'About'; %>
 <%- include('layout-wrapper', { body: `
-<div style="text-align: center; padding: 3rem 0;">
-  <h1 style="font-size: 3rem; margin-bottom: 1rem;">About Prompt Framework Studio</h1>
-  <div style="margin: 2rem 0;">
+<div class="text-center py-3">
+  <h1 style="font-size: 3rem;" class="mb-1">About Prompt Framework Studio</h1>
+  <div class="my-2">
     <span class="badge" style="font-size: 1rem; padding: 0.5rem 1rem;">Version ${version}</span>
   </div>
 </div>
 
-<div style="max-width: 800px; margin: 0 auto;">
-  <div style="margin-bottom: 3rem;">
-    <h2 style="font-size: 1.75rem; margin-bottom: 1rem; color: var(--color-dark);">About</h2>
-    <p style="line-height: 1.8; margin-bottom: 1rem;">
+<div class="content-container-md">
+  <div class="mb-3">
+    <h2 style="font-size: 1.75rem; color: var(--color-dark);" class="mb-1">About</h2>
+    <p style="line-height: 1.8;" class="mb-1">
       Prompt Framework Studio is a web application designed to help you create structured, 
       effective prompts for Large Language Models (LLMs) using proven prompting frameworks.
     </p>
@@ -21,35 +21,35 @@
     </p>
   </div>
 
-  <div style="margin-bottom: 3rem;">
-    <h2 style="font-size: 1.75rem; margin-bottom: 1rem; color: var(--color-dark);">Features</h2>
-    <div style="display: grid; gap: 1rem;">
-      <div style="padding: 1rem; border-left: 3px solid var(--color-primary); background: var(--color-bg-light);">
+  <div class="mb-3">
+    <h2 style="font-size: 1.75rem; color: var(--color-dark);" class="mb-1">Features</h2>
+    <div class="grid gap-1">
+      <div class="p-1" style="border-left: 3px solid var(--color-primary); background: var(--color-bg-light);">
         <strong>Multiple Prompting Frameworks</strong> - Choose from Tree-of-Thought, Chain-of-Thought, Self-Consistency, Role-Based, and Reflection strategies
       </div>
-      <div style="padding: 1rem; border-left: 3px solid var(--color-primary); background: var(--color-bg-light);">
+      <div class="p-1" style="border-left: 3px solid var(--color-primary); background: var(--color-bg-light);">
         <strong>Save and Manage Prompts</strong> - Build a personal library of your prompts for easy access and reuse
       </div>
-      <div style="padding: 1rem; border-left: 3px solid var(--color-primary); background: var(--color-bg-light);">
+      <div class="p-1" style="border-left: 3px solid var(--color-primary); background: var(--color-bg-light);">
         <strong>Custom Criteria</strong> - Define framework-specific requirements tailored to your needs
       </div>
-      <div style="padding: 1rem; border-left: 3px solid var(--color-primary); background: var(--color-bg-light);">
+      <div class="p-1" style="border-left: 3px solid var(--color-primary); background: var(--color-bg-light);">
         <strong>Real-Time Preview</strong> - See your prompt generated as you fill out the form
       </div>
-      <div style="padding: 1rem; border-left: 3px solid var(--color-primary); background: var(--color-bg-light);">
+      <div class="p-1" style="border-left: 3px solid var(--color-primary); background: var(--color-bg-light);">
         <strong>Premium Features</strong> - Upgrade for unlimited saved prompts and export capabilities
       </div>
     </div>
   </div>
 
-  <div style="margin-bottom: 3rem; padding: 2rem; background: var(--color-bg-light); border-radius: 8px; text-align: center;">
-    <h2 style="font-size: 1.75rem; margin-bottom: 1rem; color: var(--color-dark);">Author</h2>
+  <div class="mb-3 p-2 text-center" style="background: var(--color-bg-light); border-radius: 8px;">
+    <h2 style="font-size: 1.75rem; color: var(--color-dark);" class="mb-1">Author</h2>
     <p style="line-height: 1.8;">
       Created by <strong>Dave Carty</strong> at <a href="https://simplicate.ai" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary); text-decoration: none; font-weight: 600;">Simplicate AI</a>
     </p>
   </div>
 
-  <div style="text-align: center; margin-top: 3rem;">
+  <div class="text-center mt-3">
     <a href="/" class="btn">← Back to Home</a>
   </div>
 </div>

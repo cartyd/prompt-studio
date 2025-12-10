@@ -1,21 +1,21 @@
 <% const title = 'Check Your Email'; %>
 <%- include('../layout-wrapper', { body: `
-<div style="max-width: 600px; margin: 0 auto; text-align: center;">
-  <div style="font-size: 48px; margin-bottom: 1rem;">📧</div>
-  <h2 style="margin-bottom: 1rem;">Check Your Email</h2>
+<div class="message-container">
+  <div class="message-icon">📧</div>
+  <h2 class="message-title">Check Your Email</h2>
   
   <div class="success" style="text-align: left;">
     ${typeof fromResend !== 'undefined' && fromResend ? '<p><strong>Verification email sent!</strong></p>' : '<p><strong>Account created successfully!</strong></p>'}
     <p>We've sent a verification email to <strong>${email}</strong>.</p>
   </div>
   
-  <p style="margin: 2rem 0;">
+  <p class="message-content">
     Please check your inbox and click the verification link to activate your account. 
     The link will expire in 24 hours.
   </p>
   
-  <div style="background: #ecf0f1; padding: 1.5rem; border-radius: 4px; margin: 2rem 0;">
-    <p style="margin: 0 0 1rem 0; font-size: 0.9rem;">Didn't receive the email?</p>
+  <div class="info-box">
+    <p class="mb-1 link-small">Didn't receive the email?</p>
     <form method="POST" action="/auth/resend-verification" style="display: inline;">
       <input type="hidden" name="_csrf" value="${csrfToken}">
       <input type="hidden" name="email" value="${email}">
@@ -23,7 +23,7 @@
     </form>
   </div>
   
-  <p style="color: #7f8c8d; font-size: 0.9rem;">
+  <p class="info-box-muted">
     Check your spam folder if you don't see the email in your inbox.
   </p>
 </div>

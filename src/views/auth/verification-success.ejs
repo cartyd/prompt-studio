@@ -1,15 +1,15 @@
 <% const title = 'Email Verified'; %>
 <%- include('../layout-wrapper', { body: `
-<div style="max-width: 600px; margin: 0 auto; text-align: center;">
-  <div style="font-size: 48px; margin-bottom: 1rem;">✅</div>
-  <h2 style="margin-bottom: 1rem;">Email Verified Successfully!</h2>
+<div class="message-container">
+  <div class="message-icon">✅</div>
+  <h2 class="message-title">Email Verified Successfully!</h2>
   
   <div class="success">
     <p>Your email address has been verified. You can now login to your account.</p>
   </div>
   
-  <p style="margin: 2rem 0;">
-    <a href="/auth/login" class="btn" style="min-width: 200px;">Login to Your Account</a>
+  <p class="message-content">
+    <a href="/auth/login" class="btn btn-min-width">Login to Your Account</a>
   </p>
 </div>
 `, user }) %>

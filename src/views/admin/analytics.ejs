@@ -1,68 +1,6 @@
 <% const title = 'Analytics'; %>
 <%- include('../layout-wrapper', { body: `
-<style>
-  .admin-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-  }
-  
-  .time-filter {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 2rem;
-  }
-  
-  .time-filter a {
-    padding: 0.5rem 1rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    text-decoration: none;
-    color: var(--color-text);
-  }
-  
-  .time-filter a.active {
-    background: var(--color-primary);
-    color: white;
-    border-color: var(--color-primary);
-  }
-  
-  .analytics-section {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-    margin-bottom: 1.5rem;
-  }
-  
-  .analytics-section h2 {
-    margin-bottom: 1rem;
-    font-size: 1.25rem;
-  }
-  
-  .data-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .data-table th {
-    text-align: left;
-    padding: 0.75rem;
-    background: #f5f5f5;
-    font-weight: 600;
-    border-bottom: 2px solid #e0e0e0;
-  }
-  
-  .data-table td {
-    padding: 0.75rem;
-    border-bottom: 1px solid #e0e0e0;
-  }
-  
-  .data-table tr:hover {
-    background: #fafafa;
-  }
-</style>
+<link rel="stylesheet" href="/css/admin.css">
 
 <div class="admin-header">
   <h1>Analytics</h1>

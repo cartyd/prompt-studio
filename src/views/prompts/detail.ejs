@@ -1,18 +1,18 @@
 <% const title = prompt.title; %>
 <%- include('../layout-wrapper', { body: `
-<div style="max-width: 900px; margin: 0 auto;">
-  <div style="margin-bottom: 1rem;">
-    <a href="/prompts" style="color: #3498db;">&larr; Back to My Prompts</a>
+<div class="content-container-lg">
+  <div class="mb-1">
+    <a href="/prompts" style="color: var(--color-primary);">&larr; Back to My Prompts</a>
   </div>
 
-  <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+  <div class="flex-between mb-1" style="align-items: start;">
     <div>
       <h2 style="margin-bottom: 0.25rem;">${prompt.title}</h2>
-      <p style="color: #7f8c8d;">
+      <p class="text-muted">
         ${prompt.frameworkType} • Created ${new Date(prompt.createdAt).toLocaleDateString()}
       </p>
     </div>
-    <div style="display: flex; gap: 0.5rem;">
+    <div class="flex gap-0-5">
       <button onclick="copyToClipboard()" class="btn btn-secondary">Copy to Clipboard</button>
       ${subscription.isPremium ? `
         <a href="/prompts/${prompt.id}/export" class="btn">Export</a>
@@ -20,17 +20,10 @@
     </div>
   </div>
 
-  <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-top: 1rem;">
+  <div style="background: var(--color-bg-light); padding: 1.5rem; border-radius: 8px;" class="mt-1">
     <pre id="prompt-text" style="white-space: pre-wrap; font-family: inherit; margin: 0;">${prompt.finalPromptText}</pre>
   </div>
 </div>
 
-<script>
-  function copyToClipboard() {
-    const text = document.getElementById('prompt-text').textContent;
-    navigator.clipboard.writeText(text).then(() => {
-      alert('Prompt copied to clipboard!');
-    });
-  }
-</script>
+<script src="/js/prompt-detail.js"></script>
 `, user, subscription }) %>

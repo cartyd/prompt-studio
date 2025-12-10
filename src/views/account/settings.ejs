@@ -1,11 +1,11 @@
 <% const title = 'Account Settings'; %>
 <%- include('../layout-wrapper', { body: `
-<div style="max-width: 800px; margin: 0 auto;">
-  <h2 style="margin-bottom: 2rem;">Account Settings</h2>
+<div class="max-w-900 mx-auto">
+  <h2 class="mb-2">Account Settings</h2>
 
   <!-- Account Information -->
-  <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 4px; margin-bottom: 2rem;">
-    <h3 style="margin: 0 0 1rem 0; font-size: 1.1rem;">Account Information</h3>
+  <div class="p-1-5 mb-2" style="background: #f8f9fa; border-radius: 4px;">
+    <h3 class="m-0 mb-1" style="font-size: 1.1rem;">Account Information</h3>
     <div style="display: grid; grid-template-columns: 150px 1fr; gap: 0.75rem; font-size: 0.95rem;">
       <div style="color: #7f8c8d; font-weight: 500;">Email:</div>
       <div><strong>${user.email}</strong></div>
@@ -22,14 +22,14 @@
   </div>
 
   <!-- Change Password Section -->
-  <div style="background: #ffffff; border: 1px solid #e0e0e0; border-radius: 4px; padding: 2rem; margin-bottom: 2rem;">
-    <h3 style="margin: 0 0 1rem 0; font-size: 1.1rem;">Change Password</h3>
-    <p style="color: #7f8c8d; margin-bottom: 1.5rem; font-size: 0.95rem;">
+  <div class="p-2 mb-2" style="background: #ffffff; border: 1px solid #e0e0e0; border-radius: 4px;">
+    <h3 class="m-0 mb-1" style="font-size: 1.1rem;">Change Password</h3>
+    <p class="mb-1-5" style="color: #7f8c8d; font-size: 0.95rem;">
       Choose a strong password that you don't use for other accounts. Your password must be at least 8 characters long.
     </p>
 
-    ${passwordSuccess ? `<div class="success" style="margin-bottom: 1.5rem;">${passwordSuccess}</div>` : ''}
-    ${passwordError ? `<div class="error" style="margin-bottom: 1.5rem;">${passwordError}</div>` : ''}
+    ${passwordSuccess ? `<div class="success mb-1-5">${passwordSuccess}</div>` : ''}
+    ${passwordError ? `<div class="error mb-1-5">${passwordError}</div>` : ''}
 
     <form method="POST" action="/account/change-password">
       <input type="hidden" name="_csrf" value="${csrfToken}">
