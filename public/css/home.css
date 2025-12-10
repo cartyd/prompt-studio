@@ -80,20 +80,21 @@ main {
 .hero-btn {
   font-size: 1.125rem;
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(90deg, #d85c28, #f29964) !important;
-  color: #fff !important;
+  background: linear-gradient(90deg, #d85c28, #f29964);
+  color: #fff;
   border: none;
-  border-radius: 50px !important;
+  border-radius: 50px;
   cursor: pointer;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  transition: all 0.2s ease;
+  transition: 0.2s;
+  width: auto;
 }
 
 .hero-btn:hover {
-  background: linear-gradient(90deg, #c04d20, #d88555) !important;
+  background: linear-gradient(90deg, #c04d20, #d88555);
   transform: translateY(-2px);
 }
 
