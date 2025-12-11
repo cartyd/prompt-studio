@@ -25,7 +25,7 @@
         <div class="prompt-content">
           <h3><%= p.title %></h3>
           <p class="prompt-meta">
-            <%= p.frameworkType %> • <%= new Date(p.createdAt).toLocaleDateString() %>
+            <%= p.frameworkType %> • <span data-format-date="<%= p.createdAt %>" data-format="date"><%= p.createdAt %></span>
           </p>
           <p class="prompt-preview"><%= p.finalPromptText.substring(0, 200) %><%= p.finalPromptText.length > 200 ? '...' : '' %></p>
         </div>
