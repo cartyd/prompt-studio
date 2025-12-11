@@ -18,8 +18,15 @@ npm ci --omit=dev
 
 # Optional Prisma migrations if present
 if [ -d prisma ]; then
-  npx prisma generate || true
-  npx prisma migrate deploy || true
+  # Generate Prisma Client
+  npx prisma generate --schema=prisma/schema.prisma || true
+  
+  # Run migrations using DATABASE_URL from .env
+  # Note: We skip migration if it fails (already applied or no migrations)
+  if [ -f .env ]; then
+    source .env
+    DATABASE_URL="$DATABASE_URL" npx prisma migrate deploy --schema=prisma/schema.prisma || echo "Migration skipped or already applied"
+  fi
 fi
 
 # Ensure logs directory exists
