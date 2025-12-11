@@ -23,9 +23,16 @@ const frameworkIcons = {
 
 <!-- Grid of framework cards -->
 <div class="frameworks-wrapper">
-  <!-- Row 1: First 3 frameworks -->
+  <!-- Discover Wizard Card -->
   <div class="feature-grid-frameworks row-1">
-    ${frameworks.slice(0, 3).map(f => `
+    <div class="feature-card discover-card">
+      <i class='bx bx-compass icon'></i>
+      <h3>Discover</h3>
+      <p>Not sure which framework to use? Let our wizard guide you to the perfect match for your needs.</p>
+      <a href="/wizard" class="btn"><i class='bx bx-play-circle'></i> Find My Framework</a>
+      <div class="discover-badge">Recommended for beginners</div>
+    </div>
+    ${frameworks.slice(0, 2).map(f => `
       <div class="feature-card">
         <i class='bx ${frameworkIcons[f.id] || 'bx-code-alt'} icon'></i>
         <h3>${f.name}</h3>
@@ -36,9 +43,8 @@ const frameworkIcons = {
   </div>
   
   <!-- Row 2: Remaining frameworks -->
-  ${frameworks.length > 3 ? `
   <div class="feature-grid-frameworks row-2">
-    ${frameworks.slice(3).map(f => `
+    ${frameworks.slice(2).map(f => `
       <div class="feature-card">
         <i class='bx ${frameworkIcons[f.id] || 'bx-code-alt'} icon'></i>
         <h3>${f.name}</h3>
@@ -47,6 +53,5 @@ const frameworkIcons = {
       </div>
     `).join('')}
   </div>
-  ` : ''}
 </div>
 `, user, subscription }) %>

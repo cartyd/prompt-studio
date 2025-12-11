@@ -17,6 +17,7 @@ const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
   // Show framework form
   fastify.get('/:frameworkId', { preHandler: requireAuth }, async (request, reply) => {
     const { frameworkId } = request.params as { frameworkId: string };
+    const { fromWizard, prepopulate } = request.query as { fromWizard?: string; prepopulate?: string };
     const framework = getFrameworkById(frameworkId);
 
     if (!framework) {
@@ -36,10 +37,22 @@ const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
       customCriteria = criteria.map((c: { criteriaName: string }) => c.criteriaName);
     }
 
+    // Parse prepopulate data from wizard if provided
+    let prepopulateData: Record<string, string> | undefined;
+    if (prepopulate) {
+      try {
+        prepopulateData = JSON.parse(decodeURIComponent(prepopulate));
+      } catch (e) {
+        // Invalid JSON, ignore
+        prepopulateData = undefined;
+      }
+    }
+
     // Log framework view event
     await logEvent(fastify.prisma, request, request.user?.id, 'framework_view', {
       frameworkId,
       frameworkName: framework.name,
+      fromWizard: fromWizard === 'true',
     });
 
     return reply.viewWithCsrf('frameworks/form', {
@@ -47,6 +60,8 @@ const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
       user: request.user,
       subscription: request.subscription,
       customCriteria,
+      prepopulateData,
+      fromWizard: fromWizard === 'true',
     });
   });
 

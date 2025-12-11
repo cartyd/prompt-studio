@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import * as Prisma from '@prisma/client';
 import { FastifyRequest } from 'fastify';
 import { extractRequestMetadata } from './analytics-helpers';
 
@@ -20,7 +20,7 @@ export interface EventMetadata {
  * @param metadata - Additional event data
  */
 export async function logEvent(
-  prisma: PrismaClient,
+  prisma: Prisma.PrismaClient,
   request: FastifyRequest,
   userId: string | undefined,
   eventType: EventType,

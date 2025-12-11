@@ -9,9 +9,6 @@ module.exports = {
     '!src/**/*.d.ts'
   ],
   moduleFileExtensions: ['ts', 'js', 'json'],
-  testEnvironmentOptions: {
-    localStorage: null
-  },
   transform: {
     '^.+\\.ts$': ['ts-jest', {
       tsconfig: {

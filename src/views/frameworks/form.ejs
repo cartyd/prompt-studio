@@ -78,10 +78,12 @@
           if (field.optional) {
             return ``; // Optional fields rendered in Advanced Options section
           }
-          const defaultVal = field.defaultValue || '';
+          const prepopVal = (typeof prepopulateData !== 'undefined' && prepopulateData && prepopulateData[field.name]) || '';
+          const defaultVal = prepopVal || field.defaultValue || '';
+          const showWizardHint = prepopVal && typeof fromWizard !== 'undefined' && fromWizard;
           return `<div class="form-group">
             <label for="${field.name}">${field.label}${field.required ? ' *' : ''}
-              ${defaultVal && field.type !== 'number' ? `<small style="color: #7f8c8d; font-weight: normal; margin-left: 0.5rem;">(using default)</small>` : ''}
+              ${showWizardHint ? `<small style="color: #28a745; font-weight: normal; margin-left: 0.5rem;"><i class='bx bx-check-circle'></i> Pre-filled from wizard</small>` : defaultVal && field.type !== 'number' ? `<small style="color: #7f8c8d; font-weight: normal; margin-left: 0.5rem;">(using default)</small>` : ''}
             </label>
             ${field.type === 'textarea' 
               ? `<textarea id="${field.name}" name="${field.name}" placeholder="${field.placeholder || ''}" ${field.required ? 'required' : ''}>${defaultVal}</textarea>`

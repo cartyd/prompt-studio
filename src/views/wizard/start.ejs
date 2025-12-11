@@ -1,0 +1,69 @@
+<% const title = 'Find Your Perfect Framework'; %>
+<%- include('../layout-wrapper', { body: `
+<link rel="stylesheet" href="/css/wizard.css">
+
+<div class="wizard-container">
+  <div class="wizard-header">
+    <i class='bx bx-compass wizard-icon'></i>
+    <h1>Let's Find Your Perfect Prompting Framework</h1>
+    <p class="wizard-subtitle">Not sure which framework to use? We'll help you discover the best approach for your needs in just a few simple questions.</p>
+  </div>
+
+  <div class="wizard-content">
+    <div class="wizard-welcome-card">
+      <h2>How It Works</h2>
+      <div class="wizard-steps">
+        <div class="wizard-step-item">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>Answer 4 Quick Questions</h3>
+            <p>Tell us about your task and what matters most to you</p>
+          </div>
+        </div>
+        <div class="wizard-step-item">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>Get Your Recommendation</h3>
+            <p>We'll match you with the perfect framework and explain why</p>
+          </div>
+        </div>
+        <div class="wizard-step-item">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>Start Creating</h3>
+            <p>Jump right into your chosen framework with helpful starter content</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="wizard-benefits">
+        <h3>Why Use the Wizard?</h3>
+        <ul>
+          <li><i class='bx bx-check-circle'></i> <strong>Save time</strong> - No need to research each framework</li>
+          <li><i class='bx bx-check-circle'></i> <strong>Learn as you go</strong> - Understand why we recommend each framework</li>
+          <li><i class='bx bx-check-circle'></i> <strong>Get it right</strong> - Match your task with the best approach</li>
+          <li><i class='bx bx-check-circle'></i> <strong>No experience needed</strong> - Written for everyone, not just AI experts</li>
+        </ul>
+      </div>
+
+      <div class="wizard-actions">
+        <a href="/wizard/question/0" class="btn btn-primary btn-large">
+          <i class='bx bx-play-circle'></i>
+          Start the Wizard
+        </a>
+        <a href="/frameworks" class="btn-link">
+          <i class='bx bx-grid-alt'></i>
+          Skip and browse all frameworks
+        </a>
+      </div>
+
+      <p class="wizard-time-estimate">
+        <i class='bx bx-time-five'></i>
+        Takes about 2 minutes
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="/js/wizard.js"></script>
+`, user, subscription }) %>
