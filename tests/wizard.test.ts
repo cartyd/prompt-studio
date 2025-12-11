@@ -32,9 +32,9 @@ describe('Answer Validation', () => {
   it('should validate complete answers', () => {
     const answers: WizardAnswer[] = [
       { questionId: 'q1', selectedOptionIds: ['explore-ideas'] },
-      { questionId: 'q2', selectedOptionIds: ['very-complex'] },
+      { questionId: 'q2', selectedOptionIds: ['multiple-approaches'] },
       { questionId: 'q3', selectedOptionIds: ['creativity'] },
-      { questionId: 'q4', selectedOptionIds: ['starting-fresh'] },
+      { questionId: 'q4', selectedOptionIds: ['open-exploration'] },
     ];
 
     const result = validateAnswers(answers);
@@ -51,7 +51,7 @@ describe('Answer Validation', () => {
   it('should reject incomplete answers', () => {
     const answers: WizardAnswer[] = [
       { questionId: 'q1', selectedOptionIds: ['explore-ideas'] },
-      { questionId: 'q2', selectedOptionIds: ['very-complex'] },
+      { questionId: 'q2', selectedOptionIds: ['multiple-approaches'] },
     ];
 
     const result = validateAnswers(answers);
@@ -62,9 +62,9 @@ describe('Answer Validation', () => {
   it('should reject invalid question IDs', () => {
     const answers: WizardAnswer[] = [
       { questionId: 'invalid', selectedOptionIds: ['test'] },
-      { questionId: 'q2', selectedOptionIds: ['very-complex'] },
+      { questionId: 'q2', selectedOptionIds: ['multiple-approaches'] },
       { questionId: 'q3', selectedOptionIds: ['creativity'] },
-      { questionId: 'q4', selectedOptionIds: ['starting-fresh'] },
+      { questionId: 'q4', selectedOptionIds: ['open-exploration'] },
     ];
 
     const result = validateAnswers(answers);
@@ -75,9 +75,9 @@ describe('Answer Validation', () => {
   it('should reject invalid option IDs', () => {
     const answers: WizardAnswer[] = [
       { questionId: 'q1', selectedOptionIds: ['invalid-option'] },
-      { questionId: 'q2', selectedOptionIds: ['very-complex'] },
+      { questionId: 'q2', selectedOptionIds: ['multiple-approaches'] },
       { questionId: 'q3', selectedOptionIds: ['creativity'] },
-      { questionId: 'q4', selectedOptionIds: ['starting-fresh'] },
+      { questionId: 'q4', selectedOptionIds: ['open-exploration'] },
     ];
 
     const result = validateAnswers(answers);
@@ -88,9 +88,9 @@ describe('Answer Validation', () => {
   it('should reject multiple selections for single-choice questions', () => {
     const answers: WizardAnswer[] = [
       { questionId: 'q1', selectedOptionIds: ['explore-ideas', 'break-down-problem'] },
-      { questionId: 'q2', selectedOptionIds: ['very-complex'] },
+      { questionId: 'q2', selectedOptionIds: ['multiple-approaches'] },
       { questionId: 'q3', selectedOptionIds: ['creativity'] },
-      { questionId: 'q4', selectedOptionIds: ['starting-fresh'] },
+      { questionId: 'q4', selectedOptionIds: ['open-exploration'] },
     ];
 
     const result = validateAnswers(answers);
@@ -101,9 +101,9 @@ describe('Answer Validation', () => {
   it('should reject answers with no option selected', () => {
     const answers: WizardAnswer[] = [
       { questionId: 'q1', selectedOptionIds: [] },
-      { questionId: 'q2', selectedOptionIds: ['very-complex'] },
+      { questionId: 'q2', selectedOptionIds: ['multiple-approaches'] },
       { questionId: 'q3', selectedOptionIds: ['creativity'] },
-      { questionId: 'q4', selectedOptionIds: ['starting-fresh'] },
+      { questionId: 'q4', selectedOptionIds: ['open-exploration'] },
     ];
 
     const result = validateAnswers(answers);
@@ -116,9 +116,9 @@ describe('Recommendation Algorithm', () => {
   it('should recommend ToT for exploring multiple ideas', () => {
     const answers: WizardAnswer[] = [
       { questionId: 'q1', selectedOptionIds: ['explore-ideas'] },
-      { questionId: 'q2', selectedOptionIds: ['very-complex'] },
+      { questionId: 'q2', selectedOptionIds: ['multiple-approaches'] },
       { questionId: 'q3', selectedOptionIds: ['creativity'] },
-      { questionId: 'q4', selectedOptionIds: ['starting-fresh'] },
+      { questionId: 'q4', selectedOptionIds: ['open-exploration'] },
     ];
 
     const result = calculateRecommendation(answers);
@@ -132,9 +132,9 @@ describe('Recommendation Algorithm', () => {
   it('should recommend CoT for step-by-step analysis', () => {
     const answers: WizardAnswer[] = [
       { questionId: 'q1', selectedOptionIds: ['break-down-problem'] },
-      { questionId: 'q2', selectedOptionIds: ['needs-analysis'] },
+      { questionId: 'q2', selectedOptionIds: ['logical-steps'] },
       { questionId: 'q3', selectedOptionIds: ['clarity'] },
-      { questionId: 'q4', selectedOptionIds: ['starting-fresh'] },
+      { questionId: 'q4', selectedOptionIds: ['clear-problem'] },
     ];
 
     const result = calculateRecommendation(answers);
@@ -146,7 +146,7 @@ describe('Recommendation Algorithm', () => {
   it('should recommend Reflection for improving drafts', () => {
     const answers: WizardAnswer[] = [
       { questionId: 'q1', selectedOptionIds: ['improve-draft'] },
-      { questionId: 'q2', selectedOptionIds: ['refinement'] },
+      { questionId: 'q2', selectedOptionIds: ['iterative-refinement'] },
       { questionId: 'q3', selectedOptionIds: ['polish'] },
       { questionId: 'q4', selectedOptionIds: ['have-draft'] },
     ];
@@ -159,7 +159,7 @@ describe('Recommendation Algorithm', () => {
   it('should recommend Few-Shot for matching styles', () => {
     const answers: WizardAnswer[] = [
       { questionId: 'q1', selectedOptionIds: ['match-style'] },
-      { questionId: 'q2', selectedOptionIds: ['straightforward'] },
+      { questionId: 'q2', selectedOptionIds: ['follow-examples'] },
       { questionId: 'q3', selectedOptionIds: ['tone-style'] },
       { questionId: 'q4', selectedOptionIds: ['have-examples'] },
     ];
@@ -172,9 +172,9 @@ describe('Recommendation Algorithm', () => {
   it('should recommend Self-Consistency for best version', () => {
     const answers: WizardAnswer[] = [
       { questionId: 'q1', selectedOptionIds: ['best-version'] },
-      { questionId: 'q2', selectedOptionIds: ['straightforward'] },
-      { questionId: 'q3', selectedOptionIds: ['tone-style'] },
-      { questionId: 'q4', selectedOptionIds: ['starting-fresh'] },
+      { questionId: 'q2', selectedOptionIds: ['generate-synthesize'] },
+      { questionId: 'q3', selectedOptionIds: ['polish'] },
+      { questionId: 'q4', selectedOptionIds: ['need-synthesis'] },
     ];
 
     const result = calculateRecommendation(answers);
@@ -191,9 +191,9 @@ describe('Recommendation Algorithm', () => {
   it('should calculate confidence scores correctly', () => {
     const answers: WizardAnswer[] = [
       { questionId: 'q1', selectedOptionIds: ['explore-ideas'] },
-      { questionId: 'q2', selectedOptionIds: ['very-complex'] },
+      { questionId: 'q2', selectedOptionIds: ['multiple-approaches'] },
       { questionId: 'q3', selectedOptionIds: ['creativity'] },
-      { questionId: 'q4', selectedOptionIds: ['starting-fresh'] },
+      { questionId: 'q4', selectedOptionIds: ['open-exploration'] },
     ];
 
     const result = calculateRecommendation(answers);
@@ -204,15 +204,40 @@ describe('Recommendation Algorithm', () => {
   it('should include prepopulate data when available', () => {
     const answers: WizardAnswer[] = [
       { questionId: 'q1', selectedOptionIds: ['explore-ideas'] },
-      { questionId: 'q2', selectedOptionIds: ['very-complex'] },
+      { questionId: 'q2', selectedOptionIds: ['multiple-approaches'] },
       { questionId: 'q3', selectedOptionIds: ['creativity'] },
-      { questionId: 'q4', selectedOptionIds: ['starting-fresh'] },
+      { questionId: 'q4', selectedOptionIds: ['open-exploration'] },
     ];
 
     const result = calculateRecommendation(answers);
     if (result.prepopulateData) {
       expect(typeof result.prepopulateData).toBe('object');
       expect(result.prepopulateData.role).toBeTruthy();
+    }
+  });
+
+  it('should provide alternative recommendations when confidence is 50% or lower', () => {
+    // Create a scenario with mixed signals that should result in low confidence
+    const answers: WizardAnswer[] = [
+      { questionId: 'q1', selectedOptionIds: ['explore-ideas'] },
+      { questionId: 'q2', selectedOptionIds: ['generate-synthesize'] },
+      { questionId: 'q3', selectedOptionIds: ['accuracy'] },
+      { questionId: 'q4', selectedOptionIds: ['open-exploration'] },
+    ];
+
+    const result = calculateRecommendation(answers);
+    
+    if (result.confidence <= 50) {
+      expect(result.alternativeRecommendations).toBeDefined();
+      expect(Array.isArray(result.alternativeRecommendations)).toBe(true);
+      if (result.alternativeRecommendations && result.alternativeRecommendations.length > 0) {
+        result.alternativeRecommendations.forEach((alt) => {
+          expect(alt.frameworkId).toBeTruthy();
+          expect(alt.frameworkName).toBeTruthy();
+          expect(alt.confidence).toBeGreaterThan(0);
+          expect(alt.explanation).toBeTruthy();
+        });
+      }
     }
   });
 
@@ -223,9 +248,9 @@ describe('Recommendation Algorithm', () => {
       // Create answers that heavily favor this framework
       const answers: WizardAnswer[] = [
         { questionId: 'q1', selectedOptionIds: ['explore-ideas'] },
-        { questionId: 'q2', selectedOptionIds: ['very-complex'] },
+        { questionId: 'q2', selectedOptionIds: ['multiple-approaches'] },
         { questionId: 'q3', selectedOptionIds: ['creativity'] },
-        { questionId: 'q4', selectedOptionIds: ['starting-fresh'] },
+        { questionId: 'q4', selectedOptionIds: ['open-exploration'] },
       ];
 
       // This tests that recommendation returns valid data structure
@@ -241,14 +266,14 @@ describe('Recommendation Algorithm', () => {
 describe('Mixed Scenario Recommendations', () => {
   it('should handle competing weights correctly', () => {
     const answers: WizardAnswer[] = [
-      { questionId: 'q1', selectedOptionIds: ['explore-ideas'] }, // ToT: 5
-      { questionId: 'q2', selectedOptionIds: ['needs-analysis'] }, // CoT: 4
-      { questionId: 'q3', selectedOptionIds: ['accuracy'] }, // CoT: 3, ToT: 2
-      { questionId: 'q4', selectedOptionIds: ['starting-fresh'] }, // ToT: 2, CoT: 2
+      { questionId: 'q1', selectedOptionIds: ['explore-ideas'] },
+      { questionId: 'q2', selectedOptionIds: ['logical-steps'] },
+      { questionId: 'q3', selectedOptionIds: ['accuracy'] },
+      { questionId: 'q4', selectedOptionIds: ['clear-problem'] },
     ];
 
     const result = calculateRecommendation(answers);
-    // Should be ToT with score of 9 vs CoT with 9, or close
+    // Should be either ToT or CoT based on weights
     expect(['tot', 'cot']).toContain(result.frameworkId);
     expect(result.confidence).toBeGreaterThan(0);
   });
