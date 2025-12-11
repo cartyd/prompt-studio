@@ -20,6 +20,7 @@ mkdir -p "$RELEASE_DIR"
 
 log "Install deps and build locally"
 npm ci
+npx prisma generate
 npm run build
 
 log "Stage minimal runtime files"
