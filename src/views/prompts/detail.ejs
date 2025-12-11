@@ -9,7 +9,7 @@
     <div>
       <h2 style="margin-bottom: 0.25rem;">${prompt.title}</h2>
       <p class="text-muted">
-        ${prompt.frameworkType} • Created ${new Date(prompt.createdAt).toLocaleDateString()}
+        ${prompt.frameworkType} • Created <span data-format-date="${prompt.createdAt}" data-format="date">${prompt.createdAt}</span>
       </p>
     </div>
     <div class="flex gap-0-5">

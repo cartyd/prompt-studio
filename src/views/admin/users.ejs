@@ -67,7 +67,7 @@
         </td>
         <td>${u._count.prompts}</td>
         <td>${u._count.events}</td>
-        <td>${new Date(u.createdAt).toLocaleDateString()}</td>
+        <td><span data-format-date="${u.createdAt}" data-format="date">${u.createdAt}</span></td>
         <td>
           <div class="action-dropdown">
             <button class="action-btn">

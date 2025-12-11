@@ -14,10 +14,10 @@
       <div>${user.name}</div>
       
       <div style="color: #7f8c8d; font-weight: 500;">Member Since:</div>
-      <div>${new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+      <div><span data-format-date="${user.createdAt}" data-format="long-date">${user.createdAt}</span></div>
       
       <div style="color: #7f8c8d; font-weight: 500;">Last Password Change:</div>
-      <div>${new Date(user.lastPasswordChange).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+      <div><span data-format-date="${user.lastPasswordChange}" data-format="long-date">${user.lastPasswordChange}</span></div>
     </div>
   </div>
 
