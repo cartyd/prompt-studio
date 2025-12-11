@@ -1,0 +1,88 @@
+<% const title = 'Your Recommended Framework'; %>
+<%- include('../layout-wrapper', { body: `
+<link rel="stylesheet" href="/css/wizard.css">
+
+<div class="wizard-container">
+  <div class="wizard-recommendation">
+    <!-- Success Animation -->
+    <div class="recommendation-icon">
+      <i class='bx bx-check-circle'></i>
+    </div>
+
+    <h1 class="recommendation-title">Perfect Match Found!</h1>
+    <p class="recommendation-subtitle">Based on your answers, we recommend:</p>
+
+    <!-- Framework Card -->
+    <div class="recommendation-framework-card">
+      <h2 class="framework-name">${recommendation.frameworkName}</h2>
+      <div class="confidence-badge">
+        <i class='bx bx-trending-up'></i>
+        ${recommendation.confidence}% match
+      </div>
+    </div>
+
+    <!-- Explanation Section -->
+    <div class="recommendation-explanation">
+      <h3><i class='bx bx-bulb'></i> What This Framework Does</h3>
+      <p class="explanation-text">${recommendation.explanation}</p>
+    </div>
+
+    <!-- Why Chosen Section -->
+    <div class="recommendation-why">
+      <h3><i class='bx bx-list-check'></i> Why We Chose This for You</h3>
+      <ul class="why-chosen-list">
+        ${recommendation.whyChosen.map(reason => `
+          <li><i class='bx bx-check'></i> ${reason}</li>
+        `).join('')}
+      </ul>
+    </div>
+
+    <!-- Actions -->
+    <div class="recommendation-actions">
+      ${recommendation.prepopulateData ? `
+        <a href="/frameworks/${recommendation.frameworkId}?fromWizard=true&prepopulate=${encodeURIComponent(JSON.stringify(recommendation.prepopulateData))}" class="btn btn-primary btn-large">
+          <i class='bx bx-play-circle'></i>
+          Start with ${recommendation.frameworkName}
+        </a>
+      ` : `
+        <a href="/frameworks/${recommendation.frameworkId}?fromWizard=true" class="btn btn-primary btn-large">
+          <i class='bx bx-play-circle'></i>
+          Start with ${recommendation.frameworkName}
+        </a>
+      `}
+      
+      <div class="secondary-actions">
+        <a href="/frameworks" class="btn-link">
+          <i class='bx bx-grid-alt'></i>
+          Browse all frameworks instead
+        </a>
+        <form action="/wizard/reset" method="POST" style="display: inline;">
+          <button type="submit" class="btn-link">
+            <i class='bx bx-refresh'></i>
+            Try the wizard again
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Educational Tip -->
+    <div class="recommendation-tip">
+      <i class='bx bx-info-circle'></i>
+      <p><strong>Pro Tip:</strong> You can always switch to a different framework later if you want to try a different approach.</p>
+    </div>
+  </div>
+</div>
+
+<script src="/js/wizard.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Track recommendation view
+  console.log('Wizard complete:', {
+    framework: '${recommendation.frameworkId}',
+    confidence: ${recommendation.confidence}
+  });
+  
+  // Add confetti or celebration animation here if desired
+});
+</script>
+`, user, subscription }) %>

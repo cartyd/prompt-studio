@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import * as Prisma from '@prisma/client';
 
 export const FREE_PROMPT_LIMIT = 5;
 
@@ -23,7 +23,7 @@ export interface AuthUser {
 
 declare module 'fastify' {
   interface FastifyInstance {
-    prisma: PrismaClient;
+    prisma: Prisma.PrismaClient;
     csrfProtection(request: any, reply: any, done: () => void): void;
   }
 
@@ -91,3 +91,53 @@ export const DEFAULT_EVALUATION_CRITERIA = [
   'Risk/Safety',
   'Cost/Resource Impact',
 ] as const;
+
+// Wizard types
+export interface WizardQuestion {
+  id: string;
+  text: string;
+  description?: string;
+  type: 'single-choice' | 'multiple-choice';
+  options: WizardOption[];
+}
+
+export interface WizardOption {
+  id: string;
+  text: string;
+  description?: string;
+  icon?: string;
+  weights: {
+    tot?: number;
+    cot?: number;
+    'self-consistency'?: number;
+    role?: number;
+    reflection?: number;
+  };
+}
+
+export interface WizardAnswer {
+  questionId: string;
+  selectedOptionIds: string[];
+}
+
+export interface WizardRecommendation {
+  frameworkId: string;
+  frameworkName: string;
+  confidence: number;
+  explanation: string;
+  whyChosen: string[];
+  prepopulateData?: Record<string, string>;
+}
+
+export interface WizardSession {
+  answers: WizardAnswer[];
+  currentStep: number;
+  startedAt: Date;
+}
+
+declare module 'fastify' {
+  interface Session {
+    userId?: string;
+    wizardSession?: WizardSession;
+  }
+}

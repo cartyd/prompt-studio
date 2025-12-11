@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { PrismaClient } from '@prisma/client';
+import * as Prisma from '@prisma/client';
 import { TOKEN_CONSTANTS } from '../constants';
 
 export type TokenType = 'email_verification' | 'password_reset';
@@ -15,7 +15,7 @@ export function generateSecureToken(): string {
  * Create a verification token in the database
  */
 export async function createVerificationToken(
-  prisma: PrismaClient,
+  prisma: Prisma.PrismaClient,
   userId: string,
   type: TokenType
 ): Promise<string> {
@@ -54,7 +54,7 @@ export async function createVerificationToken(
  * Returns the userId if valid, null otherwise
  */
 export async function validateAndConsumeToken(
-  prisma: PrismaClient,
+  prisma: Prisma.PrismaClient,
   token: string,
   type: TokenType
 ): Promise<string | null> {
@@ -91,7 +91,7 @@ export async function validateAndConsumeToken(
 /**
  * Clean up expired tokens (can be run as a scheduled job)
  */
-export async function cleanupExpiredTokens(prisma: PrismaClient): Promise<number> {
+export async function cleanupExpiredTokens(prisma: Prisma.PrismaClient): Promise<number> {
   const result = await prisma.verificationToken.deleteMany({
     where: {
       expiresAt: {

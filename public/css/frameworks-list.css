@@ -89,6 +89,32 @@
   transform: rotate(360deg);
 }
 
+/* Discover Card Special Styling */
+.feature-card.discover-card {
+  background: linear-gradient(135deg, #fff5f1 0%, #ffffff 100%);
+  border: 2px solid #F26631;
+  position: relative;
+}
+
+.feature-card.discover-card:hover {
+  border-color: #d85c28;
+  box-shadow: 0 4px 12px rgba(242, 102, 49, 0.2);
+}
+
+.discover-badge {
+  background: #28a745;
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 .feature-card a.btn {
   display: inline-flex;
   align-items: center;
