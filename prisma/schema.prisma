@@ -9,9 +9,9 @@ generator client {
 // - Development: Use relative paths (e.g., "file:./dev.db")
 // - Production: Use absolute paths to avoid path resolution issues
 //   Example: "file:/var/www/prompt-studio/prisma/data/prod.db"
+// - Prisma 7+: Database URL is now configured in prisma.config.ts
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
 }
 
 model User {

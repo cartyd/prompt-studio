@@ -1,8 +1,10 @@
 import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 import { PrismaClient } from '@prisma/client';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import { validateAndGenerate } from '../src/prompt-generators';
 
-const prisma = new PrismaClient();
+const adapter = new PrismaBetterSqlite3({ url: process.env.DATABASE_URL || './prisma/dev.db' });
+const prisma = new PrismaClient({ adapter });
 
 describe('Custom Criteria Database', () => {
   let premiumUserId: string;

@@ -12,8 +12,12 @@ describe('Subscription Info', () => {
         id: '1',
         name: 'Premium User',
         email: 'premium@example.com',
+        passwordHash: 'hash',
+        lastPasswordChange: new Date(),
+        isAdmin: false,
         subscriptionTier: 'premium',
         subscriptionExpiresAt: futureDate,
+        createdAt: new Date(),
       };
 
       const result = getSubscriptionInfo(user);
@@ -30,8 +34,12 @@ describe('Subscription Info', () => {
         id: '2',
         name: 'Expiring User',
         email: 'expiring@example.com',
+        passwordHash: 'hash',
+        lastPasswordChange: new Date(),
+        isAdmin: false,
         subscriptionTier: 'premium',
         subscriptionExpiresAt: today,
+        createdAt: new Date(),
       };
 
       const result = getSubscriptionInfo(user);
@@ -55,8 +63,12 @@ describe('Subscription Info', () => {
         id: '3',
         name: 'Expired User',
         email: 'expired@example.com',
+        passwordHash: 'hash',
+        lastPasswordChange: new Date(),
+        isAdmin: false,
         subscriptionTier: 'premium',
         subscriptionExpiresAt: pastDate,
+        createdAt: new Date(),
       };
 
       const result = getSubscriptionInfo(user);
@@ -70,8 +82,12 @@ describe('Subscription Info', () => {
         id: '4',
         name: 'No Expiry User',
         email: 'noexpiry@example.com',
+        passwordHash: 'hash',
+        lastPasswordChange: new Date(),
+        isAdmin: false,
         subscriptionTier: 'premium',
         subscriptionExpiresAt: null,
+        createdAt: new Date(),
       };
 
       const result = getSubscriptionInfo(user);
@@ -87,8 +103,12 @@ describe('Subscription Info', () => {
         id: '5',
         name: 'Free User',
         email: 'free@example.com',
+        passwordHash: 'hash',
+        lastPasswordChange: new Date(),
+        isAdmin: false,
         subscriptionTier: 'free',
         subscriptionExpiresAt: null,
+        createdAt: new Date(),
       };
 
       const result = getSubscriptionInfo(user);
@@ -105,8 +125,12 @@ describe('Subscription Info', () => {
         id: '6',
         name: 'Free User With Date',
         email: 'free-date@example.com',
+        passwordHash: 'hash',
+        lastPasswordChange: new Date(),
+        isAdmin: false,
         subscriptionTier: 'free',
         subscriptionExpiresAt: futureDate,
+        createdAt: new Date(),
       };
 
       const result = getSubscriptionInfo(user);
@@ -126,8 +150,12 @@ describe('Subscription Info', () => {
         id: '7',
         name: 'Long Term User',
         email: 'longterm@example.com',
+        passwordHash: 'hash',
+        lastPasswordChange: new Date(),
+        isAdmin: false,
         subscriptionTier: 'premium',
         subscriptionExpiresAt: farFuture,
+        createdAt: new Date(),
       };
 
       const result = getSubscriptionInfo(user);
@@ -144,8 +172,12 @@ describe('Subscription Info', () => {
         id: '8',
         name: 'Long Expired User',
         email: 'longexpired@example.com',
+        passwordHash: 'hash',
+        lastPasswordChange: new Date(),
+        isAdmin: false,
         subscriptionTier: 'premium',
         subscriptionExpiresAt: farPast,
+        createdAt: new Date(),
       };
 
       const result = getSubscriptionInfo(user);
@@ -162,16 +194,24 @@ describe('Subscription Info', () => {
         id: '9',
         name: 'Premium User',
         email: 'premium2@example.com',
+        passwordHash: 'hash',
+        lastPasswordChange: new Date(),
+        isAdmin: false,
         subscriptionTier: 'premium',
         subscriptionExpiresAt: futureDate,
+        createdAt: new Date(),
       };
 
       const freeUser: AuthUser = {
         id: '10',
         name: 'Free User',
         email: 'free2@example.com',
+        passwordHash: 'hash',
+        lastPasswordChange: new Date(),
+        isAdmin: false,
         subscriptionTier: 'free',
         subscriptionExpiresAt: null,
+        createdAt: new Date(),
       };
 
       const premiumResult = getSubscriptionInfo(premiumUser);
