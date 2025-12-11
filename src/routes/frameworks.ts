@@ -33,7 +33,7 @@ const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
         where: { userId: request.user!.id },
         orderBy: { createdAt: 'desc' },
       });
-      customCriteria = criteria.map((c) => c.criteriaName);
+      customCriteria = criteria.map((c: { criteriaName: string }) => c.criteriaName);
     }
 
     // Log framework view event

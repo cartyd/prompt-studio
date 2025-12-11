@@ -54,7 +54,7 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
       'NL': 'Netherlands',
     };
 
-    const countryStats = countryStatsRaw.map(stat => ({
+    const countryStats = countryStatsRaw.map((stat: { country: string | null; _count: number }) => ({
       country: countryNameMap[stat.country || ''] || stat.country || 'Unknown',
       countryCode: stat.country,
       _count: stat._count,
@@ -200,7 +200,7 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
     `;
     
     // Convert bigint count to number for display
-    const dailyEventsFormatted = dailyEvents.map(e => ({
+    const dailyEventsFormatted = dailyEvents.map((e: { date: string; count: bigint }) => ({
       date: e.date,
       count: Number(e.count)
     }));
@@ -228,7 +228,7 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
         END
     `;
     
-    const timeOfDayStats = timeOfDayQuery.map(t => ({
+    const timeOfDayStats = timeOfDayQuery.map((t: { period: string; count: bigint }) => ({
       period: t.period,
       count: Number(t.count)
     }));

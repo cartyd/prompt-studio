@@ -13,7 +13,7 @@ const customCriteriaRoutes: FastifyPluginAsync = async (fastify) => {
       orderBy: { createdAt: 'desc' },
     });
 
-    return reply.send({ criteria: customCriteria.map((c) => c.criteriaName) });
+    return reply.send({ criteria: customCriteria.map((c: { criteriaName: string }) => c.criteriaName) });
   });
 
   // Save new custom criteria (premium only)
