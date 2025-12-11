@@ -434,11 +434,16 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       });
     }
 
-    // Update password
+    // Update password and mark email as verified
+    // Users who can reset their password have proven email ownership
     const passwordHash = await bcrypt.hash(password, 10);
     await fastify.prisma.user.update({
       where: { id: userId },
-      data: { passwordHash },
+      data: { 
+        passwordHash,
+        emailVerified: true,
+        emailVerifiedAt: new Date(),
+      },
     });
 
     // Destroy any existing sessions for this user (security measure)
