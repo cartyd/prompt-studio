@@ -16,7 +16,7 @@ export const wizardQuestions: WizardQuestion[] = [
         text: 'Explore different ideas before deciding',
         description: 'I want to brainstorm multiple approaches and choose the best one',
         icon: 'bx-network-chart',
-        weights: { tot: 5, cot: 2, 'self-consistency': 2 },
+        weights: { tot: 5, cot: 1, 'self-consistency': 1 },
       },
       {
         id: 'break-down-problem',
@@ -30,57 +30,64 @@ export const wizardQuestions: WizardQuestion[] = [
         text: 'Improve something I already have',
         description: 'I have a draft and want to make it better',
         icon: 'bx-edit',
-        weights: { reflection: 5, 'self-consistency': 1 },
+        weights: { reflection: 5 },
       },
       {
         id: 'match-style',
         text: 'Create something that matches a specific style',
         description: 'I have examples and want consistent output',
         icon: 'bx-copy',
-        weights: { role: 5, 'self-consistency': 1 },
+        weights: { role: 5 },
       },
       {
         id: 'best-version',
         text: 'Get the best possible answer',
         description: 'I want multiple attempts combined into one great result',
         icon: 'bx-check-circle',
-        weights: { 'self-consistency': 5, tot: 2 },
+        weights: { 'self-consistency': 5, tot: 1 },
       },
     ],
   },
   {
     id: 'q2',
-    text: 'How complex is your task?',
-    description: 'This helps us match you with the right approach',
+    text: 'How do you prefer to work?',
+    description: 'This helps us match you with the right thinking style',
     type: 'single-choice',
     options: [
       {
-        id: 'very-complex',
-        text: 'Very complex with many possible outcomes',
-        description: 'Multiple paths to consider, need to compare options',
+        id: 'multiple-approaches',
+        text: 'See multiple approaches, then choose the best',
+        description: 'I like comparing different options before deciding',
         icon: 'bx-scatter-chart',
-        weights: { tot: 4, cot: 2 },
+        weights: { tot: 5, 'self-consistency': 1 },
       },
       {
-        id: 'needs-analysis',
-        text: 'Needs careful analysis and planning',
-        description: 'Step-by-step thinking is important',
+        id: 'logical-steps',
+        text: 'Follow a logical, step-by-step process',
+        description: 'I prefer structured reasoning from start to finish',
         icon: 'bx-list-ol',
-        weights: { cot: 4, tot: 1 },
+        weights: { cot: 5 },
       },
       {
-        id: 'refinement',
-        text: 'It\'s about refining or polishing',
-        description: 'Making existing content better',
+        id: 'iterative-refinement',
+        text: 'Start rough, then refine iteratively',
+        description: 'I like to draft first, then improve through feedback',
         icon: 'bx-paint',
-        weights: { reflection: 4, 'self-consistency': 2 },
+        weights: { reflection: 5, 'self-consistency': 1 },
       },
       {
-        id: 'straightforward',
-        text: 'Straightforward but needs quality',
-        description: 'Clear task, just want excellent execution',
+        id: 'follow-examples',
+        text: 'Follow patterns and examples',
+        description: 'I work best when I can replicate a proven approach',
+        icon: 'bx-copy',
+        weights: { role: 5 },
+      },
+      {
+        id: 'generate-synthesize',
+        text: 'Generate several ideas, then synthesize the best parts',
+        description: 'I like creating multiple versions and combining strengths',
         icon: 'bx-target-lock',
-        weights: { 'self-consistency': 3, role: 3, cot: 1 },
+        weights: { 'self-consistency': 5, tot: 1 },
       },
     ],
   },
@@ -95,64 +102,78 @@ export const wizardQuestions: WizardQuestion[] = [
         text: 'Accuracy and thoroughness',
         description: 'Getting the right answer is critical',
         icon: 'bx-bullseye',
-        weights: { cot: 3, tot: 2, 'self-consistency': 2 },
+        weights: { cot: 4, tot: 2, 'self-consistency': 1 },
       },
       {
         id: 'creativity',
         text: 'Exploring creative alternatives',
         description: 'Want to see different possibilities',
         icon: 'bx-bulb',
-        weights: { tot: 4, 'self-consistency': 2 },
+        weights: { tot: 5, 'self-consistency': 1 },
       },
       {
         id: 'tone-style',
         text: 'Tone and style consistency',
         description: 'How it sounds matters as much as what it says',
         icon: 'bx-palette',
-        weights: { role: 4, 'self-consistency': 3, reflection: 2 },
+        weights: { role: 5, 'self-consistency': 1 },
       },
       {
         id: 'clarity',
         text: 'Clarity and easy-to-follow reasoning',
         description: 'I need to understand the thinking process',
         icon: 'bx-book-open',
-        weights: { cot: 4, reflection: 2 },
+        weights: { cot: 5, reflection: 1 },
       },
       {
         id: 'polish',
         text: 'A polished, refined final result',
         description: 'Quality and completeness above all',
         icon: 'bx-medal',
-        weights: { reflection: 3, 'self-consistency': 3, tot: 1 },
+        weights: { reflection: 4, 'self-consistency': 3 },
       },
     ],
   },
   {
     id: 'q4',
-    text: 'Do you have examples or existing content?',
-    description: 'This helps us personalize your experience',
+    text: 'What starting point do you have?',
+    description: 'This helps us tailor the framework to your situation',
     type: 'single-choice',
     options: [
       {
         id: 'have-examples',
-        text: 'Yes, I have examples to show',
-        description: 'I can provide samples of what I want',
+        text: 'Specific examples of desired output',
+        description: 'I have samples that show what I want',
         icon: 'bx-collection',
-        weights: { role: 5, 'self-consistency': 1 },
+        weights: { role: 5 },
       },
       {
         id: 'have-draft',
-        text: 'Yes, I have a draft to improve',
-        description: 'I\'ve already started and need help refining',
+        text: 'A draft that needs improvement',
+        description: 'I\'ve already created something that needs refinement',
         icon: 'bx-file',
-        weights: { reflection: 5 },
+        weights: { reflection: 4, 'self-consistency': 1 },
       },
       {
-        id: 'starting-fresh',
-        text: 'No, starting from scratch',
-        description: 'I\'m beginning with just an idea',
-        icon: 'bx-plus-circle',
-        weights: { tot: 2, cot: 2, 'self-consistency': 2 },
+        id: 'clear-problem',
+        text: 'A clear problem definition',
+        description: 'I know exactly what needs to be solved',
+        icon: 'bx-bullseye',
+        weights: { cot: 4, tot: 1 },
+      },
+      {
+        id: 'open-exploration',
+        text: 'Open-ended exploration needed',
+        description: 'I\'m still figuring out the best approach',
+        icon: 'bx-compass',
+        weights: { tot: 4, 'self-consistency': 1 },
+      },
+      {
+        id: 'need-synthesis',
+        text: 'Need highest quality synthesis',
+        description: 'I want the best possible result from multiple attempts',
+        icon: 'bx-diamond',
+        weights: { 'self-consistency': 4, reflection: 1 },
       },
     ],
   },
@@ -209,7 +230,7 @@ export function calculateRecommendation(answers: WizardAnswer[]): WizardRecommen
   const totalScore = Object.values(scores).reduce((sum, score) => sum + score, 0);
   const confidence = Math.round((topScore / totalScore) * 100);
 
-  return {
+  const recommendation: WizardRecommendation = {
     frameworkId: topFramework,
     frameworkName: getFrameworkName(topFramework),
     confidence,
@@ -217,6 +238,22 @@ export function calculateRecommendation(answers: WizardAnswer[]): WizardRecommen
     whyChosen: getWhyChosen(topFramework, answers),
     prepopulateData: getPrepopulateData(topFramework, answers),
   };
+
+  // If confidence is 50% or lower, include alternative recommendations
+  if (confidence <= 50 && sortedFrameworks.length > 1) {
+    const alternatives = sortedFrameworks
+      .slice(1, 3) // Get top 2 alternatives
+      .map(([frameworkId, score]) => ({
+        frameworkId,
+        frameworkName: getFrameworkName(frameworkId),
+        confidence: Math.round((score / totalScore) * 100),
+        explanation: getExplanation(frameworkId, answers),
+      }));
+
+    recommendation.alternativeRecommendations = alternatives;
+  }
+
+  return recommendation;
 }
 
 function getFrameworkName(id: string): string {
@@ -232,8 +269,8 @@ function getFrameworkName(id: string): string {
 
 function getExplanation(frameworkId: string, _answers: WizardAnswer[]): string {
   const explanations: Record<string, string> = {
-    tot: 'Tree-of-Thought is perfect when you want to explore multiple approaches before deciding. Think of it like brainstorming with yourself—you\'ll generate different ideas, evaluate each one, and then choose the best path forward. It\'s especially powerful for complex decisions with many possible outcomes.',
-    cot: 'Chain-of-Thought breaks down complex problems into clear, logical steps. Like solving a math problem by showing your work, this framework helps you (and the AI) think through each part of the problem systematically. You\'ll get structured reasoning that\'s easy to follow and verify.',
+    tot: 'Tree-of-Thought is perfect when you want to explore multiple approaches before deciding. Think of it like brainstorming with yourself. You generate different ideas, evaluate each one, and then choose the best path forward. It\'s especially powerful for complex decisions with many possible outcomes.',
+    cot: 'Chain-of-Thought breaks down complex problems into clear, logical steps. Like solving a math problem by showing your work, this framework helps you (and the AI) think through each part of the problem systematically. You get structured reasoning that\'s easy to follow and verify.',
     'self-consistency':
       'Self-Consistency creates multiple versions of your answer and combines the best parts. Imagine having several drafts and picking the strongest elements from each—that\'s what this framework does. It\'s ideal when quality, tone, and polish matter most.',
     role: 'Few-Shot Prompting teaches by example. You show the AI what "good" looks like with 2-3 samples, and it follows that pattern. This is perfect when you need consistency across multiple outputs or want to match a specific style, tone, or format.',

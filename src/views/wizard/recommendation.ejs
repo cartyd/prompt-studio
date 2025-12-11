@@ -79,11 +79,34 @@
       </div>
     </div>
 
+    <!-- Alternative Recommendations for Low Confidence -->
+    ${recommendation.alternativeRecommendations && recommendation.alternativeRecommendations.length > 0 ? `
+    <div class="alternative-recommendations">
+      <h3><i class='bx bx-objects-horizontal-left'></i> Other Strong Matches</h3>
+      <p class="alternatives-intro">Your needs could be met by multiple frameworks. Here are other options to consider:</p>
+      <div class="alternatives-grid">
+        ${recommendation.alternativeRecommendations.map(alt => `
+        <div class="alternative-card">
+          <div class="alternative-header">
+            <h4>${alt.frameworkName}</h4>
+            <span class="alternative-confidence">${alt.confidence}% match</span>
+          </div>
+          <p class="alternative-explanation">${alt.explanation}</p>
+          <a href="/frameworks/${alt.frameworkId}?fromWizard=true" class="btn btn-outline">
+            <i class='bx bx-right-arrow-circle'></i>
+            Choose ${alt.frameworkName}
+          </a>
+        </div>
+        `).join('')}
+      </div>
+    </div>
+    ` : ''}
+
     <!-- Educational Tip -->
     ${recommendation.confidence < 50 ? `
     <div class="recommendation-tip" style="background: #fff3cd; border-color: #ffc107;">
       <i class='bx bx-info-circle' style="color: #856404;"></i>
-      <p style="color: #856404;"><strong>Note:</strong> Your answers didn't strongly favor one framework. We've suggested the best match, but feel free to browse all frameworks to find what resonates with you.</p>
+      <p style="color: #856404;"><strong>Note:</strong> Your answers suggest multiple frameworks could work well. Review the options above or browse all frameworks to find what resonates with you.</p>
     </div>
     ` : `
     <div class="recommendation-tip">

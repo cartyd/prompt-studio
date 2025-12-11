@@ -127,6 +127,12 @@ export interface WizardRecommendation {
   explanation: string;
   whyChosen: string[];
   prepopulateData?: Record<string, string>;
+  alternativeRecommendations?: Array<{
+    frameworkId: string;
+    frameworkName: string;
+    confidence: number;
+    explanation: string;
+  }>;
 }
 
 export interface WizardSession {
