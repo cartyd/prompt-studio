@@ -1,4 +1,18 @@
 <% const title = 'Your Recommended Framework'; %>
+<%
+  // Adjust messaging based on confidence level
+  let headingTitle, headingSubtitle;
+  if (recommendation.confidence >= 70) {
+    headingTitle = 'Great Match Found!';
+    headingSubtitle = 'Based on your answers, we recommend:';
+  } else if (recommendation.confidence >= 50) {
+    headingTitle = 'We Have a Recommendation';
+    headingSubtitle = 'Based on your answers, this framework fits your needs:';
+  } else {
+    headingTitle = 'Here\'s Our Suggestion';
+    headingSubtitle = 'Based on your answers, we think this could work well:';
+  }
+%>
 <%- include('../layout-wrapper', { body: `
 <link rel="stylesheet" href="/css/wizard.css">
 
@@ -9,22 +23,8 @@
       <i class='bx bx-check-circle'></i>
     </div>
 
-    <%
-      // Adjust messaging based on confidence level
-      let title, subtitle;
-      if (recommendation.confidence >= 70) {
-        title = 'Great Match Found!';
-        subtitle = 'Based on your answers, we recommend:';
-      } else if (recommendation.confidence >= 50) {
-        title = 'We Have a Recommendation';
-        subtitle = 'Based on your answers, this framework fits your needs:';
-      } else {
-        title = 'Here\'s Our Suggestion';
-        subtitle = 'Based on your answers, we think this could work well:';
-      }
-    %>
-    <h1 class="recommendation-title"><%= title %></h1>
-    <p class="recommendation-subtitle"><%= subtitle %></p>
+    <h1 class="recommendation-title">${headingTitle}</h1>
+    <p class="recommendation-subtitle">${headingSubtitle}</p>
 
     <!-- Framework Card -->
     <div class="recommendation-framework-card">
