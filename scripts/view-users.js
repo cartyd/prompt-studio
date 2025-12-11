@@ -5,9 +5,12 @@
 //   node scripts/view-users.js <filter>   # filter by substring in email
 
 const { PrismaClient } = require('@prisma/client');
+const { PrismaBetterSqlite3 } = require('@prisma/adapter-better-sqlite3');
+require('dotenv/config');
 
 (async () => {
-  const prisma = new PrismaClient();
+  const adapter = new PrismaBetterSqlite3({ url: process.env.DATABASE_URL || './prisma/dev.db' });
+  const prisma = new PrismaClient({ adapter });
   try {
     const filter = process.argv.slice(2).find(a => !a.startsWith('--')) || '';
     const where = filter
