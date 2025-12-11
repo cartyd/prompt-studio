@@ -9,8 +9,22 @@
       <i class='bx bx-check-circle'></i>
     </div>
 
-    <h1 class="recommendation-title">Perfect Match Found!</h1>
-    <p class="recommendation-subtitle">Based on your answers, we recommend:</p>
+    <%
+      // Adjust messaging based on confidence level
+      let title, subtitle;
+      if (recommendation.confidence >= 70) {
+        title = 'Great Match Found!';
+        subtitle = 'Based on your answers, we recommend:';
+      } else if (recommendation.confidence >= 50) {
+        title = 'We Have a Recommendation';
+        subtitle = 'Based on your answers, this framework fits your needs:';
+      } else {
+        title = 'Here\'s Our Suggestion';
+        subtitle = 'Based on your answers, we think this could work well:';
+      }
+    %>
+    <h1 class="recommendation-title"><%= title %></h1>
+    <p class="recommendation-subtitle"><%= subtitle %></p>
 
     <!-- Framework Card -->
     <div class="recommendation-framework-card">
@@ -66,10 +80,17 @@
     </div>
 
     <!-- Educational Tip -->
+    ${recommendation.confidence < 50 ? `
+    <div class="recommendation-tip" style="background: #fff3cd; border-color: #ffc107;">
+      <i class='bx bx-info-circle' style="color: #856404;"></i>
+      <p style="color: #856404;"><strong>Note:</strong> Your answers didn't strongly favor one framework. We've suggested the best match, but feel free to browse all frameworks to find what resonates with you.</p>
+    </div>
+    ` : `
     <div class="recommendation-tip">
       <i class='bx bx-info-circle'></i>
       <p><strong>Pro Tip:</strong> You can always switch to a different framework later if you want to try a different approach.</p>
     </div>
+    `}
   </div>
 </div>
 
