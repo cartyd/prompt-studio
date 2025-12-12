@@ -7,42 +7,40 @@
   <a href="/frameworks" class="btn">Create New Prompt</a>
 </div>
 
-<% if (!subscription.isPremium && prompts.length >= 5) { %>
+${(!subscription || !subscription.isPremium) && prompts.length >= 5 ? `
   <div class="error">
     You've reached your free tier limit of 5 prompts. <a href="/premium">Upgrade to Premium</a> for unlimited prompts.
   </div>
-<% } %>
+` : ''}
 
-<% if (prompts.length === 0) { %>
+${prompts.length === 0 ? `
   <div class="empty-state">
     <p>You haven't saved any prompts yet.</p>
     <a href="/frameworks" class="btn">Create Your First Prompt</a>
   </div>
-<% } else { %>
+` : `
   <div class="grid grid-cols-1 grid-gap-md">
-    <% prompts.forEach(function(p) { %>
-      <div id="prompt-row-<%= p.id %>" class="prompt-row">
+    ${prompts.map(p => `
+      <div id="prompt-row-${p.id}" class="prompt-row">
         <div class="prompt-content">
-          <h3><%= p.title %></h3>
+          <h3>${p.title}</h3>
           <p class="prompt-meta">
-            <%= p.frameworkType %> • <span data-format-date="<%= p.createdAt %>" data-format="date"><%= p.createdAt %></span>
+            ${p.frameworkType} • <span data-format-date="${p.createdAt}" data-format="date">${p.createdAt}</span>
           </p>
-          <p class="prompt-preview"><%= p.finalPromptText.substring(0, 200) %><%= p.finalPromptText.length > 200 ? '...' : '' %></p>
+          <p class="prompt-preview">${p.finalPromptText.substring(0, 200)}${p.finalPromptText.length > 200 ? '...' : ''}</p>
         </div>
         <div class="prompt-actions">
-          <a href="/prompts/<%= p.id %>" class="btn btn-secondary">View</a>
-          <% if (subscription.isPremium) { %>
-            <a href="/prompts/<%= p.id %>/export" class="btn">Export</a>
-          <% } %>
+          <a href="/prompts/${p.id}" class="btn btn-secondary">View</a>
+          ${subscription && subscription.isPremium ? `<a href="/prompts/${p.id}/export" class="btn">Export</a>` : ''}
           <button 
-            hx-delete="/prompts/<%= p.id %>" 
-            hx-target="#prompt-row-<%= p.id %>" 
+            hx-delete="/prompts/${p.id}" 
+            hx-target="#prompt-row-${p.id}" 
             hx-swap="outerHTML"
             hx-confirm="Are you sure you want to delete this prompt?"
             class="btn btn-danger">Delete</button>
         </div>
       </div>
-    <% }); %>
+    `).join('')}
   </div>
-<% } %>
+`}
 `, user, subscription }) %>
