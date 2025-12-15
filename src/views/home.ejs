@@ -1,10 +1,6 @@
 <% const title = 'Home'; %>
 <% const additionalStyles = '<link rel="stylesheet" href="/css/home.css"><link rel="preload" as="image" href="/images/tot.png" fetchpriority="high">'; %>
 <%
-const getStartedBtn = !user 
-  ? '<a href="/auth/register" class="hero-btn"><i class="bx bx-frame"></i> Get Started</a>'
-  : '<a href="/frameworks" class="hero-btn"><i class="bx bx-frame"></i> Explore Frameworks</a>';
-
 // Feature cards data for easier maintenance and potential i18n
 const FEATURES = [
   {
@@ -46,7 +42,7 @@ const bodyContent = String.raw`
   <div class="hero-content">
     <h1 class="hero-title">Prompt Framework Studio</h1>
     <p>Create structured, effective prompts using proven LLM prompting frameworks</p>
-    ${getStartedBtn}
+    <a href="${getStartedBtn.href}" class="hero-btn"><i class="bx bx-frame"></i> ${getStartedBtn.text}</a>
   </div>
   
   <!-- CAROUSEL -->

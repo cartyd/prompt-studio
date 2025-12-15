@@ -8,9 +8,15 @@ const indexRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.get('/', async (request, reply) => {
     await loadUserFromSession(request);
 
+    // Determine CTA button based on auth status
+    const getStartedBtn = !request.user 
+      ? { href: '/auth/register', text: 'Get Started' }
+      : { href: '/frameworks', text: 'Explore Frameworks' };
+
     return reply.viewWithCsrf('home', {
       user: request.user,
       subscription: request.subscription,
+      getStartedBtn,
     });
   });
 
