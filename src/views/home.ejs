@@ -1,5 +1,5 @@
 <% const title = 'Home'; %>
-<% const additionalStyles = '<link rel="stylesheet" href="/css/home.css">'; %>
+<% const additionalStyles = '<link rel="stylesheet" href="/css/home.css"><link rel="preload" as="image" href="/images/tot.png" fetchpriority="high">'; %>
 <%
 const getStartedBtn = !user 
   ? '<a href="/auth/register" class="hero-btn"><i class="bx bx-frame"></i> Get Started</a>'
@@ -18,9 +18,9 @@ const bodyContent = String.raw`
   <!-- CAROUSEL -->
   <div class="hero-carousel-wrapper">
     <div class="hero-carousel" id="heroCarousel" role="region" aria-label="Framework examples carousel">
-      <img src="/images/sc.png" class="side" alt="Self-Consistency Framework" loading="lazy" decoding="async">
-      <img src="/images/tot.png" class="center" alt="Tree-of-Thought Framework" decoding="async" fetchpriority="high">
-      <img src="/images/cot.png" class="side" alt="Chain-of-Thought Framework" loading="lazy" decoding="async">
+      <img src="/images/sc.png" width="360" height="250" class="side" alt="Self-Consistency Framework" loading="lazy" decoding="async">
+      <img src="/images/tot.png" width="460" height="320" class="center" alt="Tree-of-Thought Framework" decoding="async" fetchpriority="high">
+      <img src="/images/cot.png" width="360" height="250" class="side" alt="Chain-of-Thought Framework" loading="lazy" decoding="async">
     </div>
   </div>
   
@@ -70,6 +70,13 @@ const bodyContent = String.raw`
 
 <script src="/js/canvas-node-system.js" defer></script>
 <script src="/js/carousel.js" defer></script>
+
+<noscript>
+  <style>
+    .hero-carousel img { opacity: 1 !important; filter: none !important; }
+    .hero-carousel img.side { opacity: 0.7 !important; }
+  </style>
+</noscript>
 `;
 %>
 <%- include('layout-wrapper', { body: bodyContent, additionalStyles: additionalStyles }) %>
