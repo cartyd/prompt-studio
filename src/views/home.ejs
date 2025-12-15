@@ -5,6 +5,40 @@ const getStartedBtn = !user
   ? '<a href="/auth/register" class="hero-btn"><i class="bx bx-frame"></i> Get Started</a>'
   : '<a href="/frameworks" class="hero-btn"><i class="bx bx-frame"></i> Explore Frameworks</a>';
 
+// Feature cards data for easier maintenance and potential i18n
+const FEATURES = [
+  {
+    icon: 'bx-trees',
+    title: 'Multiple Frameworks',
+    description: 'Choose from Tree-of-Thought, Chain-of-Thought, Self-Consistency, Role-Based, and Reflection prompting strategies.'
+  },
+  {
+    icon: 'bx-edit',
+    title: 'Guided Forms',
+    description: 'Fill out simple forms tailored to each framework to generate professional, structured prompts.'
+  },
+  {
+    icon: 'bx-book',
+    title: 'Prompt Library',
+    description: 'Save your prompts to a personal library for easy access and reuse.'
+  },
+  {
+    icon: 'bx-bolt',
+    title: 'Real-Time Preview',
+    description: 'See your prompt generated in real-time as you fill out the form.'
+  },
+  {
+    icon: 'bx-rocket',
+    title: 'Premium Features',
+    description: 'Upgrade for unlimited saved prompts and export capabilities.'
+  },
+  {
+    icon: 'bx-lock',
+    title: 'Secure & Private',
+    description: 'Your prompts are private and secure, accessible only to you.'
+  }
+];
+
 const bodyContent = String.raw`
 <!-- HERO SECTION -->
 <div class="hero">
@@ -29,36 +63,12 @@ const bodyContent = String.raw`
 <!-- FEATURE GRID -->
 <div class="feature-grid-wrapper">
   <div class="feature-grid">
-    <div class="feature-card">
-      <i class='bx bx-trees icon' aria-hidden="true"></i>
-      <h3>Multiple Frameworks</h3>
-      <p>Choose from Tree-of-Thought, Chain-of-Thought, Self-Consistency, Role-Based, and Reflection prompting strategies.</p>
-    </div>
-    <div class="feature-card">
-      <i class='bx bx-edit icon' aria-hidden="true"></i>
-      <h3>Guided Forms</h3>
-      <p>Fill out simple forms tailored to each framework to generate professional, structured prompts.</p>
-    </div>
-    <div class="feature-card">
-      <i class='bx bx-book icon' aria-hidden="true"></i>
-      <h3>Prompt Library</h3>
-      <p>Save your prompts to a personal library for easy access and reuse.</p>
-    </div>
-    <div class="feature-card">
-      <i class='bx bx-bolt icon' aria-hidden="true"></i>
-      <h3>Real-Time Preview</h3>
-      <p>See your prompt generated in real-time as you fill out the form.</p>
-    </div>
-    <div class="feature-card">
-      <i class='bx bx-rocket icon' aria-hidden="true"></i>
-      <h3>Premium Features</h3>
-      <p>Upgrade for unlimited saved prompts and export capabilities.</p>
-    </div>
-    <div class="feature-card">
-      <i class='bx bx-lock icon' aria-hidden="true"></i>
-      <h3>Secure & Private</h3>
-      <p>Your prompts are private and secure, accessible only to you.</p>
-    </div>
+    ${FEATURES.map(feature => `
+    <article class="feature-card">
+      <i class='bx ${feature.icon} icon' aria-hidden="true"></i>
+      <h3>${feature.title}</h3>
+      <p>${feature.description}</p>
+    </article>`).join('')}
   </div>
   
   <!-- Decorative corner lines -->
