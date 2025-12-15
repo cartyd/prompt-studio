@@ -1,0 +1,40 @@
+/* ==========  BASE STYLES  ========== */
+* { 
+  margin: 0; 
+  padding: 0; 
+  box-sizing: border-box; 
+}
+
+body { 
+  font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+  line-height: 1.6; 
+  color: var(--color-text);
+  background-color: #FAFAFA;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+.container { 
+  max-width: var(--container-max-width); 
+  margin: 0 auto; 
+  padding: 0 var(--spacing-md);
+  width: 100%;
+}
+
+/* ==========  LAYOUT  ========== */
+main { 
+  min-height: calc(100vh - var(--footer-height));
+  padding-top: var(--spacing-xl);
+  padding-bottom: var(--spacing-xl);
+}
+
+footer { 
+  margin-top: var(--spacing-xxl); 
+  padding: var(--spacing-xl) 0; 
+  background: var(--color-bg-light); 
+  text-align: center; 
+}
+
+footer a {
+  color: var(--color-primary);
+  text-decoration: none;
+}

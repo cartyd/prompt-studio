@@ -1,88 +1,18 @@
-<% const title = `Question ${stepNum + 1} of ${totalSteps}`; %>
+<% 
+const title = `Question ${stepNum + 1} of ${totalSteps}`;
+const { WizardUtils } = require('../../utils/wizard-helpers.js');
+
+const wizardConfig = {
+  question,
+  stepNum,
+  totalSteps,
+  previousAnswer
+};
+%>
 <%- include('../layout-wrapper', { body: `
 <link rel="stylesheet" href="/css/wizard.css">
 
-<div class="wizard-container">
-  <!-- Progress Bar -->
-  <div class="wizard-progress-bar">
-    <div class="progress-fill" style="width: ${((stepNum + 1) / totalSteps) * 100}%"></div>
-  </div>
+${WizardUtils.renderQuestionForm(wizardConfig)}
 
-  <!-- Progress Text -->
-  <div class="wizard-progress-text">
-    <span>Question ${stepNum + 1} of ${totalSteps}</span>
-  </div>
-
-  <!-- Question Card -->
-  <div class="wizard-question-card">
-    <h1 class="question-title">${question.text}</h1>
-    ${question.description ? `<p class="question-description">${question.description}</p>` : ''}
-
-    <form id="wizard-form" class="wizard-options-form">
-      <input type="hidden" name="questionId" value="${question.id}">
-      
-      <div class="wizard-options ${question.type === 'multiple-choice' ? 'multiple-choice' : ''}">
-        ${question.options.map(option => {
-          const isSelected = previousAnswer && previousAnswer.selectedOptionIds.includes(option.id);
-          return `
-            <label class="wizard-option-card ${isSelected ? 'selected' : ''}" for="option-${option.id}">
-              <input 
-                type="${question.type === 'single-choice' ? 'radio' : 'checkbox'}" 
-                id="option-${option.id}" 
-                name="selectedOptionIds" 
-                value="${option.id}"
-                ${isSelected ? 'checked' : ''}
-                required
-              >
-              <div class="option-content">
-                ${option.icon ? `<i class='bx ${option.icon} option-icon'></i>` : ''}
-                <div class="option-text">
-                  <h3>${option.text}</h3>
-                  ${option.description ? `<p>${option.description}</p>` : ''}
-                </div>
-                <i class='bx bx-check-circle option-check'></i>
-              </div>
-            </label>
-          `;
-        }).join('')}
-      </div>
-
-      <div class="wizard-navigation">
-        ${stepNum > 0 ? `
-          <a href="/wizard/question/${stepNum - 1}" class="btn btn-secondary">
-            <i class='bx bx-chevron-left'></i>
-            Back
-          </a>
-        ` : `
-          <a href="/wizard" class="btn btn-secondary">
-            <i class='bx bx-home'></i>
-            Start Over
-          </a>
-        `}
-        
-        <button type="submit" class="btn btn-primary" id="next-btn">
-          ${stepNum + 1 === totalSteps ? 'See Recommendation' : 'Next'}
-          <i class='bx bx-chevron-right'></i>
-        </button>
-      </div>
-    </form>
-  </div>
-
-  <!-- Helper Text -->
-  <p class="wizard-help-text">
-    <i class='bx bx-info-circle'></i>
-    Choose the option that best matches your needs
-  </p>
-</div>
-
-<script src="/js/wizard.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  WizardForm.init({
-    questionType: '${question.type}',
-    totalSteps: ${totalSteps},
-    currentStep: ${stepNum}
-  });
-});
-</script>
+${WizardUtils.renderScript(question, totalSteps, stepNum)}
 `, user, subscription }) %>

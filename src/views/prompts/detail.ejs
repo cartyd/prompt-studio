@@ -2,12 +2,12 @@
 <%- include('../layout-wrapper', { body: `
 <div class="content-container-lg">
   <div class="mb-1">
-    <a href="/prompts" style="color: var(--color-primary);">&larr; Back to My Prompts</a>
+    <a href="/prompts" class="text-primary">&larr; Back to My Prompts</a>
   </div>
 
-  <div class="flex-between mb-1" style="align-items: start;">
+  <div class="flex-between-start mb-md">
     <div>
-      <h2 style="margin-bottom: 0.25rem;">${prompt.title}</h2>
+      <h2 class="mb-xs">${prompt.title}</h2>
       <p class="text-muted">
         ${prompt.frameworkType} • Created <span data-format-date="${prompt.createdAt}" data-format="date">${prompt.createdAt}</span>
       </p>
@@ -20,8 +20,8 @@
     </div>
   </div>
 
-  <div style="background: var(--color-bg-light); padding: 1.5rem; border-radius: 8px;" class="mt-1">
-    <pre id="prompt-text" style="white-space: pre-wrap; font-family: inherit; margin: 0;">${prompt.finalPromptText}</pre>
+  <div class="content-highlight mt-md">
+    <pre id="prompt-text" class="pre-wrap">${prompt.finalPromptText}</pre>
   </div>
 </div>
 

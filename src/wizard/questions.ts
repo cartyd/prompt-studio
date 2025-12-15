@@ -1,4 +1,16 @@
-import { WizardQuestion, WizardAnswer, WizardRecommendation } from '../types';
+import { WizardQuestion, WizardAnswer, WizardRecommendation } from '../types/index';
+import { 
+  CONFIDENCE_THRESHOLDS, 
+  toPercentage,
+  DEFAULT_FRAMEWORK_ROLES,
+  FRAMEWORK_IDS
+} from '../constants/scoring';
+import { 
+  getFrameworkName, 
+  getFrameworkExplanation, 
+  getFrameworkSelectionReasons, 
+  generatePrepopulateData 
+} from './data-mapping';
 
 /**
  * Wizard questions designed to guide non-technical users to the right framework
@@ -214,9 +226,9 @@ export function calculateRecommendation(answers: WizardAnswer[]): WizardRecommen
   if (sortedFrameworks.length === 0) {
     // Default to CoT if no clear winner
     return {
-      frameworkId: 'cot',
+      frameworkId: FRAMEWORK_IDS.CHAIN_OF_THOUGHT,
       frameworkName: 'Chain-of-Thought (CoT)',
-      confidence: 50,
+      confidence: CONFIDENCE_THRESHOLDS.LOW,
       explanation:
         'Chain-of-Thought helps you break down any problem into clear, logical steps. It\'s a great all-purpose approach for structured thinking.',
       whyChosen: [
@@ -228,26 +240,26 @@ export function calculateRecommendation(answers: WizardAnswer[]): WizardRecommen
 
   const [topFramework, topScore] = sortedFrameworks[0];
   const totalScore = Object.values(scores).reduce((sum, score) => sum + score, 0);
-  const confidence = Math.round((topScore / totalScore) * 100);
+  const confidence = toPercentage(topScore / totalScore);
 
   const recommendation: WizardRecommendation = {
     frameworkId: topFramework,
     frameworkName: getFrameworkName(topFramework),
     confidence,
-    explanation: getExplanation(topFramework, answers),
-    whyChosen: getWhyChosen(topFramework, answers),
+    explanation: getFrameworkExplanation(topFramework),
+    whyChosen: getWhyChosenReasons(topFramework, answers),
     prepopulateData: getPrepopulateData(topFramework, answers),
   };
 
   // If confidence is 50% or lower, include alternative recommendations
-  if (confidence <= 50 && sortedFrameworks.length > 1) {
+  if (confidence <= CONFIDENCE_THRESHOLDS.ALTERNATIVE_CUTOFF && sortedFrameworks.length > 1) {
     const alternatives = sortedFrameworks
       .slice(1, 3) // Get top 2 alternatives
       .map(([frameworkId, score]) => ({
         frameworkId,
         frameworkName: getFrameworkName(frameworkId),
-        confidence: Math.round((score / totalScore) * 100),
-        explanation: getExplanation(frameworkId, answers),
+        confidence: toPercentage(score / totalScore),
+        explanation: getFrameworkExplanation(frameworkId),
       }));
 
     recommendation.alternativeRecommendations = alternatives;
@@ -256,63 +268,38 @@ export function calculateRecommendation(answers: WizardAnswer[]): WizardRecommen
   return recommendation;
 }
 
-function getFrameworkName(id: string): string {
-  const names: Record<string, string> = {
-    tot: 'Tree-of-Thought (ToT)',
-    cot: 'Chain-of-Thought (CoT)',
-    'self-consistency': 'Self-Consistency',
-    role: 'Few-Shot / Role Prompting',
-    reflection: 'Reflection / Revision',
-  };
-  return names[id] || id;
-}
+function getWhyChosenReasons(frameworkId: string, _answers: WizardAnswer[]): string[] {
+  // Convert answers to simple object format expected by data-mapping functions
+  const answersObj = _answers.reduce((acc, answer) => {
+    acc[answer.questionId] = answer.selectedOptionIds[0] || '';
+    return acc;
+  }, {} as Record<string, string>);
 
-function getExplanation(frameworkId: string, _answers: WizardAnswer[]): string {
-  const explanations: Record<string, string> = {
-    tot: 'Tree-of-Thought is perfect when you want to explore multiple approaches before deciding. Think of it like brainstorming with yourself. You generate different ideas, evaluate each one, and then choose the best path forward. It\'s especially powerful for complex decisions with many possible outcomes.',
-    cot: 'Chain-of-Thought breaks down complex problems into clear, logical steps. Like solving a math problem by showing your work, this framework helps you (and the AI) think through each part of the problem systematically. You get structured reasoning that\'s easy to follow and verify.',
-    'self-consistency':
-      'Self-Consistency creates multiple versions of your answer and combines the best parts. Imagine having several drafts and picking the strongest elements from each—that\'s what this framework does. It\'s ideal when quality, tone, and polish matter most.',
-    role: 'Few-Shot Prompting teaches by example. You show the AI what "good" looks like with 2-3 samples, and it follows that pattern. This is perfect when you need consistency across multiple outputs or want to match a specific style, tone, or format.',
-    reflection:
-      'Reflection helps you improve what you already have. The AI creates a first draft, critically reviews it for weaknesses, then produces an improved version. It\'s like having an editor who makes your work clearer, more complete, and more polished.',
-  };
-  return explanations[frameworkId] || '';
-}
-
-function getWhyChosen(frameworkId: string, _answers: WizardAnswer[]): string[] {
-  const reasons: Record<string, string[]> = {
-    tot: [
-      'You want to explore multiple approaches before deciding',
-      'Your task is complex with many possible outcomes',
-      'You value thoroughness and considering alternatives',
-    ],
-    cot: [
-      'You need step-by-step reasoning and clarity',
-      'Your task requires careful analysis and planning',
-      'Understanding the thinking process is important to you',
-    ],
-    'self-consistency': [
-      'You want the highest quality final result',
-      'Tone, wording, and polish are important',
-      'Multiple perspectives help create better outcomes',
-    ],
-    role: [
-      'You have examples that show what you want',
-      'Consistency and matching a specific style matters',
-      'You want predictable, pattern-based results',
-    ],
-    reflection: [
-      'You already have content to improve',
-      'Refinement and polish are your priorities',
-      'You want critical feedback built into the process',
-    ],
-  };
-
-  return reasons[frameworkId] || ['This framework matches your needs best'];
+  return getFrameworkSelectionReasons(frameworkId, answersObj);
 }
 
 function getPrepopulateData(
+  frameworkId: string,
+  answers: WizardAnswer[]
+): Record<string, string> | undefined {
+  // Convert answers to simple object format expected by data-mapping functions
+  const answersObj = answers.reduce((acc, answer) => {
+    acc[answer.questionId] = answer.selectedOptionIds[0] || '';
+    return acc;
+  }, {} as Record<string, string>);
+
+  const data = generatePrepopulateData(frameworkId, answersObj);
+  
+  // Convert any string[] values to comma-separated strings for form compatibility
+  const convertedData: Record<string, string> = {};
+  for (const [key, value] of Object.entries(data)) {
+    convertedData[key] = Array.isArray(value) ? value.join(', ') : value;
+  }
+  
+  return Object.keys(convertedData).length > 0 ? convertedData : getDefaultPrepopulateData(frameworkId, answers);
+}
+
+function getDefaultPrepopulateData(
   frameworkId: string,
   answers: WizardAnswer[]
 ): Record<string, string> | undefined {
@@ -321,26 +308,18 @@ function getPrepopulateData(
   const prepopulate: Record<string, string> = {};
 
   // Set default role based on framework
-  const defaultRoles: Record<string, string> = {
-    tot: 'expert problem solver',
-    cot: 'logical thinker',
-    'self-consistency': 'analytical reasoner',
-    role: 'professional expert',
-    reflection: 'critical editor',
-  };
-
-  if (defaultRoles[frameworkId]) {
-    prepopulate.role = defaultRoles[frameworkId];
+  if (DEFAULT_FRAMEWORK_ROLES[frameworkId as keyof typeof DEFAULT_FRAMEWORK_ROLES]) {
+    prepopulate.role = DEFAULT_FRAMEWORK_ROLES[frameworkId as keyof typeof DEFAULT_FRAMEWORK_ROLES];
   }
 
   // Provide helpful placeholder based on user's goal
-  if (q1Answer?.selectedOptionIds[0] === 'explore-ideas' && frameworkId === 'tot') {
+  if (q1Answer?.selectedOptionIds[0] === 'explore-ideas' && frameworkId === FRAMEWORK_IDS.TREE_OF_THOUGHT) {
     prepopulate.objective =
       'Describe the decision or problem you need to solve. Include any relevant constraints, goals, or context.';
-  } else if (q1Answer?.selectedOptionIds[0] === 'break-down-problem' && frameworkId === 'cot') {
+  } else if (q1Answer?.selectedOptionIds[0] === 'break-down-problem' && frameworkId === FRAMEWORK_IDS.CHAIN_OF_THOUGHT) {
     prepopulate.problem =
       'Describe the problem you need to solve step-by-step. Include any relevant data or context.';
-  } else if (q1Answer?.selectedOptionIds[0] === 'improve-draft' && frameworkId === 'reflection') {
+  } else if (q1Answer?.selectedOptionIds[0] === 'improve-draft' && frameworkId === FRAMEWORK_IDS.REFLECTION) {
     prepopulate.task = 'Describe what you want to create or improve.';
     prepopulate.criteria =
       'What should be improved? (e.g., clarity, tone, completeness, accuracy)';

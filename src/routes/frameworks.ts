@@ -3,6 +3,7 @@ import { requireAuth } from '../plugins/auth';
 import { frameworks, getFrameworkById, generatePrompt } from '../frameworks';
 import { ERROR_MESSAGES } from '../constants';
 import { logEvent } from '../utils/analytics';
+import { LIMITS } from '../constants/scoring';
 
 const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
   // List all frameworks
@@ -77,7 +78,7 @@ const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
     const formData = request.body as Record<string, string | string[]>;
     
     // Validate version/approach limits (max 5 for all users)
-    const maxLimit = 5;
+    const maxLimit = LIMITS.MAX_FRAMEWORK_APPROACHES;
     if (formData.approaches) {
       const approaches = parseInt(formData.approaches as string, 10);
       if (approaches > maxLimit) {

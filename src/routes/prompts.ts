@@ -88,9 +88,9 @@ const promptRoutes: FastifyPluginAsync = async (fastify) => {
         where: { userId: request.user!.id },
       });
 
-      if (promptCount >= FREE_PROMPT_LIMIT) {
+      if (promptCount >= USER_CONSTANTS.FREE_TIER_PROMPT_LIMIT) {
         return reply.view('partials/limit-reached', {
-          limit: FREE_PROMPT_LIMIT,
+          limit: USER_CONSTANTS.FREE_TIER_PROMPT_LIMIT,
         });
       }
     }

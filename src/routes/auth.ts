@@ -5,6 +5,7 @@ import { validateEmail, validatePassword, validateName } from '../validation';
 import { logEvent } from '../utils/analytics';
 import { createVerificationToken, validateAndConsumeToken } from '../utils/tokens';
 import { sendVerificationEmail, sendPasswordResetEmail, sendPasswordChangedNotification } from '../utils/email';
+import { UserQueryResult } from '../types';
 
 async function renderAuthError(
   reply: FastifyReply,
@@ -319,10 +320,16 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     // Fallback for SQLite collation issues: case-insensitive match via raw SQL
     if (!user) {
       try {
-        const rows = await fastify.prisma.$queryRaw<any[]>`SELECT id, name, email FROM User WHERE lower(email) = lower(${email}) LIMIT 1`;
+        const rows = await fastify.prisma.$queryRaw<UserQueryResult[]>`SELECT id, name, email FROM User WHERE lower(email) = lower(${email}) LIMIT 1`;
         if (rows && rows.length > 0) {
-          user = rows[0] as any;
-          fastify.log.info({ email, matched: (user as any).email }, 'forgot-password fallback match via lower(email)');
+          const partialUser = rows[0];
+          // Get full user record by ID to ensure we have all fields
+          user = await fastify.prisma.user.findUnique({
+            where: { id: partialUser.id }
+          });
+          if (user) {
+            fastify.log.info({ email, matched: partialUser.email }, 'forgot-password fallback match via lower(email)');
+          }
         }
       } catch (e) {
         fastify.log.error({ err: e, email }, 'forgot-password fallback lookup failed');
@@ -337,7 +344,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       const token = await createVerificationToken(fastify.prisma, user.id, 'password_reset');
       fastify.log.info({ email }, 'forgot-password token created; sending email');
       try {
-        await sendPasswordResetEmail(user.email, token, (user as any).name || '');
+        await sendPasswordResetEmail(user.email, token, user.name || '');
         fastify.log.info({ email: user.email }, 'forgot-password email send attempted');
       } catch (err) {
         fastify.log.error({ err, email: user.email }, 'Failed to send password reset email');

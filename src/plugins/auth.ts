@@ -1,6 +1,7 @@
 import { FastifyPluginAsync, FastifyRequest, FastifyReply } from 'fastify';
 import fp from 'fastify-plugin';
 import { SubscriptionInfo, AuthUser, SubscriptionTier } from '../types';
+import { USER_CONSTANTS } from '../constants';
 
 export async function requireAuth(request: FastifyRequest, reply: FastifyReply) {
   if (!request.session.userId) {
@@ -76,12 +77,12 @@ export async function loadUserFromSession(request: FastifyRequest): Promise<void
 
 export function getSubscriptionInfo(user: AuthUser): SubscriptionInfo {
   const isPremium =
-    user.subscriptionTier === 'premium' &&
+    user.subscriptionTier === USER_CONSTANTS.SUBSCRIPTION_TIERS.PREMIUM &&
     user.subscriptionExpiresAt !== null &&
     user.subscriptionExpiresAt > new Date();
 
   return {
-    tier: isPremium ? 'premium' : 'free',
+    tier: isPremium ? USER_CONSTANTS.SUBSCRIPTION_TIERS.PREMIUM : USER_CONSTANTS.SUBSCRIPTION_TIERS.FREE,
     isPremium,
   };
 }

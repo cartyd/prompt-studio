@@ -1,0 +1,26 @@
+/**
+ * Main CSS Entry Point
+ * Imports all modular stylesheets in correct order
+ */
+
+/* 1. Design System - Variables and utilities */
+@import url('./design-system.css');
+
+/* 2. Typography - Fonts and text styles */
+@import url('./typography.css');
+
+/* 3. Base - Reset and fundamental styles */
+@import url('./base.css');
+
+/* 4. Layout Components */
+@import url('./header.css');
+@import url('./navigation.css');
+
+/* 5. UI Components */
+@import url('./forms.css');
+
+/* 6. Responsive Utilities */
+@import url('./responsive.css');
+
+/* 7. Component-specific styles (loaded per page) */
+/* These are loaded separately via page-specific CSS files */

@@ -3,6 +3,18 @@ export const TIME_CONSTANTS = {
   PREMIUM_SUBSCRIPTION_DAYS: 90,
 } as const;
 
+export const USER_CONSTANTS = {
+  FREE_TIER_PROMPT_LIMIT: 5,
+  SUBSCRIPTION_TIERS: {
+    FREE: 'free',
+    PREMIUM: 'premium'
+  },
+  ROLES: {
+    USER: 'user',
+    ADMIN: 'admin'
+  }
+} as const;
+
 export const TOKEN_CONSTANTS = {
   EMAIL_VERIFICATION_EXPIRY_HOURS: 24,
   PASSWORD_RESET_EXPIRY_HOURS: 1,

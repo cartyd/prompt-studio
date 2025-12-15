@@ -1,0 +1,17 @@
+<% if (framework.templates && framework.templates.length > 0) { %>
+<div class="templates-section">
+  <h3 class="section-title">Templates</h3>
+  <div id="templates-container" class="templates-container">
+    <% framework.templates.forEach(template => { %>
+      <div class="template-card" data-template-id="<%= template.id %>">
+        <div class="template-row">
+          <span class="template-category <%= template.category %>"><%= template.category %></span>
+          <div class="template-indicator"></div>
+        </div>
+        <h4><%= template.name %></h4>
+        <p><%= template.description %></p>
+      </div>
+    <% }); %>
+  </div>
+</div>
+<% } %>

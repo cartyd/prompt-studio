@@ -1,32 +1,35 @@
-<% const title = 'Register'; %>
-<%- include('../layout-wrapper', { body: `
-<div class="auth-container">
-  <h2 class="auth-title">Create Account</h2>
+<% 
+const title = 'Register';
+const { AuthUtils } = require('../../utils/auth-helpers.js');
 
-  ${error ? `<div class="error" role="alert" aria-live="polite">${error}</div>` : ''}
-
-  <form method="POST" action="/auth/register" aria-label="Registration form">
-    <div class="form-group">
-      <label for="name">Name</label>
-      <input type="text" id="name" name="name" required autocomplete="name" aria-required="true">
-    </div>
-
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input type="email" id="email" name="email" required autocomplete="email" aria-required="true">
-    </div>
-
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input type="password" id="password" name="password" minlength="8" required autocomplete="new-password" aria-required="true" aria-describedby="password-hint">
-      <small id="password-hint" class="password-hint">Minimum 8 characters</small>
-    </div>
-
-    <button type="submit" class="btn w-full" aria-label="Submit registration">Register</button>
-  </form>
-
-  <p class="auth-footer-text">
-    Already have an account? <a href="/auth/login">Login here</a>
-  </p>
-</div>
-`, user }) %>
+const registerConfig = {
+  title: 'Create Account',
+  action: '/auth/register',
+  fields: [
+    { 
+      name: 'name', 
+      label: 'Name', 
+      type: 'text', 
+      autocomplete: 'name' 
+    },
+    { 
+      name: 'email', 
+      label: 'Email', 
+      type: 'email', 
+      autocomplete: 'email' 
+    },
+    { 
+      name: 'password', 
+      label: 'Password', 
+      type: 'password', 
+      autocomplete: 'new-password',
+      minlength: 8,
+      hint: 'Minimum 8 characters'
+    }
+  ],
+  submitText: 'Register',
+  footerLink: `Already have an account? <a href="/auth/login">Login here</a>`,
+  error
+};
+%>
+<%- include('../layout-wrapper', { body: AuthUtils.renderForm(registerConfig), user }) %>

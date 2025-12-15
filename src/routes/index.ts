@@ -1,6 +1,6 @@
 import { FastifyPluginAsync } from 'fastify';
 import { requireAuth, loadUserFromSession } from '../plugins/auth';
-import { TIME_CONSTANTS } from '../constants';
+import { TIME_CONSTANTS, USER_CONSTANTS } from '../constants';
 import { getAppVersion } from '../utils/version';
 
 const indexRoutes: FastifyPluginAsync = async (fastify) => {
@@ -16,7 +16,7 @@ const indexRoutes: FastifyPluginAsync = async (fastify) => {
     return reply.viewWithCsrf('home', {
       user: request.user,
       subscription: request.subscription,
-      getStartedBtn,
+      getStartedBtn
     });
   });
 
@@ -49,7 +49,7 @@ const indexRoutes: FastifyPluginAsync = async (fastify) => {
     await fastify.prisma.user.update({
       where: { id: request.user!.id },
       data: {
-        subscriptionTier: 'premium',
+        subscriptionTier: USER_CONSTANTS.SUBSCRIPTION_TIERS.PREMIUM,
         subscriptionExpiresAt: expiresAt,
       },
     });

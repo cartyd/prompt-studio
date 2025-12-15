@@ -4,27 +4,27 @@
   <h2 class="mb-2">Account Settings</h2>
 
   <!-- Account Information -->
-  <div class="p-1-5 mb-2" style="background: #f8f9fa; border-radius: 4px;">
-    <h3 class="m-0 mb-1" style="font-size: 1.1rem;">Account Information</h3>
-    <div style="display: grid; grid-template-columns: 150px 1fr; gap: 0.75rem; font-size: 0.95rem;">
-      <div style="color: #7f8c8d; font-weight: 500;">Email:</div>
+  <div class="card-light p-lg mb-md">
+    <h3 class="m-0 mb-md heading-sm">Account Information</h3>
+    <div class="grid-settings">
+      <div class="label-muted">Email:</div>
       <div><strong>${user.email}</strong></div>
       
-      <div style="color: #7f8c8d; font-weight: 500;">Name:</div>
+      <div class="label-muted">Name:</div>
       <div>${user.name}</div>
       
-      <div style="color: #7f8c8d; font-weight: 500;">Member Since:</div>
+      <div class="label-muted">Member Since:</div>
       <div><span data-format-date="${user.createdAt}" data-format="long-date">${user.createdAt}</span></div>
       
-      <div style="color: #7f8c8d; font-weight: 500;">Last Password Change:</div>
+      <div class="label-muted">Last Password Change:</div>
       <div><span data-format-date="${user.lastPasswordChange}" data-format="long-date">${user.lastPasswordChange}</span></div>
     </div>
   </div>
 
   <!-- Change Password Section -->
-  <div class="p-2 mb-2" style="background: #ffffff; border: 1px solid #e0e0e0; border-radius: 4px;">
-    <h3 class="m-0 mb-1" style="font-size: 1.1rem;">Change Password</h3>
-    <p class="mb-1-5" style="color: #7f8c8d; font-size: 0.95rem;">
+  <div class="card-white p-xl mb-md">
+    <h3 class="m-0 mb-md heading-sm">Change Password</h3>
+    <p class="mb-lg text-muted-sm">
       Choose a strong password that you don't use for other accounts. Your password must be at least 8 characters long.
     </p>
 
@@ -42,7 +42,7 @@
       <div class="form-group">
         <label for="newPassword">New Password</label>
         <input type="password" id="newPassword" name="newPassword" required minlength="8">
-        <small style="color: #7f8c8d; font-size: 0.85rem;">
+        <small class="text-muted text-sm">
           Must be at least 8 characters long
         </small>
       </div>
@@ -57,17 +57,17 @@
   </div>
 
   <!-- Security Notice -->
-  <div style="background: #fff8dc; border-left: 4px solid #f39c12; padding: 1rem 1.5rem; border-radius: 4px; margin-bottom: 2rem;">
-    <p style="margin: 0; font-size: 0.9rem; color: #8b6914;">
+  <div class="card-warning mb-xxl">
+    <p class="m-0 text-sm text-warning">
       <strong>🔒 Security Tip:</strong> After changing your password, you'll receive a confirmation email. 
       If you didn't make this change, please contact support immediately.
     </p>
   </div>
 
   <!-- Email Change Coming Soon -->
-  <div style="background: #ffffff; border: 1px solid #e0e0e0; border-radius: 4px; padding: 2rem;">
-    <h3 style="margin: 0 0 1rem 0; font-size: 1.1rem; color: #95a5a6;">Change Email Address</h3>
-    <p style="color: #7f8c8d; margin: 0; font-size: 0.95rem;">
+  <div class="card-white p-xxl">
+    <h3 class="m-0 mb-md heading-sm text-secondary">Change Email Address</h3>
+    <p class="text-muted m-0 text-muted-sm">
       Email change functionality is coming soon. For now, please contact support if you need to change your email address.
     </p>
   </div>

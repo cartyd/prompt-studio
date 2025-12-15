@@ -1,6 +1,7 @@
 import * as Prisma from '@prisma/client';
 import { FastifyRequest } from 'fastify';
 import { extractRequestMetadata } from './analytics-helpers';
+import { analyticsLogger } from './logger';
 
 export type EventType = 'login' | 'framework_view' | 'prompt_generate' | 'prompt_save' | 'password_changed';
 
@@ -49,6 +50,6 @@ export async function logEvent(
     });
   } catch (error) {
     // Silently fail - don't let analytics break the app
-    console.error('Failed to log analytics event:', error);
+    analyticsLogger.error('Failed to log analytics event', error);
   }
 }

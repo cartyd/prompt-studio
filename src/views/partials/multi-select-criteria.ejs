@@ -1,48 +1,48 @@
 <div class="form-group">
   <label for="criteria">Evaluation Criteria *</label>
-  <div style="background: white; border: 1px solid #ddd; border-radius: 4px; padding: 1rem; max-height: 300px; overflow-y: auto;">
-    <div id="criteria-checkboxes" style="display: flex; flex-direction: column; gap: 0.5rem;">
+  <div class="scrollable-content">
+    <div id="criteria-checkboxes" class="flex-col">
       <!-- Default criteria checkboxes will be rendered here -->
     </div>
     
-    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee;">
+    <div class="mt-md pt-md border-top-light">
       <button type="button" 
               id="add-custom-btn" 
-              style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; background: #f8f9fa; border: 1px dashed #3498db; border-radius: 4px; cursor: pointer; color: #3498db; font-size: 0.9rem;">
+              class="btn-dashed">
         <span>+ Add Custom Criteria</span>
       </button>
       
-      <div id="custom-input-container" style="display: none; margin-top: 0.75rem;">
-        <div style="display: flex; gap: 0.5rem; align-items: start;">
-          <div style="flex: 1;">
+      <div id="custom-input-container" class="hidden mt-md">
+        <div class="flex-row">
+          <div class="flex-1">
             <input type="text" 
                    id="custom-criteria-input" 
                    placeholder="Enter custom criteria..."
                    maxlength="200"
-                   style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;">
-            <small style="display: block; margin-top: 0.25rem; color: #7f8c8d; font-size: 0.8rem;">
+                   class="form-field">
+            <small class="block mt-xs text-muted text-xs">
               <% if (subscription.isPremium) { %>
                 💾 Custom criteria can be saved for future use
               <% } else { %>
-                ⏱️ Custom criteria available this session only · <a href="/premium" style="color: #3498db;">Upgrade to save</a>
+                ⏱️ Custom criteria available this session only · <a href="/premium" class="link-premium">Upgrade to save</a>
               <% } %>
             </small>
           </div>
           <button type="button" 
                   id="add-custom-submit-btn" 
-                  style="padding: 0.5rem 1rem; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap;">
+                  class="btn-add">
             Add
           </button>
           <button type="button" 
                   id="cancel-custom-btn" 
-                  style="padding: 0.5rem 1rem; background: #f8f9fa; color: #7f8c8d; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                  class="btn-cancel">
             Cancel
           </button>
         </div>
         <% if (subscription.isPremium) { %>
-        <div style="margin-top: 0.5rem;">
-          <label style="display: inline-flex; align-items: center; gap: 0.25rem; cursor: pointer; font-size: 0.85rem;">
-            <input type="checkbox" id="save-custom-checkbox" style="cursor: pointer;">
+        <div class="mt-sm">
+          <label class="flex-inline cursor-pointer text-sm">
+            <input type="checkbox" id="save-custom-checkbox" class="cursor-pointer">
             <span>💾 Save for future sessions</span>
           </label>
         </div>
@@ -54,7 +54,7 @@
   <!-- Hidden input to store selected criteria as JSON array -->
   <input type="hidden" id="criteria" name="criteria" value="[]">
   
-  <small style="display: block; margin-top: 0.5rem; color: #7f8c8d; font-size: 0.85rem;">
+  <small class="block mt-sm text-muted text-sm">
     <span id="criteria-count">0</span> criteria selected
   </small>
 </div>

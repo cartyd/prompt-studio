@@ -1,10 +1,11 @@
 <% const title = 'Premium'; %>
+<% const { USER_CONSTANTS } = require('../constants'); %>
 <%- include('layout-wrapper', { body: `
 <div class="content-container-lg">
   <h2 class="text-center mb-2">Upgrade to Premium</h2>
 
   ${subscription.isPremium ? `
-    <div class="success text-center" style="font-size: 1.25rem; padding: 2rem;">
+    <div class="success text-center success-large">
       <strong>You are currently a Premium member!</strong>
       <p class="mt-0-5">Enjoy unlimited saved prompts and exports.</p>
     </div>
@@ -15,7 +16,7 @@
         <ul class="tier-list">
           <li>✓ Access to all frameworks</li>
           <li>✓ Generate unlimited prompts</li>
-          <li class="tier-list-unavailable">✗ Save up to 5 prompts only</li>
+          <li class="tier-list-unavailable">✗ Save up to ${USER_CONSTANTS.FREE_TIER_PROMPT_LIMIT} prompts only</li>
           <li class="tier-list-unavailable">✗ No export functionality</li>
         </ul>
       </div>

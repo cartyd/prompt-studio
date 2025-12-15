@@ -1,5 +1,6 @@
 import { FastifyPluginAsync } from 'fastify';
 import { requireAuth } from '../plugins/auth';
+import { PrismaError } from '../types';
 
 const customCriteriaRoutes: FastifyPluginAsync = async (fastify) => {
   // Get user's custom criteria (premium only)
@@ -41,9 +42,10 @@ const customCriteriaRoutes: FastifyPluginAsync = async (fastify) => {
       });
 
       return reply.status(201).send({ criteria: customCriteria.criteriaName });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const prismaError = error as PrismaError;
       // Handle duplicate criteria
-      if (error.code === 'P2002') {
+      if (prismaError.code === 'P2002') {
         return reply.status(409).send({ error: 'This criteria already exists' });
       }
       throw error;

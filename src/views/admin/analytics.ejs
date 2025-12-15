@@ -1,4 +1,5 @@
 <% const title = 'Analytics'; %>
+<% const { AdminDataHelpers } = require('../../utils/template-data-helpers'); %>
 <%- include('../layout-wrapper', { body: `
 <link rel="stylesheet" href="/css/admin.css">
 
@@ -96,7 +97,7 @@
           <td>${stat.generates}</td>
           <td><strong>${stat.total}</strong></td>
         </tr>
-      `).join('') : '<tr><td colspan="4" style="text-align: center; color: #7f8c8d;">No framework usage data available for this period</td></tr>'}
+      `).join('') : '<tr><td colspan="4" class="text-center text-muted">No framework usage data available for this period</td></tr>'}
     </tbody>
   </table>
 </div>

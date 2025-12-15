@@ -1,8 +1,7 @@
 import * as Prisma from '@prisma/client';
+import { USER_CONSTANTS } from '../constants';
 
-export const FREE_PROMPT_LIMIT = 5;
-
-export type SubscriptionTier = 'free' | 'premium';
+export type SubscriptionTier = typeof USER_CONSTANTS.SUBSCRIPTION_TIERS[keyof typeof USER_CONSTANTS.SUBSCRIPTION_TIERS];
 
 export interface SubscriptionInfo {
   tier: SubscriptionTier;
@@ -91,6 +90,24 @@ export const DEFAULT_EVALUATION_CRITERIA = [
   'Risk/Safety',
   'Cost/Resource Impact',
 ] as const;
+
+// Query parameter interfaces
+export interface AdminQueryParams {
+  page?: string;
+  days?: string;
+}
+
+// Database query result interfaces
+export interface UserQueryResult {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export interface PrismaError extends Error {
+  code?: string;
+  meta?: Record<string, unknown>;
+}
 
 // Wizard types
 export interface WizardQuestion {

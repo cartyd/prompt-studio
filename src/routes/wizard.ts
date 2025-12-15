@@ -14,7 +14,7 @@ const wizardRoutes: FastifyPluginAsync = async (fastify) => {
       startedAt: new Date(),
     };
 
-    await logEvent(fastify.prisma, request, request.user?.id, 'login' as any, {
+    await logEvent(fastify.prisma, request, request.user?.id, 'framework_view', {
       eventType: 'wizard_start',
       source: 'framework_discovery',
     });
@@ -42,6 +42,13 @@ const wizardRoutes: FastifyPluginAsync = async (fastify) => {
 
     // Get previous answer if exists
     const previousAnswer = session?.answers.find((a) => a.questionId === question.id);
+
+    // Log wizard step view
+    await logEvent(fastify.prisma, request, request.user?.id, 'framework_view', {
+      eventType: 'wizard_question_view',
+      questionStep: stepNum,
+      questionId: question.id,
+    });
 
     return reply.viewWithCsrf('wizard/question', {
       question,
@@ -107,7 +114,7 @@ const wizardRoutes: FastifyPluginAsync = async (fastify) => {
     const currentQuestionIndex = wizardQuestions.findIndex((q) => q.id === questionId);
     const nextStep = currentQuestionIndex + 1;
 
-    await logEvent(fastify.prisma, request, request.user?.id, 'login' as any, {
+    await logEvent(fastify.prisma, request, request.user?.id, 'framework_view', {
       eventType: 'wizard_answer',
       questionId,
       step: currentQuestionIndex,
@@ -142,7 +149,7 @@ const wizardRoutes: FastifyPluginAsync = async (fastify) => {
     // Calculate recommendation
     const recommendation = calculateRecommendation(session.answers);
 
-    await logEvent(fastify.prisma, request, request.user?.id, 'login' as any, {
+    await logEvent(fastify.prisma, request, request.user?.id, 'framework_view', {
       eventType: 'wizard_complete',
       recommendedFramework: recommendation.frameworkId,
       confidence: recommendation.confidence,
@@ -164,7 +171,7 @@ const wizardRoutes: FastifyPluginAsync = async (fastify) => {
       startedAt: new Date(),
     };
 
-    await logEvent(fastify.prisma, request, request.user?.id, 'login' as any, {
+    await logEvent(fastify.prisma, request, request.user?.id, 'framework_view', {
       eventType: 'wizard_reset',
     });
 

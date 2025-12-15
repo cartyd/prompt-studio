@@ -1,5 +1,7 @@
 import { FastifyPluginAsync } from 'fastify';
 import { requireAdmin } from '../plugins/auth';
+import { AdminQueryParams } from '../types';
+import { USER_CONSTANTS } from '../constants';
 
 const adminRoutes: FastifyPluginAsync = async (fastify) => {
   // Admin Dashboard
@@ -7,7 +9,7 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
     // Get key metrics
     const [totalUsers, premiumUsers, totalPrompts, totalEvents] = await Promise.all([
       fastify.prisma.user.count(),
-      fastify.prisma.user.count({ where: { subscriptionTier: 'premium' } }),
+      fastify.prisma.user.count({ where: { subscriptionTier: USER_CONSTANTS.SUBSCRIPTION_TIERS.PREMIUM } }),
       fastify.prisma.prompt.count(),
       fastify.prisma.event.count(),
     ]);
@@ -78,7 +80,8 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
 
   // User Management
   fastify.get('/users', { preHandler: requireAdmin }, async (request, reply) => {
-    const page = parseInt((request.query as any).page || '1', 10);
+    const query = request.query as AdminQueryParams;
+    const page = parseInt(query.page || '1', 10);
     const pageSize = 20;
     const skip = (page - 1) * pageSize;
 
@@ -126,7 +129,7 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
       });
     }
 
-    const isPremium = targetUser.subscriptionTier === 'premium';
+    const isPremium = targetUser.subscriptionTier === USER_CONSTANTS.SUBSCRIPTION_TIERS.PREMIUM;
     const newTier = isPremium ? 'free' : 'premium';
     const expiresAt = isPremium
       ? null
@@ -176,7 +179,8 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
 
   // Analytics page
   fastify.get('/analytics', { preHandler: requireAdmin }, async (request, reply) => {
-    const days = parseInt((request.query as any).days || '7', 10);
+    const query = request.query as AdminQueryParams;
+    const days = parseInt(query.days || '7', 10);
     const since = new Date();
     since.setDate(since.getDate() - days);
 

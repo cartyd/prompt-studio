@@ -1,0 +1,20 @@
+<% if (framework.fields.some(f => f.optional)) { %>
+<div class="advanced-section">
+  <button type="button" id="toggle-advanced-btn" class="advanced-toggle">
+    <span id="advanced-icon" class="toggle-icon">▶</span>
+    <span>Advanced Options (optional)</span>
+  </button>
+  <div id="advanced-options" class="advanced-options-content">
+    <% framework.fields.filter(f => f.optional).forEach(field => { %>
+      <div class="form-group">
+        <label for="<%= field.name %>"><%= field.label %></label>
+        <textarea 
+          id="<%= field.name %>" 
+          name="<%= field.name %>" 
+          placeholder="<%= field.placeholder || '' %>"
+        ></textarea>
+      </div>
+    <% }); %>
+  </div>
+</div>
+<% } %>
