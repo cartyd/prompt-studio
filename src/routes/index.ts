@@ -2,6 +2,7 @@ import { FastifyPluginAsync } from 'fastify';
 import { requireAuth, loadUserFromSession } from '../plugins/auth';
 import { TIME_CONSTANTS, USER_CONSTANTS } from '../constants';
 import { getAppVersion } from '../utils/version';
+import { HOME_FEATURES } from '../utils/home';
 
 const indexRoutes: FastifyPluginAsync = async (fastify) => {
   // Home page
@@ -16,7 +17,8 @@ const indexRoutes: FastifyPluginAsync = async (fastify) => {
     return reply.viewWithCsrf('home', {
       user: request.user,
       subscription: request.subscription,
-      getStartedBtn
+      getStartedBtn,
+      features: HOME_FEATURES
     });
   });
 
@@ -36,6 +38,7 @@ const indexRoutes: FastifyPluginAsync = async (fastify) => {
     return reply.viewWithCsrf('premium', {
       user: request.user,
       subscription: request.subscription,
+      freeTierLimit: USER_CONSTANTS.FREE_TIER_PROMPT_LIMIT,
     });
   });
 

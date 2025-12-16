@@ -1,18 +1,16 @@
 <% const title = 'My Prompts'; %>
-<% const { USER_CONSTANTS } = require('../../constants'); %>
-<% const { PromptListHelpers } = require('../../utils/template-data-helpers'); %>
-<% const processedPrompts = PromptListHelpers.processPromptsForDisplay(prompts, subscription); %>
 <%- include('../layout-wrapper', { body: `
 <link rel="stylesheet" href="/css/prompts.css">
+<link rel="stylesheet" href="/css/framework-form.css">
 
 <div class="prompts-header">
   <h2>My Prompts</h2>
   <a href="/frameworks" class="btn">Create New Prompt</a>
 </div>
 
-${(!subscription || !subscription.isPremium) && prompts.length >= ${USER_CONSTANTS.FREE_TIER_PROMPT_LIMIT} ? `
+${(!subscription || !subscription.isPremium) && prompts.length >= freeTierLimit ? `
   <div class="error">
-    You've reached your free tier limit of ${USER_CONSTANTS.FREE_TIER_PROMPT_LIMIT} prompts. <a href="/premium">Upgrade to Premium</a> for unlimited prompts.
+    You've reached your free tier limit of ${freeTierLimit} prompts. <a href="/premium">Upgrade to Premium</a> for unlimited prompts.
   </div>
 ` : ''}
 
@@ -23,7 +21,123 @@ ${prompts.length === 0 ? `
   </div>
 ` : `
   <div class="grid grid-cols-1 grid-gap-md">
-    ${processedPrompts.map(p => PromptListHelpers.renderPromptRow(p)).join('')}
+    ${processedPrompts.map(p => `
+      <div id="prompt-row-${p.id}" class="prompt-row">
+        <div class="prompt-content">
+          <h3>${p.title}</h3>
+          <p class="prompt-meta">
+            ${p.frameworkType} • <span data-format-date="${p.displayDate}" data-format="date">${p.displayDate}</span>
+          </p>
+          <p class="prompt-preview">${p.truncatedText}</p>
+        </div>
+        <div class="prompt-actions">
+          <a href="/prompts/${p.id}" class="btn btn-secondary">View</a>
+          ${p.canExport ? `<a href="/prompts/${p.id}/export" class="btn">Export</a>` : ''}
+          <button 
+            class="btn btn-danger delete-prompt-btn"
+            data-prompt-id="${p.id}"
+            data-prompt-title="${p.title.replace(/"/g, '&quot;')}">Delete</button>
+        </div>
+      </div>
+    `).join('')}
   </div>
 `}
+
+<!-- Delete Confirmation Modal -->
+<div id="delete-modal" class="modal">
+  <div class="modal-content">
+    <button id="delete-modal-close" class="modal-close-btn">&times;</button>
+    <div class="modal-icon">
+      <i class='bx bx-trash' style='color:#e74c3c; font-size: 3rem;'></i>
+    </div>
+    <h2 id="delete-modal-title" class="modal-title">Delete Prompt</h2>
+    <p id="delete-modal-message" class="modal-message"></p>
+    <p class="modal-warning">This action cannot be undone.</p>
+    <div class="modal-btn-row-centered">
+      <button id="delete-modal-confirm" class="btn btn-danger">Delete</button>
+      <button id="delete-modal-cancel" class="btn btn-secondary">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+  
+  const modal = document.getElementById('delete-modal');
+  const modalMessage = document.getElementById('delete-modal-message');
+  const modalConfirm = document.getElementById('delete-modal-confirm');
+  const modalCancel = document.getElementById('delete-modal-cancel');
+  const modalClose = document.getElementById('delete-modal-close');
+  
+  let currentPromptId = null;
+  let currentPromptRow = null;
+  
+  function showModal(promptId, promptTitle) {
+    currentPromptId = promptId;
+    currentPromptRow = document.getElementById('prompt-row-' + promptId);
+    modalMessage.textContent = 'Delete "' + promptTitle + '"?';
+    modal.style.display = 'flex';
+  }
+  
+  function hideModal() {
+    modal.style.display = 'none';
+    currentPromptId = null;
+    currentPromptRow = null;
+  }
+  
+  function deletePrompt() {
+    if (!currentPromptId || !currentPromptRow) return;
+    
+    fetch('/prompts/' + currentPromptId, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      if (response.ok) {
+        // Remove the prompt row from DOM
+        currentPromptRow.remove();
+        hideModal();
+        
+        // Check if there are no more prompts and reload if needed
+        const remainingPrompts = document.querySelectorAll('.prompt-row');
+        if (remainingPrompts.length === 0) {
+          window.location.reload();
+        }
+      } else {
+        alert('Failed to delete prompt. Please try again.');
+        hideModal();
+      }
+    })
+    .catch(error => {
+      console.error('Error deleting prompt:', error);
+      alert('Failed to delete prompt. Please try again.');
+      hideModal();
+    });
+  }
+  
+  // Attach event listeners to delete buttons
+  document.querySelectorAll('.delete-prompt-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const promptId = this.dataset.promptId;
+      const promptTitle = this.dataset.promptTitle;
+      showModal(promptId, promptTitle);
+    });
+  });
+  
+  // Modal controls
+  if (modalConfirm) modalConfirm.addEventListener('click', deletePrompt);
+  if (modalCancel) modalCancel.addEventListener('click', hideModal);
+  if (modalClose) modalClose.addEventListener('click', hideModal);
+  
+  // Close modal on backdrop click
+  if (modal) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) hideModal();
+    });
+  }
+})();
+</script>
 `, user, subscription }) %>

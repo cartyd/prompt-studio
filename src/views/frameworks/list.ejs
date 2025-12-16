@@ -1,6 +1,5 @@
 <% const title = 'Frameworks'; %>
-<% const { FrameworkListHelpers } = require('../../utils/template-data-helpers'); %>
-<% const organizedFrameworks = FrameworkListHelpers.organizeFrameworks(frameworks); %>
+<% const organizedFrameworks = { featured: frameworks.slice(0, 2), regular: frameworks.slice(2) }; %>
 
 <% 
 // Map framework IDs to Boxicon classes

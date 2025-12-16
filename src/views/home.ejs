@@ -1,6 +1,4 @@
 <% const title = 'Home'; %>
-<% const { HomePageHelpers } = require('../utils/template-data-helpers'); %>
-<% const processedFeatures = HomePageHelpers.processFeatures(features); %>
 <% const additionalStyles = '<link rel="stylesheet" href="/css/home.css"><link rel="preload" as="image" href="/images/tot.png" fetchpriority="high">'; %>
 
 <% const bodyContent = String.raw`
@@ -27,7 +25,7 @@
 <!-- FEATURE GRID -->
 <div class="feature-grid-wrapper">
   <div class="feature-grid">
-    ${processedFeatures.map(feature => `
+    ${features.map(feature => `
     <article class="feature-card">
       <i class='bx ${feature.icon} icon' aria-hidden="true"></i>
       <h3>${feature.title}</h3>

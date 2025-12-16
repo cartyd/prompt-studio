@@ -684,13 +684,14 @@
   position: relative;
   background: #fff;
   border-radius: 10px;
-  padding: 60px 30px;
-  max-width: 600px;
+  padding: 40px 30px;
+  max-width: 500px;
   max-height: 90%;
   overflow-y: auto;
   transform: translateY(-20px);
   animation: slideDown 0.3s forwards;
   z-index: 1001;
+  text-align: center;
 }
 
 @keyframes slideDown {
@@ -704,11 +705,28 @@
   }
 }
 
-.modal-message {
-  white-space: pre-wrap;
-  font-size: 1rem;
+.modal-icon {
+  margin-bottom: 1rem;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 600;
   color: #2c3e50;
-  margin-bottom: 20px;
+  margin: 0 0 1rem 0;
+}
+
+.modal-message {
+  font-size: 1.1rem;
+  color: #2c3e50;
+  margin: 0 0 0.5rem 0;
+  font-weight: 500;
+}
+
+.modal-warning {
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  margin: 0 0 1.5rem 0;
 }
 
 .modal-btn-row {
@@ -717,9 +735,16 @@
   gap: 0.5rem;
 }
 
-.modal-btn-row .btn {
+.modal-btn-row-centered {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.modal-btn-row .btn,
+.modal-btn-row-centered .btn {
   flex: 0 0 auto;
-  min-width: 100px;
+  min-width: 120px;
   background: #3498db;
   color: white;
   border: none;
@@ -728,19 +753,34 @@
   cursor: pointer;
   font-size: 1rem;
   transition: 0.2s;
+  font-weight: 500;
 }
 
-.modal-btn-row .btn:hover {
+.modal-btn-row .btn:hover,
+.modal-btn-row-centered .btn:hover {
   background: #2d89ca;
 }
 
-.modal-btn-row .btn-secondary {
+.modal-btn-row .btn-secondary,
+.modal-btn-row-centered .btn-secondary {
   background: #ecf0f1;
   color: #34495e;
 }
 
-.modal-btn-row .btn-secondary:hover {
+.modal-btn-row .btn-secondary:hover,
+.modal-btn-row-centered .btn-secondary:hover {
   background: #dfe6e9;
+}
+
+.modal-btn-row .btn-danger,
+.modal-btn-row-centered .btn-danger {
+  background: #e74c3c;
+  color: white;
+}
+
+.modal-btn-row .btn-danger:hover,
+.modal-btn-row-centered .btn-danger:hover {
+  background: #c0392b;
 }
 
 .modal-close-btn {

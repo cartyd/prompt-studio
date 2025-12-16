@@ -1,9 +1,6 @@
-<% 
-const title = 'Your Recommended Framework';
-const { WizardUtils } = require('../../utils/wizard-helpers.js');
-%>
+<% const title = 'Your Recommended Framework'; %>
 <%- include('../layout-wrapper', { body: `
 <link rel="stylesheet" href="/css/wizard.css">
 
-${WizardUtils.renderRecommendation(recommendation).replace('value=""', `value="${csrfToken}"`)}
+${recommendationHtml}
 `, user, subscription }) %>

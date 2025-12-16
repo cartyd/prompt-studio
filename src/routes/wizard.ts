@@ -3,6 +3,7 @@ import { requireAuth } from '../plugins/auth';
 import { wizardQuestions, calculateRecommendation, validateAnswers } from '../wizard/questions';
 import { WizardAnswer } from '../types';
 import { logEvent } from '../utils/analytics';
+import { WizardUtils } from '../utils/wizard-helpers';
 
 const wizardRoutes: FastifyPluginAsync = async (fastify) => {
   // Start wizard - show welcome page
@@ -50,11 +51,18 @@ const wizardRoutes: FastifyPluginAsync = async (fastify) => {
       questionId: question.id,
     });
 
-    return reply.viewWithCsrf('wizard/question', {
-      question,
+    // Render wizard question form and script server-side
+    const wizardFormHtml = WizardUtils.renderQuestionForm({
+      question: question as any,
       stepNum,
       totalSteps: wizardQuestions.length,
-      previousAnswer,
+      previousAnswer
+    });
+    const wizardScriptHtml = WizardUtils.renderScript(question as any, wizardQuestions.length, stepNum);
+    
+    return reply.viewWithCsrf('wizard/question', {
+      wizardFormHtml,
+      wizardScriptHtml,
       user: request.user,
       subscription: request.subscription,
     });
@@ -156,8 +164,11 @@ const wizardRoutes: FastifyPluginAsync = async (fastify) => {
       totalAnswers: session.answers.length,
     });
 
+    // Render recommendation page server-side
+    const recommendationHtml = WizardUtils.renderRecommendation(recommendation as any, request.csrfToken!);
+    
     return reply.viewWithCsrf('wizard/recommendation', {
-      recommendation,
+      recommendationHtml,
       user: request.user,
       subscription: request.subscription,
     });

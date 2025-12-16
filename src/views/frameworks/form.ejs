@@ -1,8 +1,4 @@
-<% 
-// Import framework form helpers to eliminate God Template anti-pattern
-const FrameworkFormHelpers = require('../../src/utils/framework-form-helpers.js');
-const title = framework.name; 
-%>
+<% const title = framework.name; %>
 <%- include('../layout-wrapper', { body: `
 <link rel="stylesheet" href="/css/framework-form.css">
 <link rel="stylesheet" href="/css/design-system.css">
@@ -21,7 +17,7 @@ const title = framework.name;
     </div>
   </div>
 
-  ${FrameworkFormHelpers.renderExamplesSection(framework)}
+  ${renderedExamples}
 
   <div class="form-layout ${framework.templates && framework.templates.length > 0 ? 'has-templates' : ''}">
     <div class="form-section">
@@ -31,9 +27,9 @@ const title = framework.name;
             hx-trigger="submit"
             class="form-container">
         
-        ${FrameworkFormHelpers.renderFormFields(framework, prepopulateData, fromWizard)}
-        ${FrameworkFormHelpers.renderCriteriaSelector(framework, subscription)}
-        ${FrameworkFormHelpers.renderAdvancedOptions(framework)}
+        ${renderedFields}
+        ${renderedCriteria}
+        ${renderedAdvanced}
 
         <div class="form-actions">
           <button type="submit" class="btn btn-primary">Generate Preview</button>
@@ -49,11 +45,11 @@ const title = framework.name;
       </div>
     </div>
 
-    ${FrameworkFormHelpers.renderTemplatesSection(framework)}
+    ${renderedTemplates}
   </div>
 </div>
 
-${FrameworkFormHelpers.renderModal()}
+${renderedModal}
 `, user, subscription }) %>
 
 <script src="/js/framework-form.js"></script>
@@ -68,52 +64,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const criteriaFieldDef = <%- JSON.stringify(framework.fields.find(f => f.type === 'multi-select-criteria')) %>;
-  if (criteriaFieldDef) {
-    FrameworkCriteria.init({
-      isPremium: <%= subscription.isPremium %>,
-      defaultCriteria: criteriaFieldDef.options || [],
-      savedCustomCriteria: <%= JSON.stringify(customCriteria || []) %>,
-      defaultValues: criteriaFieldDef.defaultValue || []
-    });
-  }
-  
-  FrameworkAdvancedOptions.init();
-  FrameworkModal.init();
-});
-</script>
-
-<% if (framework.templates && framework.templates.length > 0) { %>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const templates = <%- JSON.stringify(framework.templates) %>;
-  FrameworkTemplates.init(templates);
-});
-</script>
-<% } %>
-`, user, subscription }) %>
-
-<script src="/js/framework-form.js"></script>
-<% if (framework.examples) { %>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const examples = <%- JSON.stringify(framework.examples) %>;
-  FrameworkExamples.init(examples);
-});
-</script>
-<% } %>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const criteriaFieldDef = <%- JSON.stringify(framework.fields.find(f => f.type === 'multi-select-criteria')) %>;
-  if (criteriaFieldDef) {
-    FrameworkCriteria.init({
-      isPremium: <%= subscription.isPremium %>,
-      defaultCriteria: criteriaFieldDef.options || [],
-      savedCustomCriteria: <%= JSON.stringify(customCriteria || []) %>,
-      defaultValues: criteriaFieldDef.defaultValue || []
-    });
-  }
+  <% const criteriaFieldDef = framework.fields.find(f => f.type === 'multi-select-criteria'); %>
+  <% if (criteriaFieldDef) { %>
+  const criteriaFieldDef = <%- JSON.stringify(criteriaFieldDef) %>;
+  FrameworkCriteria.init({
+    isPremium: <%= subscription.isPremium %>,
+    defaultCriteria: criteriaFieldDef.options || [],
+    savedCustomCriteria: <%= JSON.stringify(customCriteria || []) %>,
+    defaultValues: criteriaFieldDef.defaultValue || []
+  });
+  <% } %>
   
   FrameworkAdvancedOptions.init();
   FrameworkModal.init();

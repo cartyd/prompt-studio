@@ -432,10 +432,41 @@ window.FrameworkModal = (function() {
     setupClearFormButton();
   }
 
-  function showModal(message, onConfirm) {
+  function showModal(message, onConfirm, options = {}) {
     const modal = document.getElementById('unified-modal');
+    const modalTitle = document.getElementById('unified-modal-title');
     const modalMessage = document.getElementById('unified-modal-message');
+    const modalWarning = document.getElementById('unified-modal-warning');
+    const modalIcon = document.getElementById('unified-modal-icon');
+    const modalConfirm = document.getElementById('unified-modal-confirm');
+    
+    // Set title
+    if (modalTitle) modalTitle.textContent = options.title || 'Confirm Action';
+    
+    // Set message
     if (modalMessage) modalMessage.textContent = message;
+    
+    // Set warning (optional)
+    if (modalWarning) {
+      modalWarning.textContent = options.warning || '';
+      modalWarning.style.display = options.warning ? 'block' : 'none';
+    }
+    
+    // Set icon
+    if (modalIcon) {
+      if (options.icon) {
+        modalIcon.className = 'bx ' + options.icon;
+        modalIcon.style.color = options.iconColor || '#f39c12';
+      } else {
+        // Default icon
+        modalIcon.className = 'bx bx-error-circle';
+        modalIcon.style.color = '#f39c12';
+      }
+    }
+    
+    // Set confirm button text
+    if (modalConfirm) modalConfirm.textContent = options.confirmText || 'OK';
+    
     if (modal) modal.style.display = 'flex';
     confirmCallback = onConfirm;
   }
@@ -451,7 +482,7 @@ window.FrameworkModal = (function() {
     if (!clearFormBtn) return;
 
     clearFormBtn.addEventListener('click', function() {
-      showModal('Are you sure you want to clear all form fields?', function() {
+      showModal('Clear all form fields?', function() {
         // Clear all text inputs and textareas
         const form = clearFormBtn.closest('form');
         if (!form) return;
@@ -480,6 +511,12 @@ window.FrameworkModal = (function() {
         if (preview) {
           preview.innerHTML = '<p style="color: #7f8c8d;">Fill out the form and click "Generate Preview" to see your prompt.</p>';
         }
+      }, {
+        title: 'Clear Form',
+        icon: 'bx-error-circle',
+        iconColor: '#f39c12',
+        confirmText: 'Clear',
+        warning: 'All unsaved changes will be lost.'
       });
     });
   }

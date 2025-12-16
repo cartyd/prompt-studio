@@ -1,18 +1,7 @@
-<% 
-const title = `Question ${stepNum + 1} of ${totalSteps}`;
-const { WizardUtils } = require('../../utils/wizard-helpers.js');
-
-const wizardConfig = {
-  question,
-  stepNum,
-  totalSteps,
-  previousAnswer
-};
-%>
 <%- include('../layout-wrapper', { body: `
 <link rel="stylesheet" href="/css/wizard.css">
 
-${WizardUtils.renderQuestionForm(wizardConfig)}
+${wizardFormHtml}
 
-${WizardUtils.renderScript(question, totalSteps, stepNum)}
+${wizardScriptHtml}
 `, user, subscription }) %>
