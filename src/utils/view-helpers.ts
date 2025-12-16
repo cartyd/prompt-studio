@@ -2,6 +2,15 @@
  * View utility functions to eliminate code duplication and complex logic in templates
  */
 
+interface AuthFormConfig {
+  title: string;
+  action: string;
+  fields: any[];
+  submitText: string;
+  footerLink?: string;
+  error?: string;
+}
+
 /**
  * Authentication form utilities
  */
@@ -9,7 +18,7 @@ export const AuthUtils = {
   /**
    * Generate common auth form structure to eliminate duplication
    */
-  renderForm(config) {
+  renderForm(config: AuthFormConfig): string {
     const { title, action, fields, submitText, footerLink, error } = config;
     
     return `
@@ -27,7 +36,7 @@ export const AuthUtils = {
     `;
   },
 
-  renderField(field) {
+  renderField(field: any): string {
     const { name, label, type = 'text', required = true, autocomplete, hint, minlength } = field;
     
     return `
@@ -49,6 +58,11 @@ export const AuthUtils = {
   }
 };
 
+interface FieldRenderOptions {
+  showWizardHint?: boolean;
+  fromWizard?: boolean;
+}
+
 /**
  * Form field utilities
  */
@@ -56,7 +70,7 @@ export const FieldUtils = {
   /**
    * Render different field types consistently
    */
-  renderField(field, value = '', options = {}) {
+  renderField(field: any, value: string = '', options: FieldRenderOptions = {}): string {
     const { showWizardHint = false, fromWizard = false } = options;
     const defaultVal = value || field.defaultValue || '';
     const wizardHint = showWizardHint && defaultVal && fromWizard;
@@ -74,7 +88,7 @@ export const FieldUtils = {
     `;
   },
 
-  renderInput(field, value) {
+  renderInput(field: any, value: string): string {
     const baseAttrs = `id="${field.name}" name="${field.name}" placeholder="${field.placeholder || ''}" ${field.required ? 'required' : ''}`;
     
     switch (field.type) {
@@ -161,7 +175,7 @@ export class TemplateUtils {
    */
   static attributesToString(attributes: Record<string, any>): string {
     return Object.entries(attributes)
-      .filter(([key, value]) => value !== null && value !== undefined && value !== false)
+      .filter(([, value]) => value !== null && value !== undefined && value !== false)
       .map(([key, value]) => {
         if (value === true) return key;
         return `${key}="${String(value).replace(/"/g, '&quot;')}"`;
@@ -231,7 +245,7 @@ export const NavUtils = {
   /**
    * Render wizard navigation consistently
    */
-  renderWizardNav(stepNum, totalSteps) {
+  renderWizardNav(stepNum: number, totalSteps: number): string {
     const isLastStep = stepNum + 1 === totalSteps;
     const backButton = stepNum > 0 
       ? `<a href="/wizard/question/${stepNum - 1}" class="btn btn-secondary"><i class='bx bx-chevron-left'></i> Back</a>`
@@ -256,7 +270,7 @@ export const LayoutUtils = {
   /**
    * Generate responsive grid columns
    */
-  getGridColumns(breakpoint = 'desktop') {
+  getGridColumns(breakpoint: 'mobile' | 'tablet' | 'desktop' = 'desktop'): string {
     const configs = {
       mobile: 'grid-template-columns: 1fr;',
       tablet: 'grid-template-columns: repeat(2, 1fr);',
@@ -268,7 +282,7 @@ export const LayoutUtils = {
   /**
    * Generate progress bar
    */
-  renderProgressBar(current, total) {
+  renderProgressBar(current: number, total: number): string {
     const percentage = ((current + 1) / total) * 100;
     return `
       <div class="wizard-progress-bar">
@@ -285,16 +299,16 @@ export const ContentUtils = {
   /**
    * Truncate text consistently
    */
-  truncate(text, maxLength = 200) {
+  truncate(text: string, maxLength: number = 200): string {
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   },
 
   /**
    * Format framework examples consistently
    */
-  formatExampleValue(value) {
+  formatExampleValue(value: any): string {
     if (Array.isArray(value)) {
-      return value.map((c, i) => `(${i + 1}) ${c}`).join(', ');
+      return value.map((c: any, i: number) => `(${i + 1}) ${c}`).join(', ');
     }
     return typeof value === 'string' ? value.replace(/\n/g, '<br>') : value;
   }

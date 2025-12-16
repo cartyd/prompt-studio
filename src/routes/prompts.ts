@@ -1,6 +1,5 @@
 import { FastifyPluginAsync } from 'fastify';
 import { requireAuth } from '../plugins/auth';
-import { FREE_PROMPT_LIMIT } from '../types';
 import { ERROR_MESSAGES, USER_CONSTANTS } from '../constants';
 import { logEvent } from '../utils/analytics';
 

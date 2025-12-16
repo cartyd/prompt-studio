@@ -305,7 +305,7 @@ export class FrameworkFormHelpers {
    */
   static attributesToString(attributes: Record<string, any>): string {
     return Object.entries(attributes)
-      .filter(([key, value]) => value !== null && value !== undefined && value !== false)
+      .filter(([, value]) => value !== null && value !== undefined && value !== false)
       .map(([key, value]) => {
         if (value === true) return key;
         return `${key}="${String(value).replace(/"/g, '&quot;')}"`;

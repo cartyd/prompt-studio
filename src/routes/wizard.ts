@@ -165,7 +165,8 @@ const wizardRoutes: FastifyPluginAsync = async (fastify) => {
     });
 
     // Render recommendation page server-side
-    const recommendationHtml = WizardUtils.renderRecommendation(recommendation as any, request.csrfToken!);
+    const csrfToken = (request as any).csrfToken || '';
+    const recommendationHtml = WizardUtils.renderRecommendation(recommendation as any, csrfToken);
     
     return reply.viewWithCsrf('wizard/recommendation', {
       recommendationHtml,
