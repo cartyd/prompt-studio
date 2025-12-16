@@ -1,11 +1,11 @@
 <div>
-  <div style="background: white; padding: 1rem; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 1rem; max-height: 400px; overflow-y: auto;">
-    <pre id="prompt-text" style="white-space: pre-wrap; font-family: inherit; margin: 0;"><%= promptText %></pre>
+  <div class="info-box mb-md">
+    <pre id="prompt-text" class="pre-wrap"><%= promptText %></pre>
   </div>
   <button type="button" 
           id="copy-prompt-btn" 
           class="copy-btn"
-          style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 1rem;">
+          class="flex-center mb-md">
     <span id="copy-icon">📋</span>
     <span id="copy-text">Copy to Clipboard</span>
   </button>
@@ -20,60 +20,57 @@
       <input type="text" id="title" name="title" placeholder="<%= frameworkName %> Prompt">
     </div>
 
-    <button type="submit" class="btn" style="width: 100%;">Save Prompt</button>
+    <button type="submit" class="btn w-full">Save Prompt</button>
   </form>
 
-  <div id="save-result" style="margin-top: 1rem;"></div>
+  <div id="save-result" class="mt-md"></div>
 </div>
 
 <script>
 (function() {
-  // Wait a tiny bit for htmx to finish inserting the content
+  // Wait for clipboard.js to be loaded, then initialize
   setTimeout(function() {
-    const copyBtn = document.getElementById('copy-prompt-btn');
-    if (copyBtn && !copyBtn.dataset.listenerAttached) {
-      copyBtn.dataset.listenerAttached = 'true';
-      
-      copyBtn.addEventListener('click', function() {
-        const promptText = document.getElementById('prompt-text').textContent;
-        const icon = document.getElementById('copy-icon');
-        const text = document.getElementById('copy-text');
+    if (window.initializeCopyButtons) {
+      window.initializeCopyButtons();
+    } else {
+      // Fallback if clipboard.js is not loaded
+      const copyBtn = document.getElementById('copy-prompt-btn');
+      if (copyBtn && !copyBtn.dataset.listenerAttached) {
+        copyBtn.dataset.listenerAttached = 'true';
         
-        navigator.clipboard.writeText(promptText).then(() => {
-          // Success feedback
-          icon.textContent = '✓';
-          text.textContent = 'Copied!';
-          copyBtn.style.background = '#27ae60';
+        copyBtn.addEventListener('click', function() {
+          const promptText = document.getElementById('prompt-text').textContent;
+          const icon = document.getElementById('copy-icon');
+          const text = document.getElementById('copy-text');
           
-          // Reset after 2 seconds
-          setTimeout(() => {
-            icon.textContent = '📋';
-            text.textContent = 'Copy to Clipboard';
-            copyBtn.style.background = '#3498db';
-          }, 2000);
-        }).catch(err => {
-          // Fallback for older browsers
-          const textArea = document.createElement('textarea');
-          textArea.value = promptText;
-          textArea.style.position = 'fixed';
-          textArea.style.left = '-999999px';
-          document.body.appendChild(textArea);
-          textArea.select();
-          try {
-            document.execCommand('copy');
+          navigator.clipboard.writeText(promptText).then(() => {
             icon.textContent = '✓';
             text.textContent = 'Copied!';
+            copyBtn.style.background = '#27ae60';
+            
             setTimeout(() => {
               icon.textContent = '📋';
               text.textContent = 'Copy to Clipboard';
+              copyBtn.style.background = '#3498db';
             }, 2000);
-          } catch (err) {
-            console.error('Failed to copy:', err);
-            text.textContent = 'Copy failed';
-          }
-          document.body.removeChild(textArea);
+          }).catch(() => {
+            const textArea = document.createElement('textarea');
+            textArea.value = promptText;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+              document.execCommand('copy');
+              icon.textContent = '✓';
+              text.textContent = 'Copied!';
+            } catch (err) {
+              text.textContent = 'Copy failed';
+            }
+            document.body.removeChild(textArea);
+          });
         });
-      });
+      }
     }
   }, 10);
 })();

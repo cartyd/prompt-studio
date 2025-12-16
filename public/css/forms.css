@@ -1,0 +1,33 @@
+/* ==========  FORMS  ========== */
+.form-group { 
+  margin-bottom: var(--spacing-md); 
+}
+
+.form-group label { 
+  display: block; 
+  margin-bottom: var(--spacing-xs); 
+  font-weight: 500; 
+}
+
+.form-group input, 
+.form-group textarea { 
+  width: 100%; 
+  padding: var(--spacing-sm); 
+  border: 1px solid var(--color-border); 
+  border-radius: 4px; 
+  /* Prevent iOS zoom on focus */
+  font-size: max(16px, 1rem);
+}
+
+.form-group textarea { 
+  min-height: 100px; 
+  font-family: inherit; 
+}
+
+/* Touch-friendly form controls */
+input[type="checkbox"], 
+input[type="radio"] {
+  min-width: 20px;
+  min-height: 20px;
+  cursor: pointer;
+}

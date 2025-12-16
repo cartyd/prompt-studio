@@ -1,0 +1,37 @@
+<% if (framework.fields.find(f => f.type === 'multi-select-criteria')) { %>
+<div class="form-group">
+  <label for="criteria">Evaluation Criteria *</label>
+  <div class="criteria-box">
+    <div id="criteria-checkboxes"></div>
+    <div class="custom-criteria-wrapper">
+      <button type="button" id="add-custom-btn">+ Add Custom Criteria</button>
+      <div id="custom-input-container" class="custom-input-container">
+        <input type="text" id="custom-criteria-input" placeholder="Enter custom criteria..." maxlength="200">
+        <div class="custom-btn-row">
+          <button type="button" id="add-custom-submit-btn" class="btn">Add</button>
+          <button type="button" id="cancel-custom-btn" class="btn-secondary">Cancel</button>
+        </div>
+        <small class="criteria-help">
+          <%= subscription.isPremium 
+            ? '💾 Custom criteria can be saved for future use' 
+            : '⏱️ Custom criteria available this session only · <a href="/premium">Upgrade to save</a>' 
+          %>
+        </small>
+        <% if (subscription.isPremium) { %>
+        <div class="save-option">
+          <label class="save-checkbox-label">
+            <input type="checkbox" id="save-custom-checkbox">
+            <span>💾 Save for future sessions</span>
+          </label>
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  <input type="hidden" id="criteria" name="criteria" value="[]">
+  <small class="criteria-counter">
+    <span id="criteria-count">0</span>/4 criteria selected 
+    <span class="default-note">(4 defaults selected)</span>
+  </small>
+</div>
+<% } %>

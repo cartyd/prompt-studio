@@ -23,11 +23,6 @@ jobs:
     environment: production
 
     steps:
-      - name: Validate required secrets
-        if: ${{ secrets.SSH_HOST == '' || secrets.SSH_USER == '' || secrets.SSH_KEY == '' }}
-        run: |
-          echo "::error::Missing one or more required secrets (SSH_HOST, SSH_USER, SSH_KEY). Add them in Settings > Secrets and variables > Actions.";
-          exit 1
 
       - name: Checkout
         uses: actions/checkout@v4

@@ -1,0 +1,50 @@
+<% if (framework.examples) { %>
+<div class="examples-section">
+  <button type="button" id="toggle-examples-btn" class="toggle-examples-btn">
+    <span class="toggle-left">
+      <span class="toggle-icon-large">
+        <i class='bx bx-book'></i>
+      </span>
+      <span class="toggle-text-group">
+        <span class="toggle-examples-main">View Detailed Examples</span>
+        <span class="toggle-subtitle">Learn what makes a high-quality prompt</span>
+      </span>
+    </span>
+    <span class="toggle-hint-wrapper">
+      <span id="toggle-hint" class="toggle-hint">Click to expand</span>
+      <span id="toggle-icon" class="toggle-icon">
+        <i class='bx bx-chevron-right'></i>
+      </span>
+    </span>
+  </button>
+  
+  <div id="examples-container" class="examples-container">
+    <div class="example-controls">
+      <div class="category-buttons">
+        <button type="button" id="category-general" class="category-btn active" data-category="general">General</button>
+        <button type="button" id="category-business" class="category-btn" data-category="business">Business</button>
+      </div>
+      <button type="button" id="load-example-btn" class="load-example-btn">
+        <i class='bx bx-upload'></i> Load Example
+      </button>
+    </div>
+    <div id="example-content" class="example-content-box">
+      <% framework.fields.forEach(field => {
+        const exampleValue = framework.examples.general[field.name];
+        if (exampleValue) {
+          const displayValue = Array.isArray(exampleValue) 
+            ? exampleValue.map((c, i) => `(${i + 1}) ${c}`).join(', ')
+            : exampleValue;
+          const formattedValue = typeof displayValue === 'string' ? displayValue.replace(/\n/g, '<br>') : displayValue;
+      %>
+        <div class="example-field" data-field="<%= field.name %>">
+          <strong><%= field.label %>:</strong> 
+          <span class="example-value"><%- formattedValue %></span>
+        </div>
+      <% 
+        }
+      }); %>
+    </div>
+  </div>
+</div>
+<% } %>

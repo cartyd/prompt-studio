@@ -1,20 +1,20 @@
 <% const title = 'About'; %>
 <%- include('layout-wrapper', { body: `
 <div class="text-center py-3">
-  <h1 style="font-size: 3rem;" class="mb-1">About Prompt Framework Studio</h1>
+  <h1 class="heading-xl mb-md">About Prompt Framework Studio</h1>
   <div class="my-2">
-    <span class="badge" style="font-size: 1rem; padding: 0.5rem 1rem;">Version ${version}</span>
+    <span class="badge badge-version">Version ${version}</span>
   </div>
 </div>
 
 <div class="content-container-md">
   <div class="mb-3">
-    <h2 style="font-size: 1.75rem; color: var(--color-dark);" class="mb-1">About</h2>
-    <p style="line-height: 1.8;" class="mb-1">
+    <h2 class="heading-lg mb-md">About</h2>
+    <p class="line-height-lg mb-md">
       Prompt Framework Studio is a web application designed to help you create structured, 
       effective prompts for Large Language Models (LLMs) using proven prompting frameworks.
     </p>
-    <p style="line-height: 1.8;">
+    <p class="line-height-lg">
       Whether you're using Chain-of-Thought, Tree-of-Thought, or other advanced prompting 
       techniques, this tool provides a guided interface to ensure your prompts are well-structured 
       and effective.
@@ -22,30 +22,30 @@
   </div>
 
   <div class="mb-3">
-    <h2 style="font-size: 1.75rem; color: var(--color-dark);" class="mb-1">Features</h2>
+    <h2 class="heading-lg mb-md">Features</h2>
     <div class="grid gap-1">
-      <div class="p-1" style="border-left: 3px solid var(--color-primary); background: var(--color-bg-light);">
+      <div class="p-md border-accent">
         <strong>Multiple Prompting Frameworks</strong> - Choose from Tree-of-Thought, Chain-of-Thought, Self-Consistency, Role-Based, and Reflection strategies
       </div>
-      <div class="p-1" style="border-left: 3px solid var(--color-primary); background: var(--color-bg-light);">
+      <div class="p-md border-accent">
         <strong>Save and Manage Prompts</strong> - Build a personal library of your prompts for easy access and reuse
       </div>
-      <div class="p-1" style="border-left: 3px solid var(--color-primary); background: var(--color-bg-light);">
+      <div class="p-md border-accent">
         <strong>Custom Criteria</strong> - Define framework-specific requirements tailored to your needs
       </div>
-      <div class="p-1" style="border-left: 3px solid var(--color-primary); background: var(--color-bg-light);">
+      <div class="p-md border-accent">
         <strong>Real-Time Preview</strong> - See your prompt generated as you fill out the form
       </div>
-      <div class="p-1" style="border-left: 3px solid var(--color-primary); background: var(--color-bg-light);">
+      <div class="p-md border-accent">
         <strong>Premium Features</strong> - Upgrade for unlimited saved prompts and export capabilities
       </div>
     </div>
   </div>
 
-  <div class="mb-3 p-2 text-center" style="background: var(--color-bg-light); border-radius: 8px;">
-    <h2 style="font-size: 1.75rem; color: var(--color-dark);" class="mb-1">Author</h2>
-    <p style="line-height: 1.8;">
-      Created by <strong>Dave Carty</strong> at <a href="https://simplicate.ai" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary); text-decoration: none; font-weight: 600;">Simplicate AI</a>
+  <div class="content-highlight mb-lg text-center">
+    <h2 class="heading-lg mb-md">Author</h2>
+    <p class="line-height-lg">
+      Created by <strong>Dave Carty</strong> at <a href="https://simplicate.ai" target="_blank" rel="noopener noreferrer" class="link-clean">Simplicate AI</a>
     </p>
   </div>
 

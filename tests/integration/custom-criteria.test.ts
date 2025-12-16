@@ -3,14 +3,16 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import { validateAndGenerate } from '../src/prompt-generators';
 
-const adapter = new PrismaBetterSqlite3({ url: process.env.DATABASE_URL || './prisma/dev.db' });
-const prisma = new PrismaClient({ adapter });
+let prisma: PrismaClient;
 
 describe('Custom Criteria Database', () => {
   let premiumUserId: string;
   let freeUserId: string;
 
   beforeAll(async () => {
+    const adapter = new PrismaBetterSqlite3({ url: process.env.DATABASE_URL || './prisma/dev.db' });
+    prisma = new PrismaClient({ adapter });
+    
     // Clean up database
     await prisma.customCriteria.deleteMany();
     await prisma.prompt.deleteMany();

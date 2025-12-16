@@ -1,5 +1,6 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { versionLogger } from './logger';
 
 let cachedVersion: string | null = null;
 
@@ -15,7 +16,7 @@ export function getAppVersion(): string {
     cachedVersion = version;
     return version;
   } catch (error) {
-    console.error('Failed to read version from package.json:', error);
+    versionLogger.error('Failed to read version from package.json', error);
     return '0.0.0';
   }
 }

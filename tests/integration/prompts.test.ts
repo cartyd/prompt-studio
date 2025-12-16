@@ -4,14 +4,16 @@ import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import bcrypt from 'bcrypt';
 import { FREE_PROMPT_LIMIT } from '../src/types';
 
-const adapter = new PrismaBetterSqlite3({ url: process.env.DATABASE_URL || './prisma/dev.db' });
-const prisma = new PrismaClient({ adapter });
+let prisma: PrismaClient;
 
 describe('Prompt Management', () => {
   let freeUser: any;
   let premiumUser: any;
 
   beforeAll(async () => {
+    const adapter = new PrismaBetterSqlite3({ url: process.env.DATABASE_URL || './prisma/dev.db' });
+    prisma = new PrismaClient({ adapter });
+    
     // Clean up any existing test data
     await prisma.prompt.deleteMany({
       where: {

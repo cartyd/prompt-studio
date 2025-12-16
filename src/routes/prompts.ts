@@ -1,7 +1,7 @@
 import { FastifyPluginAsync } from 'fastify';
 import { requireAuth } from '../plugins/auth';
 import { FREE_PROMPT_LIMIT } from '../types';
-import { ERROR_MESSAGES } from '../constants';
+import { ERROR_MESSAGES, USER_CONSTANTS } from '../constants';
 import { logEvent } from '../utils/analytics';
 
 const MAX_FILENAME_LENGTH = 255; // Most filesystems support up to 255 characters
@@ -40,9 +40,21 @@ const promptRoutes: FastifyPluginAsync = async (fastify) => {
       where: { userId: request.user!.id },
       orderBy: { createdAt: 'desc' },
     });
+    
+    // Process prompts for display
+    const processedPrompts = prompts.map(prompt => ({
+      ...prompt,
+      truncatedText: prompt.finalPromptText && prompt.finalPromptText.length > 200 
+        ? prompt.finalPromptText.substring(0, 200) + '...'
+        : prompt.finalPromptText || '',
+      canExport: request.subscription && request.subscription.isPremium,
+      displayDate: prompt.createdAt
+    }));
 
     return reply.viewWithCsrf('prompts/list', {
       prompts,
+      processedPrompts,
+      freeTierLimit: USER_CONSTANTS.FREE_TIER_PROMPT_LIMIT,
       user: request.user,
       subscription: request.subscription,
     });
@@ -88,9 +100,9 @@ const promptRoutes: FastifyPluginAsync = async (fastify) => {
         where: { userId: request.user!.id },
       });
 
-      if (promptCount >= FREE_PROMPT_LIMIT) {
+      if (promptCount >= USER_CONSTANTS.FREE_TIER_PROMPT_LIMIT) {
         return reply.view('partials/limit-reached', {
-          limit: FREE_PROMPT_LIMIT,
+          limit: USER_CONSTANTS.FREE_TIER_PROMPT_LIMIT,
         });
       }
     }

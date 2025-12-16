@@ -1,103 +1,85 @@
 import { Template } from './types';
+import { 
+  createTotTemplate, 
+  createSelfConsistencyTemplate,
+  COMMON_ROLES,
+  COMMON_CRITERIA
+} from './utils/template-factory';
 
 // Tree-of-Thought Templates
 export const totTemplates: Template[] = [
-  {
+  createTotTemplate({
     id: 'tot-career-decision',
     name: 'Career Decision',
     description: 'Evaluate job offers or career moves',
     category: 'personal',
-    fields: {
-      role: 'career counselor with 15 years experience',
-      objective: 'Compare two career opportunities and recommend the best path',
-      approaches: '3',
-      criteria: ['Cost/Resource Impact', 'Feasibility/Practicality', 'Risk/Safety', 'Completeness/Thoroughness'],
-    },
-  },
-  {
+    role: COMMON_ROLES.CAREER_COUNSELOR,
+    objective: 'Compare two career opportunities and recommend the best path',
+    criteria: COMMON_CRITERIA.TOT_PERSONAL,
+  }),
+  createTotTemplate({
     id: 'tot-business-strategy',
     name: 'Business Strategy',
     description: 'Strategic business decisions and market expansion',
     category: 'business',
-    fields: {
-      role: 'strategic business analyst',
-      objective: 'Evaluate strategic options for business growth or market entry',
-      approaches: '3',
-      criteria: ['Cost/Resource Impact', 'Feasibility/Practicality', 'Innovation/Creativity', 'Risk/Safety'],
-    },
-  },
-  {
+    role: COMMON_ROLES.BUSINESS_ANALYST,
+    objective: 'Evaluate strategic options for business growth or market entry',
+    criteria: COMMON_CRITERIA.TOT_BUSINESS,
+  }),
+  createTotTemplate({
     id: 'tot-technical-architecture',
     name: 'Technical Architecture',
     description: 'Evaluate technical solutions or system designs',
     category: 'technical',
-    fields: {
-      role: 'senior software architect',
-      objective: 'Compare technical approaches for a system design decision',
-      approaches: '3',
-      criteria: ['Efficiency/Performance', 'Feasibility/Practicality', 'Completeness/Thoroughness', 'Risk/Safety'],
-    },
-  },
-  {
+    role: COMMON_ROLES.SOFTWARE_ARCHITECT,
+    objective: 'Compare technical approaches for a system design decision',
+    criteria: COMMON_CRITERIA.TOT_TECHNICAL,
+  }),
+  createTotTemplate({
     id: 'tot-product-feature',
     name: 'Product Feature Decision',
     description: 'Prioritize and evaluate product features',
     category: 'business',
-    fields: {
-      role: 'product manager',
-      objective: 'Evaluate which product features to build next',
-      approaches: '3',
-      criteria: ['Cost/Resource Impact', 'Feasibility/Practicality', 'Innovation/Creativity', 'Efficiency/Performance'],
-    },
-  },
+    role: COMMON_ROLES.PRODUCT_MANAGER,
+    objective: 'Evaluate which product features to build next',
+    criteria: COMMON_CRITERIA.TOT_PRODUCT,
+  }),
 ];
 
 // Self-Consistency Templates
 export const selfConsistencyTemplates: Template[] = [
-  {
+  createSelfConsistencyTemplate({
     id: 'sc-financial-planning',
     name: 'Financial Planning',
     description: 'Investment and financial decisions',
     category: 'personal',
-    fields: {
-      role: 'certified financial planner',
-      goal: 'Determine the best financial strategy for a specific situation',
-      versions: '3',
-    },
-  },
-  {
+    role: COMMON_ROLES.FINANCIAL_PLANNER,
+    goal: 'Determine the best financial strategy for a specific situation',
+  }),
+  createSelfConsistencyTemplate({
     id: 'sc-pricing-strategy',
     name: 'Pricing Strategy',
     description: 'Determine optimal pricing',
     category: 'business',
-    fields: {
-      role: 'pricing strategist',
-      goal: 'Calculate optimal pricing strategy for a product or service',
-      versions: '3',
-    },
-  },
-  {
+    role: COMMON_ROLES.PRICING_STRATEGIST,
+    goal: 'Calculate optimal pricing strategy for a product or service',
+  }),
+  createSelfConsistencyTemplate({
     id: 'sc-resource-allocation',
     name: 'Resource Allocation',
     description: 'Budget and resource distribution',
     category: 'business',
-    fields: {
-      role: 'operations manager',
-      goal: 'Determine optimal allocation of budget or resources',
-      versions: '3',
-    },
-  },
-  {
+    role: COMMON_ROLES.OPERATIONS_MANAGER,
+    goal: 'Determine optimal allocation of budget or resources',
+  }),
+  createSelfConsistencyTemplate({
     id: 'sc-data-analysis',
     name: 'Data Analysis',
     description: 'Analyze data and draw conclusions',
     category: 'technical',
-    fields: {
-      role: 'data analyst',
-      goal: 'Analyze data and provide evidence-based recommendations',
-      versions: '3',
-    },
-  },
+    role: COMMON_ROLES.DATA_ANALYST,
+    goal: 'Analyze data and provide evidence-based recommendations',
+  }),
 ];
 
 // Chain-of-Thought Templates

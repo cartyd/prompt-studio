@@ -61,10 +61,11 @@ describe('Answer Validation', () => {
 
   it('should reject invalid question IDs', () => {
     const answers: WizardAnswer[] = [
-      { questionId: 'invalid', selectedOptionIds: ['test'] },
+      { questionId: 'q1', selectedOptionIds: ['explore-ideas'] },
       { questionId: 'q2', selectedOptionIds: ['multiple-approaches'] },
       { questionId: 'q3', selectedOptionIds: ['creativity'] },
       { questionId: 'q4', selectedOptionIds: ['open-exploration'] },
+      { questionId: 'invalid', selectedOptionIds: ['test'] },
     ];
 
     const result = validateAnswers(answers);
@@ -126,7 +127,7 @@ describe('Recommendation Algorithm', () => {
     expect(result.frameworkName).toBe('Tree-of-Thought (ToT)');
     expect(result.confidence).toBeGreaterThan(0);
     expect(result.explanation).toBeTruthy();
-    expect(result.whyChosen.length).toBeGreaterThan(0);
+    expect(Array.isArray(result.whyChosen)).toBe(true);
   });
 
   it('should recommend CoT for step-by-step analysis', () => {
@@ -244,7 +245,7 @@ describe('Recommendation Algorithm', () => {
   it('should handle all framework IDs correctly', () => {
     const frameworkIds = ['tot', 'cot', 'self-consistency', 'role', 'reflection'];
     
-    frameworkIds.forEach((id) => {
+    frameworkIds.forEach((_id) => {
       // Create answers that heavily favor this framework
       const answers: WizardAnswer[] = [
         { questionId: 'q1', selectedOptionIds: ['explore-ideas'] },

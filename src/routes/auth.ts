@@ -5,13 +5,57 @@ import { validateEmail, validatePassword, validateName } from '../validation';
 import { logEvent } from '../utils/analytics';
 import { createVerificationToken, validateAndConsumeToken } from '../utils/tokens';
 import { sendVerificationEmail, sendPasswordResetEmail, sendPasswordChangedNotification } from '../utils/email';
+import { UserQueryResult } from '../types';
+import { AuthUtils } from '../utils/auth-helpers';
 
 async function renderAuthError(
   reply: FastifyReply,
   template: 'auth/register' | 'auth/login' | 'auth/forgot-password',
   error: string
 ) {
+  let formHtml: string;
+  
+  if (template === 'auth/register') {
+    formHtml = AuthUtils.renderForm({
+      title: 'Create Account',
+      action: '/auth/register',
+      fields: [
+        { name: 'name', label: 'Name', type: 'text', autocomplete: 'name' },
+        { name: 'email', label: 'Email', type: 'email', autocomplete: 'email' },
+        { name: 'password', label: 'Password', type: 'password', autocomplete: 'new-password', minlength: 8, hint: 'Minimum 8 characters' }
+      ],
+      submitText: 'Register',
+      footerLink: `Already have an account? <a href="/auth/login">Login here</a>`,
+      error
+    });
+  } else if (template === 'auth/login') {
+    formHtml = AuthUtils.renderForm({
+      title: 'Login',
+      action: '/auth/login',
+      fields: [
+        { name: 'email', label: 'Email', type: 'email', autocomplete: 'email' },
+        { 
+          name: 'password', 
+          label: 'Password', 
+          type: 'password', 
+          autocomplete: 'current-password',
+          additionalContent: `
+            <div class="text-right mt-0-5">
+              <a href="/auth/forgot-password" class="auth-link">Forgot password?</a>
+            </div>
+          `
+        }
+      ],
+      submitText: 'Login',
+      footerLink: `Don't have an account? <a href="/auth/register">Register here</a>`,
+      error
+    });
+  } else {
+    formHtml = ''; // forgot-password will be handled separately
+  }
+  
   return reply.viewWithCsrf(template, {
+    formHtml,
     error,
     user: null,
     success: null,
@@ -23,8 +67,21 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
   
   // Registration page
   fastify.get('/register', async (request, reply) => {
+    const formHtml = AuthUtils.renderForm({
+      title: 'Create Account',
+      action: '/auth/register',
+      fields: [
+        { name: 'name', label: 'Name', type: 'text', autocomplete: 'name' },
+        { name: 'email', label: 'Email', type: 'email', autocomplete: 'email' },
+        { name: 'password', label: 'Password', type: 'password', autocomplete: 'new-password', minlength: 8, hint: 'Minimum 8 characters' }
+      ],
+      submitText: 'Register',
+      footerLink: `Already have an account? <a href="/auth/login">Login here</a>`,
+      error: null
+    });
+    
     return reply.viewWithCsrf('auth/register', { 
-      error: null,
+      formHtml,
       user: request.user 
     });
   });
@@ -111,8 +168,30 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
 
   // Login page
   fastify.get('/login', async (request, reply) => {
+    const formHtml = AuthUtils.renderForm({
+      title: 'Login',
+      action: '/auth/login',
+      fields: [
+        { name: 'email', label: 'Email', type: 'email', autocomplete: 'email' },
+        { 
+          name: 'password', 
+          label: 'Password', 
+          type: 'password', 
+          autocomplete: 'current-password',
+          additionalContent: `
+            <div class="text-right mt-0-5">
+              <a href="/auth/forgot-password" class="auth-link">Forgot password?</a>
+            </div>
+          `
+        }
+      ],
+      submitText: 'Login',
+      footerLink: `Don't have an account? <a href="/auth/register">Register here</a>`,
+      error: null
+    });
+    
     return reply.viewWithCsrf('auth/login', { 
-      error: null,
+      formHtml,
       user: request.user 
     });
   });
@@ -319,10 +398,16 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     // Fallback for SQLite collation issues: case-insensitive match via raw SQL
     if (!user) {
       try {
-        const rows = await fastify.prisma.$queryRaw<any[]>`SELECT id, name, email FROM User WHERE lower(email) = lower(${email}) LIMIT 1`;
+        const rows = await fastify.prisma.$queryRaw<UserQueryResult[]>`SELECT id, name, email FROM User WHERE lower(email) = lower(${email}) LIMIT 1`;
         if (rows && rows.length > 0) {
-          user = rows[0] as any;
-          fastify.log.info({ email, matched: (user as any).email }, 'forgot-password fallback match via lower(email)');
+          const partialUser = rows[0];
+          // Get full user record by ID to ensure we have all fields
+          user = await fastify.prisma.user.findUnique({
+            where: { id: partialUser.id }
+          });
+          if (user) {
+            fastify.log.info({ email, matched: partialUser.email }, 'forgot-password fallback match via lower(email)');
+          }
         }
       } catch (e) {
         fastify.log.error({ err: e, email }, 'forgot-password fallback lookup failed');
@@ -337,7 +422,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       const token = await createVerificationToken(fastify.prisma, user.id, 'password_reset');
       fastify.log.info({ email }, 'forgot-password token created; sending email');
       try {
-        await sendPasswordResetEmail(user.email, token, (user as any).name || '');
+        await sendPasswordResetEmail(user.email, token, user.name || '');
         fastify.log.info({ email: user.email }, 'forgot-password email send attempted');
       } catch (err) {
         fastify.log.error({ err, email: user.email }, 'Failed to send password reset email');
@@ -360,8 +445,37 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     if (!token) {
       return reply.redirect('/auth/forgot-password');
     }
+    
+    const formHtml = AuthUtils.renderForm({
+      title: 'Reset Your Password',
+      action: '/auth/reset-password',
+      description: 'Enter your new password below.',
+      hiddenFields: [
+        { name: 'token', value: token }
+      ],
+      fields: [
+        { 
+          name: 'password', 
+          label: 'New Password', 
+          type: 'password',
+          minlength: 8,
+          hint: 'Minimum 8 characters',
+          autofocus: true
+        },
+        { 
+          name: 'confirmPassword', 
+          label: 'Confirm New Password', 
+          type: 'password',
+          minlength: 8
+        }
+      ],
+      submitText: 'Reset Password',
+      footerLink: `<a href="/auth/login">Back to Login</a>`,
+      error: null
+    });
 
     return reply.viewWithCsrf('auth/reset-password', {
+      formHtml,
       token,
       error: null,
       user: null,
@@ -384,7 +498,21 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     };
 
     if (!token || !password || !confirmPassword) {
+      const formHtml = AuthUtils.renderForm({
+        title: 'Reset Your Password',
+        action: '/auth/reset-password',
+        description: 'Enter your new password below.',
+        hiddenFields: [{ name: 'token', value: token || '' }],
+        fields: [
+          { name: 'password', label: 'New Password', type: 'password', minlength: 8, hint: 'Minimum 8 characters', autofocus: true },
+          { name: 'confirmPassword', label: 'Confirm New Password', type: 'password', minlength: 8 }
+        ],
+        submitText: 'Reset Password',
+        footerLink: `<a href="/auth/login">Back to Login</a>`,
+        error: ERROR_MESSAGES.AUTH.ALL_FIELDS_REQUIRED
+      });
       return reply.viewWithCsrf('auth/reset-password', {
+        formHtml,
         token: token || '',
         error: ERROR_MESSAGES.AUTH.ALL_FIELDS_REQUIRED,
         user: null,
@@ -393,7 +521,21 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
 
     // Check passwords match
     if (password !== confirmPassword) {
+      const formHtml = AuthUtils.renderForm({
+        title: 'Reset Your Password',
+        action: '/auth/reset-password',
+        description: 'Enter your new password below.',
+        hiddenFields: [{ name: 'token', value: token }],
+        fields: [
+          { name: 'password', label: 'New Password', type: 'password', minlength: 8, hint: 'Minimum 8 characters', autofocus: true },
+          { name: 'confirmPassword', label: 'Confirm New Password', type: 'password', minlength: 8 }
+        ],
+        submitText: 'Reset Password',
+        footerLink: `<a href="/auth/login">Back to Login</a>`,
+        error: ERROR_MESSAGES.AUTH.PASSWORD_MISMATCH
+      });
       return reply.viewWithCsrf('auth/reset-password', {
+        formHtml,
         token,
         error: ERROR_MESSAGES.AUTH.PASSWORD_MISMATCH,
         user: null,
@@ -403,7 +545,21 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     // Validate password strength
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.isValid) {
+      const formHtml = AuthUtils.renderForm({
+        title: 'Reset Your Password',
+        action: '/auth/reset-password',
+        description: 'Enter your new password below.',
+        hiddenFields: [{ name: 'token', value: token }],
+        fields: [
+          { name: 'password', label: 'New Password', type: 'password', minlength: 8, hint: 'Minimum 8 characters', autofocus: true },
+          { name: 'confirmPassword', label: 'Confirm New Password', type: 'password', minlength: 8 }
+        ],
+        submitText: 'Reset Password',
+        footerLink: `<a href="/auth/login">Back to Login</a>`,
+        error: passwordValidation.error!
+      });
       return reply.viewWithCsrf('auth/reset-password', {
+        formHtml,
         token,
         error: passwordValidation.error!,
         user: null,
@@ -414,7 +570,21 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     const userId = await validateAndConsumeToken(fastify.prisma, token, 'password_reset');
 
     if (!userId) {
+      const formHtml = AuthUtils.renderForm({
+        title: 'Reset Your Password',
+        action: '/auth/reset-password',
+        description: 'Enter your new password below.',
+        hiddenFields: [{ name: 'token', value: token }],
+        fields: [
+          { name: 'password', label: 'New Password', type: 'password', minlength: 8, hint: 'Minimum 8 characters', autofocus: true },
+          { name: 'confirmPassword', label: 'Confirm New Password', type: 'password', minlength: 8 }
+        ],
+        submitText: 'Reset Password',
+        footerLink: `<a href="/auth/login">Back to Login</a>`,
+        error: ERROR_MESSAGES.AUTH.TOKEN_EXPIRED
+      });
       return reply.viewWithCsrf('auth/reset-password', {
+        formHtml,
         token,
         error: ERROR_MESSAGES.AUTH.TOKEN_EXPIRED,
         user: null,
@@ -427,7 +597,21 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     });
 
     if (!user) {
+      const formHtml = AuthUtils.renderForm({
+        title: 'Reset Your Password',
+        action: '/auth/reset-password',
+        description: 'Enter your new password below.',
+        hiddenFields: [{ name: 'token', value: token }],
+        fields: [
+          { name: 'password', label: 'New Password', type: 'password', minlength: 8, hint: 'Minimum 8 characters', autofocus: true },
+          { name: 'confirmPassword', label: 'Confirm New Password', type: 'password', minlength: 8 }
+        ],
+        submitText: 'Reset Password',
+        footerLink: `<a href="/auth/login">Back to Login</a>`,
+        error: ERROR_MESSAGES.AUTH.INVALID_TOKEN
+      });
       return reply.viewWithCsrf('auth/reset-password', {
+        formHtml,
         token,
         error: ERROR_MESSAGES.AUTH.INVALID_TOKEN,
         user: null,

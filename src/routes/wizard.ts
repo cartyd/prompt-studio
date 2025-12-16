@@ -3,6 +3,7 @@ import { requireAuth } from '../plugins/auth';
 import { wizardQuestions, calculateRecommendation, validateAnswers } from '../wizard/questions';
 import { WizardAnswer } from '../types';
 import { logEvent } from '../utils/analytics';
+import { WizardUtils } from '../utils/wizard-helpers';
 
 const wizardRoutes: FastifyPluginAsync = async (fastify) => {
   // Start wizard - show welcome page
@@ -14,7 +15,7 @@ const wizardRoutes: FastifyPluginAsync = async (fastify) => {
       startedAt: new Date(),
     };
 
-    await logEvent(fastify.prisma, request, request.user?.id, 'login' as any, {
+    await logEvent(fastify.prisma, request, request.user?.id, 'framework_view', {
       eventType: 'wizard_start',
       source: 'framework_discovery',
     });
@@ -43,11 +44,25 @@ const wizardRoutes: FastifyPluginAsync = async (fastify) => {
     // Get previous answer if exists
     const previousAnswer = session?.answers.find((a) => a.questionId === question.id);
 
-    return reply.viewWithCsrf('wizard/question', {
-      question,
+    // Log wizard step view
+    await logEvent(fastify.prisma, request, request.user?.id, 'framework_view', {
+      eventType: 'wizard_question_view',
+      questionStep: stepNum,
+      questionId: question.id,
+    });
+
+    // Render wizard question form and script server-side
+    const wizardFormHtml = WizardUtils.renderQuestionForm({
+      question: question as any,
       stepNum,
       totalSteps: wizardQuestions.length,
-      previousAnswer,
+      previousAnswer
+    });
+    const wizardScriptHtml = WizardUtils.renderScript(question as any, wizardQuestions.length, stepNum);
+    
+    return reply.viewWithCsrf('wizard/question', {
+      wizardFormHtml,
+      wizardScriptHtml,
       user: request.user,
       subscription: request.subscription,
     });
@@ -107,7 +122,7 @@ const wizardRoutes: FastifyPluginAsync = async (fastify) => {
     const currentQuestionIndex = wizardQuestions.findIndex((q) => q.id === questionId);
     const nextStep = currentQuestionIndex + 1;
 
-    await logEvent(fastify.prisma, request, request.user?.id, 'login' as any, {
+    await logEvent(fastify.prisma, request, request.user?.id, 'framework_view', {
       eventType: 'wizard_answer',
       questionId,
       step: currentQuestionIndex,
@@ -142,15 +157,18 @@ const wizardRoutes: FastifyPluginAsync = async (fastify) => {
     // Calculate recommendation
     const recommendation = calculateRecommendation(session.answers);
 
-    await logEvent(fastify.prisma, request, request.user?.id, 'login' as any, {
+    await logEvent(fastify.prisma, request, request.user?.id, 'framework_view', {
       eventType: 'wizard_complete',
       recommendedFramework: recommendation.frameworkId,
       confidence: recommendation.confidence,
       totalAnswers: session.answers.length,
     });
 
+    // Render recommendation page server-side
+    const recommendationHtml = WizardUtils.renderRecommendation(recommendation as any, request.csrfToken!);
+    
     return reply.viewWithCsrf('wizard/recommendation', {
-      recommendation,
+      recommendationHtml,
       user: request.user,
       subscription: request.subscription,
     });
@@ -164,7 +182,7 @@ const wizardRoutes: FastifyPluginAsync = async (fastify) => {
       startedAt: new Date(),
     };
 
-    await logEvent(fastify.prisma, request, request.user?.id, 'login' as any, {
+    await logEvent(fastify.prisma, request, request.user?.id, 'framework_view', {
       eventType: 'wizard_reset',
     });
 

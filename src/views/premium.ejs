@@ -4,7 +4,7 @@
   <h2 class="text-center mb-2">Upgrade to Premium</h2>
 
   ${subscription.isPremium ? `
-    <div class="success text-center" style="font-size: 1.25rem; padding: 2rem;">
+    <div class="success text-center success-large">
       <strong>You are currently a Premium member!</strong>
       <p class="mt-0-5">Enjoy unlimited saved prompts and exports.</p>
     </div>
@@ -15,7 +15,7 @@
         <ul class="tier-list">
           <li>✓ Access to all frameworks</li>
           <li>✓ Generate unlimited prompts</li>
-          <li class="tier-list-unavailable">✗ Save up to 5 prompts only</li>
+          <li class="tier-list-unavailable">✗ Save up to ${freeTierLimit} prompts only</li>
           <li class="tier-list-unavailable">✗ No export functionality</li>
         </ul>
       </div>

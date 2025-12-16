@@ -1,4 +1,5 @@
 <% const title = 'Frameworks'; %>
+<% const organizedFrameworks = { featured: frameworks.slice(0, 2), regular: frameworks.slice(2) }; %>
 
 <% 
 // Map framework IDs to Boxicon classes
@@ -32,7 +33,7 @@ const frameworkIcons = {
       <a href="/wizard" class="btn"><i class='bx bx-play-circle'></i> Find My Framework</a>
       <div class="discover-badge">Recommended for beginners</div>
     </div>
-    ${frameworks.slice(0, 2).map(f => `
+    ${organizedFrameworks.featured.map(f => `
       <div class="feature-card">
         <i class='bx ${frameworkIcons[f.id] || 'bx-code-alt'} icon'></i>
         <h3>${f.name}</h3>
@@ -44,7 +45,7 @@ const frameworkIcons = {
   
   <!-- Row 2: Remaining frameworks -->
   <div class="feature-grid-frameworks row-2">
-    ${frameworks.slice(2).map(f => `
+    ${organizedFrameworks.regular.map(f => `
       <div class="feature-card">
         <i class='bx ${frameworkIcons[f.id] || 'bx-code-alt'} icon'></i>
         <h3>${f.name}</h3>

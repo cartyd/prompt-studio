@@ -1,16 +1,24 @@
 import { FastifyPluginAsync } from 'fastify';
 import { requireAuth, loadUserFromSession } from '../plugins/auth';
-import { TIME_CONSTANTS } from '../constants';
+import { TIME_CONSTANTS, USER_CONSTANTS } from '../constants';
 import { getAppVersion } from '../utils/version';
+import { HOME_FEATURES } from '../utils/home';
 
 const indexRoutes: FastifyPluginAsync = async (fastify) => {
   // Home page
   fastify.get('/', async (request, reply) => {
     await loadUserFromSession(request);
 
+    // Determine CTA button based on auth status
+    const getStartedBtn = !request.user 
+      ? { href: '/auth/register', text: 'Get Started' }
+      : { href: '/frameworks', text: 'Explore Frameworks' };
+
     return reply.viewWithCsrf('home', {
       user: request.user,
       subscription: request.subscription,
+      getStartedBtn,
+      features: HOME_FEATURES
     });
   });
 
@@ -30,6 +38,7 @@ const indexRoutes: FastifyPluginAsync = async (fastify) => {
     return reply.viewWithCsrf('premium', {
       user: request.user,
       subscription: request.subscription,
+      freeTierLimit: USER_CONSTANTS.FREE_TIER_PROMPT_LIMIT,
     });
   });
 
@@ -43,7 +52,7 @@ const indexRoutes: FastifyPluginAsync = async (fastify) => {
     await fastify.prisma.user.update({
       where: { id: request.user!.id },
       data: {
-        subscriptionTier: 'premium',
+        subscriptionTier: USER_CONSTANTS.SUBSCRIPTION_TIERS.PREMIUM,
         subscriptionExpiresAt: expiresAt,
       },
     });

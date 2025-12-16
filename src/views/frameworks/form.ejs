@@ -1,6 +1,7 @@
 <% const title = framework.name; %>
 <%- include('../layout-wrapper', { body: `
 <link rel="stylesheet" href="/css/framework-form.css">
+<link rel="stylesheet" href="/css/design-system.css">
 <div class="framework-container">
   <div class="admin-header">
     <div class="admin-header-container">
@@ -16,53 +17,7 @@
     </div>
   </div>
 
-  ${framework.examples ? `
-  <div class="examples-section">
-    <button type="button" id="toggle-examples-btn" class="toggle-examples-btn">
-      <span class="toggle-left">
-        <span class="toggle-icon-large">
-          <i class='bx bx-book'></i>
-        </span>
-        <span class="toggle-text-group">
-          <span class="toggle-examples-main">View Detailed Examples</span>
-          <span class="toggle-subtitle">Learn what makes a high-quality prompt</span>
-        </span>
-      </span>
-      <span class="toggle-hint-wrapper">
-        <span id="toggle-hint" class="toggle-hint">Click to expand</span>
-        <span id="toggle-icon" class="toggle-icon">
-          <i class='bx bx-chevron-right'></i>
-        </span>
-      </span>
-    </button>
-    
-    <div id="examples-container" class="examples-container">
-      <div class="example-controls">
-        <div class="category-buttons">
-          <button type="button" id="category-general" class="category-btn active" data-category="general">General</button>
-          <button type="button" id="category-business" class="category-btn" data-category="business">Business</button>
-        </div>
-        <button type="button" id="load-example-btn" class="load-example-btn">
-          <i class='bx bx-upload'></i> Load Example
-        </button>
-      </div>
-      <div id="example-content" class="example-content-box">
-        ${framework.fields.map(field => {
-          const exampleValue = framework.examples.general[field.name];
-          if (!exampleValue) return '';
-          const displayValue = Array.isArray(exampleValue) 
-            ? exampleValue.map((c, i) => `(${i + 1}) ${c}`).join(', ')
-            : exampleValue;
-          const formattedValue = typeof displayValue === 'string' ? displayValue.replace(/\n/g, '<br>') : displayValue;
-          return `<div class="example-field" style="margin-bottom: 0.5rem;" data-field="${field.name}">
-            <strong>${field.label}:</strong> 
-            <span class="example-value" style="font-style: italic;">${formattedValue}</span>
-          </div>`;
-        }).join('')}
-      </div>
-    </div>
-  </div>
-  ` : ''}
+  ${renderedExamples}
 
   <div class="form-layout ${framework.templates && framework.templates.length > 0 ? 'has-templates' : ''}">
     <div class="form-section">
@@ -71,70 +26,13 @@
             hx-target="#prompt-preview" 
             hx-trigger="submit"
             class="form-container">
-        ${framework.fields.map(field => {
-          if (field.type === 'multi-select-criteria') {
-            return ``; // Rendered separately below
-          }
-          if (field.optional) {
-            return ``; // Optional fields rendered in Advanced Options section
-          }
-          const prepopVal = (typeof prepopulateData !== 'undefined' && prepopulateData && prepopulateData[field.name]) || '';
-          const defaultVal = prepopVal || field.defaultValue || '';
-          const showWizardHint = prepopVal && typeof fromWizard !== 'undefined' && fromWizard;
-          return `<div class="form-group">
-            <label for="${field.name}">${field.label}${field.required ? ' *' : ''}
-              ${showWizardHint ? `<small style="color: #28a745; font-weight: normal; margin-left: 0.5rem;"><i class='bx bx-check-circle'></i> Pre-filled from wizard</small>` : defaultVal && field.type !== 'number' ? `<small style="color: #7f8c8d; font-weight: normal; margin-left: 0.5rem;">(using default)</small>` : ''}
-            </label>
-            ${field.type === 'textarea' 
-              ? `<textarea id="${field.name}" name="${field.name}" placeholder="${field.placeholder || ''}" ${field.required ? 'required' : ''}>${defaultVal}</textarea>`
-              : field.type === 'number' && (field.name === 'approaches' || field.name === 'versions')
-                ? `<input type="${field.type}" id="${field.name}" name="${field.name}" placeholder="${field.placeholder || ''}" value="${defaultVal || '3'}" min="1" max="5" ${field.required ? 'required' : ''}>`
-                : `<input type="${field.type}" id="${field.name}" name="${field.name}" placeholder="${field.placeholder || ''}" value="${defaultVal}" ${field.required ? 'required' : ''}>`
-            }
-          </div>`;
-        }).join('')}
-` +
-(framework.fields.find(f => f.type === 'multi-select-criteria') ? `
-        <div class="form-group">
-          <label for="criteria">Evaluation Criteria *</label>
-          <div class="criteria-box" style="max-height: 300px; overflow-y: auto;">
-            <div id="criteria-checkboxes"></div>
-            <div class="custom-criteria-wrapper">
-              <button type="button" id="add-custom-btn">+ Add Custom Criteria</button>
-              <div id="custom-input-container" class="custom-input-container">
-                <input type="text" id="custom-criteria-input" placeholder="Enter custom criteria..." maxlength="200">
-                <div class="custom-btn-row">
-                  <button type="button" id="add-custom-submit-btn" class="btn">Add</button>
-                  <button type="button" id="cancel-custom-btn" class="btn-secondary">Cancel</button>
-                </div>
-                <small style="display: block; margin-top: 0.5rem; color: #7f8c8d; font-size: 0.85rem;">${subscription.isPremium ? '💾 Custom criteria can be saved for future use' : '⏱️ Custom criteria available this session only · <a href="/premium" style="color: #3498db;">Upgrade to save</a>'}</small>
-                ${subscription.isPremium ? '<div style="margin-top: 0.5rem;"><label style="display: inline-flex; align-items: center; gap: 0.25rem; cursor: pointer; font-size: 0.85rem;"><input type="checkbox" id="save-custom-checkbox" style="cursor: pointer;"><span>💾 Save for future sessions</span></label></div>' : ''}
-              </div>
-            </div>
-          </div>
-          <input type="hidden" id="criteria" name="criteria" value="[]">
-          <small style="display: block; margin-top: 0.5rem; color: #7f8c8d; font-size: 0.85rem;"><span id="criteria-count">0</span>/4 criteria selected <span style="color: #95a5a6;">(4 defaults selected)</span></small>
-        </div>` : '') + `
-
-        ${framework.fields.some(f => f.optional) ? `
-        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ddd;">
-          <button type="button" id="toggle-advanced-btn" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: transparent; border: none; cursor: pointer; color: #3498db; font-size: 0.9rem;">
-            <span id="advanced-icon" style="transition: transform 0.2s;">▶</span>
-            <span>Advanced Options (optional)</span>
-          </button>
-          <div id="advanced-options" style="display: none; margin-top: 1rem;">
-            ${framework.fields.filter(f => f.optional).map(field => `
-              <div class="form-group">
-                <label for="${field.name}">${field.label}</label>
-                <textarea id="${field.name}" name="${field.name}" placeholder="${field.placeholder || ''}"></textarea>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-        ` : ''}
+        
+        ${renderedFields}
+        ${renderedCriteria}
+        ${renderedAdvanced}
 
         <div class="form-actions">
-          <button type="submit" class="btn">Generate Preview</button>
+          <button type="submit" class="btn btn-primary">Generate Preview</button>
           <button type="button" id="clear-form-btn" class="btn btn-secondary">Clear Form</button>
         </div>
       </form>
@@ -143,41 +41,15 @@
     <div class="preview-section">
       <h3 class="section-title">Prompt Preview</h3>
       <div id="prompt-preview" class="prompt-preview">
-        <p style="color: #7f8c8d;">Fill out the form and click "Generate Preview" to see your prompt.</p>
+        <p class="preview-placeholder">Fill out the form and click "Generate Preview" to see your prompt.</p>
       </div>
     </div>
 
-    ${framework.templates && framework.templates.length > 0 ? `
-    <div class="templates-section">
-      <h3 class="section-title">Templates</h3>
-      <div id="templates-container" class="templates-container">
-        ${framework.templates.map(template => `
-          <div class="template-card" data-template-id="${template.id}">
-            <div class="template-row">
-              <span class="template-category ${template.category}">${template.category}</span>
-              <div class="template-indicator"></div>
-            </div>
-            <h4>${template.name}</h4>
-            <p>${template.description}</p>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-    ` : ''}
+    ${renderedTemplates}
   </div>
 </div>
 
-<!-- Modal for confirmations -->
-<div id="unified-modal" class="modal">
-  <div class="modal-content">
-    <button id="unified-modal-close" class="modal-close-btn">&times;</button>
-    <p id="unified-modal-message" class="modal-message"></p>
-    <div class="modal-btn-row">
-      <button id="unified-modal-confirm" class="btn">OK</button>
-      <button id="unified-modal-cancel" class="btn btn-secondary">Cancel</button>
-    </div>
-  </div>
-</div>
+${renderedModal}
 `, user, subscription }) %>
 
 <script src="/js/framework-form.js"></script>
@@ -192,15 +64,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const criteriaFieldDef = <%- JSON.stringify(framework.fields.find(f => f.type === 'multi-select-criteria')) %>;
-  if (criteriaFieldDef) {
-    FrameworkCriteria.init({
-      isPremium: <%= subscription.isPremium %>,
-      defaultCriteria: criteriaFieldDef.options || [],
-      savedCustomCriteria: <%= JSON.stringify(customCriteria || []) %>,
-      defaultValues: criteriaFieldDef.defaultValue || []
-    });
-  }
+  <% const criteriaFieldDef = framework.fields.find(f => f.type === 'multi-select-criteria'); %>
+  <% if (criteriaFieldDef) { %>
+  const criteriaFieldDef = <%- JSON.stringify(criteriaFieldDef) %>;
+  FrameworkCriteria.init({
+    isPremium: <%= subscription.isPremium %>,
+    defaultCriteria: criteriaFieldDef.options || [],
+    savedCustomCriteria: <%= JSON.stringify(customCriteria || []) %>,
+    defaultValues: criteriaFieldDef.defaultValue || []
+  });
+  <% } %>
   
   FrameworkAdvancedOptions.init();
   FrameworkModal.init();

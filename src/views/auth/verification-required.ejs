@@ -4,7 +4,7 @@
   <div class="message-icon">🔒</div>
   <h2 class="message-title">Email Verification Required</h2>
   
-  <div class="error" style="text-align: left;">
+  <div class="error text-left">
     <p><strong>Your email address has not been verified.</strong></p>
     <p>To access your account, please verify your email address by clicking the link we sent to <strong>${email}</strong>.</p>
   </div>
@@ -15,7 +15,7 @@
   
   <div class="info-box">
     <p class="mb-1 link-small">Need a new verification email?</p>
-    <form method="POST" action="/auth/resend-verification" style="display: inline;">
+    <form method="POST" action="/auth/resend-verification" class="inline">
       <input type="hidden" name="_csrf" value="${csrfToken}">
       <input type="hidden" name="email" value="${email}">
       <button type="submit" class="btn">Resend Verification Email</button>

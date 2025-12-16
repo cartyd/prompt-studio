@@ -2,6 +2,7 @@ import { Client } from '@microsoft/microsoft-graph-client';
 import { ClientSecretCredential, ClientCertificateCredential } from '@azure/identity';
 import 'isomorphic-fetch';
 import fs from 'fs';
+import { emailLogger } from './logger';
 
 // Email configuration from environment variables
 // These are read at runtime to allow for dynamic configuration
@@ -35,9 +36,9 @@ function getGraphClient(): Client {
           certificate: fs.readFileSync(config.AZURE_CERTIFICATE_PATH, 'utf-8'),
         }
       );
-      console.log('Using certificate-based authentication for Microsoft Graph API');
+      emailLogger.info('Using certificate-based authentication for Microsoft Graph API');
     } catch (error) {
-      console.error('Failed to load certificate, falling back to client secret:', error);
+      emailLogger.warn('Failed to load certificate, falling back to client secret', error);
       credential = new ClientSecretCredential(
         config.AZURE_TENANT_ID,
         config.AZURE_CLIENT_ID,
@@ -52,7 +53,7 @@ function getGraphClient(): Client {
       config.AZURE_CLIENT_SECRET
     );
     if (!config.AZURE_CERTIFICATE_PATH) {
-      console.log('Using client secret authentication for Microsoft Graph API');
+      emailLogger.info('Using client secret authentication for Microsoft Graph API');
     }
   }
 
@@ -72,7 +73,7 @@ function getGraphClient(): Client {
 async function sendEmail(to: string, subject: string, htmlBody: string, _textBody: string): Promise<void> {
   // Skip email sending in test environment
   if (process.env.NODE_ENV === 'test') {
-    console.log(`[TEST MODE] Email would be sent to ${to}: ${subject}`);
+    emailLogger.info('Test mode: Email would be sent', { to, subject });
     return;
   }
 
@@ -83,7 +84,7 @@ async function sendEmail(to: string, subject: string, htmlBody: string, _textBod
   const hasClientSecret = !!config.AZURE_CLIENT_SECRET;
   
   if (!config.AZURE_TENANT_ID || !config.AZURE_CLIENT_ID || (!hasCertificate && !hasClientSecret)) {
-    console.error('Email configuration missing. Please set Azure AD credentials (certificate or client secret) in environment variables.');
+    emailLogger.error('Email configuration missing. Please set Azure AD credentials (certificate or client secret) in environment variables.');
     throw new Error('Email service not configured');
   }
 
@@ -114,9 +115,9 @@ async function sendEmail(to: string, subject: string, htmlBody: string, _textBod
 
     await client.api(`/users/${fromEmail}/sendMail`).post(message);
     
-    console.log(`Email sent successfully to ${to}`);
+    emailLogger.info('Email sent successfully', { to });
   } catch (error) {
-    console.error('Error sending email:', error);
+    emailLogger.error('Error sending email', error);
     throw new Error('Failed to send email');
   }
 }

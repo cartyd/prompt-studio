@@ -3,6 +3,8 @@ import { requireAuth } from '../plugins/auth';
 import { frameworks, getFrameworkById, generatePrompt } from '../frameworks';
 import { ERROR_MESSAGES } from '../constants';
 import { logEvent } from '../utils/analytics';
+import { LIMITS } from '../constants/scoring';
+import { FrameworkFormHelpers } from '../utils/framework-form-helpers';
 
 const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
   // List all frameworks
@@ -54,6 +56,14 @@ const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
       frameworkName: framework.name,
       fromWizard: fromWizard === 'true',
     });
+    
+    // Render form components server-side
+    const renderedExamples = FrameworkFormHelpers.renderExamplesSection(framework as any);
+    const renderedFields = FrameworkFormHelpers.renderFormFields(framework as any, prepopulateData || {}, fromWizard === 'true');
+    const renderedCriteria = FrameworkFormHelpers.renderCriteriaSelector(framework as any, request.subscription!);
+    const renderedAdvanced = FrameworkFormHelpers.renderAdvancedOptions(framework as any);
+    const renderedTemplates = FrameworkFormHelpers.renderTemplatesSection(framework as any);
+    const renderedModal = FrameworkFormHelpers.renderModal();
 
     return reply.viewWithCsrf('frameworks/form', {
       framework,
@@ -62,6 +72,12 @@ const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
       customCriteria,
       prepopulateData,
       fromWizard: fromWizard === 'true',
+      renderedExamples,
+      renderedFields,
+      renderedCriteria,
+      renderedAdvanced,
+      renderedTemplates,
+      renderedModal,
     });
   });
 
@@ -77,7 +93,7 @@ const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
     const formData = request.body as Record<string, string | string[]>;
     
     // Validate version/approach limits (max 5 for all users)
-    const maxLimit = 5;
+    const maxLimit = LIMITS.MAX_FRAMEWORK_APPROACHES;
     if (formData.approaches) {
       const approaches = parseInt(formData.approaches as string, 10);
       if (approaches > maxLimit) {
