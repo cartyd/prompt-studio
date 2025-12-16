@@ -46,7 +46,23 @@ interface AlternativeRecommendation {
   confidence: number;
 }
 
+// Map framework IDs to Boxicon classes (must match frameworks list page)
+const FRAMEWORK_ICONS: Record<string, string> = {
+  'tot': 'bx-network-chart',
+  'self-consistency': 'bx-check-double',
+  'cot': 'bx-link',
+  'role': 'bx-code-block',
+  'reflection': 'bx-edit'
+};
+
 export const WizardUtils = {
+  /**
+   * Get icon for a framework ID
+   */
+  getFrameworkIcon(frameworkId: string): string {
+    return FRAMEWORK_ICONS[frameworkId] || 'bx-code-alt';
+  },
+
   /**
    * Render wizard progress bar with consistent styling
    */
@@ -206,8 +222,10 @@ export const WizardUtils = {
    * Render recommendation framework card
    */
   renderFrameworkCard(recommendation: Recommendation): string {
+    const icon = this.getFrameworkIcon(recommendation.frameworkId);
     return `
       <div class="recommendation-framework-card">
+        <i class='bx ${icon} framework-icon'></i>
         <h2 class="framework-name">${recommendation.frameworkName}</h2>
         <div class="confidence-badge">
           <i class='bx bx-trending-up'></i>
@@ -284,15 +302,19 @@ export const WizardUtils = {
         <p class="alternatives-intro">Your needs could be met by multiple frameworks. Here are other options to consider:</p>
         
         <div class="alternatives-grid">
-          ${alternatives.map(alt => `
-            <div class="alternative-card">
-              <h4>${alt.frameworkName}</h4>
-              <div class="alternative-confidence">${alt.confidence}% match</div>
-              <a href="/frameworks/${alt.frameworkId}?fromWizard=true" class="btn btn-outline">
-                Try This One
-              </a>
-            </div>
-          `).join('')}
+          ${alternatives.map(alt => {
+            const icon = this.getFrameworkIcon(alt.frameworkId);
+            return `
+              <div class="alternative-card">
+                <i class='bx ${icon} alt-icon'></i>
+                <h4>${alt.frameworkName}</h4>
+                <div class="alternative-confidence">${alt.confidence}% match</div>
+                <a href="/frameworks/${alt.frameworkId}?fromWizard=true" class="btn btn-outline">
+                  Try This One
+                </a>
+              </div>
+            `;
+          }).join('')}
         </div>
       </div>
     `;
