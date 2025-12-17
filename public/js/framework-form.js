@@ -25,6 +25,10 @@ window.FrameworkExamples = (function() {
     setupLoadButton();
   }
 
+  function getExamples() {
+    return examples || {};
+  }
+
   function setupToggle() {
     const toggleBtn = document.getElementById('toggle-examples-btn');
     if (!toggleBtn) return;
@@ -89,51 +93,15 @@ window.FrameworkExamples = (function() {
     if (!loadBtn) return;
 
     loadBtn.addEventListener('click', function() {
-      // Reset form to initial state first
-      const form = document.querySelector('form');
-      if (form) {
-        // Clear all text inputs and textareas
-        form.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(field => {
-          if (field.type === 'number' && (field.name === 'approaches' || field.name === 'versions')) {
-            field.value = '3'; // Reset to default
-          } else {
-            field.value = '';
-          }
-        });
-        
-        // Clear criteria checkboxes
-        const criteriaField = document.getElementById('criteria');
-        if (criteriaField) {
-          const event = new CustomEvent('resetCriteria');
-          criteriaField.dispatchEvent(event);
-        }
-        
-        // Clear preview
-        const preview = document.getElementById('prompt-preview');
-        if (preview) {
-          preview.innerHTML = '<p style="color: #7f8c8d;">Fill out the form and click "Generate Preview" to see your prompt.</p>';
-        }
+      // Smart apply: load example from current category with conflict checks
+      const example = examples[currentCategory] || {};
+      if (window.FormPopulation) {
+        window.FormPopulation.applyFromSource(example, 'example');
       }
-      
-      // Load the example from current category (keep selected tab)
-      const example = examples[currentCategory];
-      Object.keys(example).forEach(key => {
-        const field = document.getElementById(key);
-        if (field) {
-          if (Array.isArray(example[key])) {
-            // For criteria arrays, trigger custom event
-            field.value = JSON.stringify(example[key]);
-            const event = new CustomEvent('loadExampleCriteria', { detail: example[key] });
-            field.dispatchEvent(event);
-          } else {
-            field.value = example[key];
-          }
-        }
-      });
     });
   }
 
-  return { init };
+  return { init, getExamples };
 })();
 
 // ==========  MULTI-SELECT CRITERIA MODULE  ==========
@@ -404,19 +372,27 @@ window.FrameworkAdvancedOptions = (function() {
 window.FrameworkModal = (function() {
   'use strict';
 
-  let confirmCallback = null;
+  let primaryCallback = null;
+  let secondaryCallback = null;
 
   function init() {
     const modal = document.getElementById('unified-modal');
-    const modalConfirm = document.getElementById('unified-modal-confirm');
+    const modalPrimary = document.getElementById('unified-modal-primary');
+    const modalSecondary = document.getElementById('unified-modal-secondary');
     const modalCancel = document.getElementById('unified-modal-cancel');
     const modalClose = document.getElementById('unified-modal-close');
 
     if (!modal) return;
 
-    if (modalConfirm) {
-      modalConfirm.addEventListener('click', function() {
-        if (confirmCallback) confirmCallback();
+    if (modalPrimary) {
+      modalPrimary.addEventListener('click', function() {
+        if (primaryCallback) primaryCallback();
+        hideModal();
+      });
+    }
+    if (modalSecondary) {
+      modalSecondary.addEventListener('click', function() {
+        if (secondaryCallback) secondaryCallback();
         hideModal();
       });
     }
@@ -432,13 +408,19 @@ window.FrameworkModal = (function() {
     setupClearFormButton();
   }
 
-  function showModal(message, onConfirm, options = {}) {
+  /**
+   * Flexible modal
+   * - If only primary provided: two-button modal (primary + cancel)
+   * - If primary and secondary provided: three-button modal
+   */
+  function showModal(message, onPrimary, options = {}) {
     const modal = document.getElementById('unified-modal');
     const modalTitle = document.getElementById('unified-modal-title');
     const modalMessage = document.getElementById('unified-modal-message');
     const modalWarning = document.getElementById('unified-modal-warning');
     const modalIcon = document.getElementById('unified-modal-icon');
-    const modalConfirm = document.getElementById('unified-modal-confirm');
+    const modalPrimary = document.getElementById('unified-modal-primary');
+    const modalSecondary = document.getElementById('unified-modal-secondary');
     
     // Set title
     if (modalTitle) modalTitle.textContent = options.title || 'Confirm Action';
@@ -465,16 +447,26 @@ window.FrameworkModal = (function() {
     }
     
     // Set confirm button text
-    if (modalConfirm) modalConfirm.textContent = options.confirmText || 'OK';
+    if (modalPrimary) modalPrimary.textContent = options.primaryText || options.confirmText || 'OK';
+    if (modalSecondary) {
+      if (options.secondaryText && options.onSecondary) {
+        modalSecondary.style.display = '';
+        modalSecondary.textContent = options.secondaryText;
+      } else {
+        modalSecondary.style.display = 'none';
+      }
+    }
     
     if (modal) modal.style.display = 'flex';
-    confirmCallback = onConfirm;
+    primaryCallback = onPrimary || null;
+    secondaryCallback = options.onSecondary || null;
   }
 
   function hideModal() {
     const modal = document.getElementById('unified-modal');
     if (modal) modal.style.display = 'none';
-    confirmCallback = null;
+    primaryCallback = null;
+    secondaryCallback = null;
   }
 
   function setupClearFormButton() {
@@ -515,7 +507,7 @@ window.FrameworkModal = (function() {
         title: 'Clear Form',
         icon: 'bx-error-circle',
         iconColor: '#f39c12',
-        confirmText: 'Clear',
+        primaryText: 'Clear',
         warning: 'All unsaved changes will be lost.'
       });
     });
@@ -524,6 +516,140 @@ window.FrameworkModal = (function() {
   return { init, showModal, hideModal };
 })();
 
+// ==========  FORM POPULATION (SMART APPLY) ==========
+window.FormPopulation = (function() {
+  'use strict';
+
+  const lastTemplateValues = new Map(); // fieldName -> normalized value
+  let programmaticSetDepth = 0;
+
+  function normalize(val) {
+    if (val == null) return '';
+    if (Array.isArray(val)) return val.map(v => String(v).trim()).join(', ');
+    return String(val).replace(/\s+/g, ' ').trim();
+  }
+
+  function withProgrammatic(fn) {
+    try {
+      programmaticSetDepth++;
+      return fn();
+    } finally {
+      programmaticSetDepth--;
+    }
+  }
+
+  function trackDirty() {
+    const form = document.querySelector('form');
+    if (!form) return;
+    form.querySelectorAll('input[name], textarea[name], select[name]').forEach(el => {
+      const markUser = () => {
+        if (programmaticSetDepth > 0) return;
+        el.dataset.origin = 'user';
+      };
+      el.addEventListener('input', markUser);
+      el.addEventListener('change', markUser);
+    });
+  }
+
+  function collectBaselines(input) {
+    const set = new Set();
+    const dataDefault = input.getAttribute('data-default');
+    if (dataDefault) set.add(normalize(dataDefault));
+
+    try {
+      if (window.FrameworkExamples && typeof window.FrameworkExamples.getExamples === 'function') {
+        const ex = window.FrameworkExamples.getExamples();
+        const name = input.name || input.id;
+        if (ex && ex.general && name in ex.general) set.add(normalize(ex.general[name]));
+        if (ex && ex.business && name in ex.business) set.add(normalize(ex.business[name]));
+      }
+    } catch (_) {}
+
+    const last = lastTemplateValues.get(input.name || input.id);
+    if (last) set.add(last);
+    return set;
+  }
+
+  function setFieldValue(input, rawVal) {
+    const val = Array.isArray(rawVal) ? rawVal : String(rawVal ?? '');
+    // Multi-select criteria uses hidden input + events
+    if ((input.id === 'criteria' || input.name === 'criteria') && Array.isArray(rawVal)) {
+      withProgrammatic(() => {
+        input.value = JSON.stringify(rawVal);
+        const event = new CustomEvent('loadExampleCriteria', { detail: rawVal });
+        input.dispatchEvent(event);
+      });
+      return;
+    }
+    withProgrammatic(() => {
+      input.value = Array.isArray(val) ? val.join(', ') : String(val);
+      input.dataset.origin = 'template';
+    });
+  }
+
+  function applyFromSource(values, source) {
+    const form = document.querySelector('form');
+    if (!form || !values) return;
+
+    const fields = Array.from(form.querySelectorAll('[name]'));
+    const conflicts = [];
+
+    for (const input of fields) {
+      const name = input.name;
+      if (!(name in values)) continue;
+      const incoming = normalize(values[name]);
+      const current = normalize((input.value ?? ''));
+      const baselines = collectBaselines(input);
+      const isUserEdited = input.dataset.origin === 'user';
+
+      if (incoming === current) continue;
+      const safe = !isUserEdited || current === '' || baselines.has(current);
+      if (!safe) conflicts.push({ name, label: input.id || name });
+    }
+
+    const fillEmptyOnly = () => {
+      for (const input of fields) {
+        const name = input.name;
+        if (!(name in values)) continue;
+        const current = normalize(input.value ?? '');
+        const baselines = collectBaselines(input);
+        if (current === '' || baselines.has(current)) {
+          setFieldValue(input, values[name]);
+        }
+      }
+    };
+
+    const overwriteAll = () => {
+      for (const input of fields) {
+        const name = input.name;
+        if (!(name in values)) continue;
+        setFieldValue(input, values[name]);
+        lastTemplateValues.set(name, normalize(values[name]));
+      }
+    };
+
+    if (conflicts.length === 0) {
+      overwriteAll();
+      return;
+    }
+
+    const count = conflicts.length;
+    const msg = `${count} field${count>1?'s':''} have edits that differ from the ${source}.`;
+    window.FrameworkModal.showModal(msg, fillEmptyOnly, {
+      title: 'Apply ' + (source === 'template' ? 'Template' : 'Example'),
+      icon: 'bx-help-circle',
+      iconColor: '#3498db',
+      primaryText: 'Fill Empty Only',
+      secondaryText: 'Overwrite All',
+      onSecondary: overwriteAll,
+      warning: 'Your edited fields will be preserved unless you choose overwrite.'
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', trackDirty);
+
+  return { applyFromSource };
+})();
 // ==========  TEMPLATE SELECTION MODULE  ==========
 window.FrameworkTemplates = (function() {
   'use strict';
@@ -561,7 +687,7 @@ window.FrameworkTemplates = (function() {
           this.classList.add('selected');
           selectedTemplateId = templateId;
           
-          // Populate form with template fields
+          // Populate form with template fields using smart apply
           populateFormFromTemplate(template);
         }
       });
@@ -596,28 +722,8 @@ window.FrameworkTemplates = (function() {
   }
 
   function populateFormFromTemplate(template) {
-    // First clear the form
-    clearForm();
-    
-    // Populate each field from template
-    Object.keys(template.fields).forEach(fieldName => {
-      const fieldValue = template.fields[fieldName];
-      const field = document.getElementById(fieldName);
-      
-      if (!field) return;
-      
-      if (Array.isArray(fieldValue)) {
-        // For criteria arrays
-        field.value = JSON.stringify(fieldValue);
-        const event = new CustomEvent('loadExampleCriteria', { detail: fieldValue });
-        field.dispatchEvent(event);
-      } else {
-        // For regular fields
-        field.value = fieldValue;
-      }
-    });
-    
-    // Show a brief notification
+    if (!template || !template.fields) return;
+    window.FormPopulation.applyFromSource(template.fields, 'template');
     showTemplateNotification(template.name);
   }
 

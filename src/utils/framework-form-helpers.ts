@@ -268,7 +268,8 @@ export class FrameworkFormHelpers {
           <p id="unified-modal-message" class="modal-message"></p>
           <p id="unified-modal-warning" class="modal-warning"></p>
           <div class="modal-btn-row-centered">
-            <button id="unified-modal-confirm" class="btn btn-primary">Clear</button>
+            <button id="unified-modal-primary" class="btn btn-primary">OK</button>
+            <button id="unified-modal-secondary" class="btn btn-secondary" style="display:none">Secondary</button>
             <button id="unified-modal-cancel" class="btn btn-secondary">Cancel</button>
           </div>
         </div>
@@ -295,6 +296,12 @@ export class FrameworkFormHelpers {
     if (field.type === 'number' && (field.name === 'approaches' || field.name === 'versions')) {
       attributes.min = '1';
       attributes.max = '5';
+    }
+
+    // Provide a baseline default for client-side smart population logic
+    const baselineDefault = field.defaultValue || (field.type === 'number' && (field.name === 'approaches' || field.name === 'versions') ? '3' : '');
+    if (baselineDefault) {
+      attributes['data-default'] = baselineDefault;
     }
     
     return attributes;
