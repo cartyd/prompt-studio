@@ -247,8 +247,14 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
 
     request.session.userId = user.id;
 
-    // Log login event
-    await logEvent(fastify.prisma, request, user.id, 'login');
+    // Update last login timestamp and log login event
+    await Promise.all([
+      fastify.prisma.user.update({
+        where: { id: user.id },
+        data: { lastLoginAt: new Date() },
+      }),
+      logEvent(fastify.prisma, request, user.id, 'login'),
+    ]);
 
     // Redirect admin users to dashboard, regular users to frameworks
     if (user.isAdmin) {

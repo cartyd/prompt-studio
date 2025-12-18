@@ -14,42 +14,35 @@
         - paragraph [ref=e11]:
           - emphasis [ref=e12]: Nothing But Prompt
       - generic [ref=e13]:
-        - link "Upgrade to Premium" [ref=e14] [cursor=pointer]:
-          - /url: /premium
-        - button "User menu" [ref=e15] [cursor=pointer]:
-          - generic [ref=e16]: T
-  - main [ref=e17]:
-    - heading "Prompting Frameworks" [level=2] [ref=e18]
-    - generic [ref=e19]:
+        - link "Login" [ref=e14] [cursor=pointer]:
+          - /url: /auth/login
+        - link "Register" [ref=e15] [cursor=pointer]:
+          - /url: /auth/register
+  - main [ref=e16]:
+    - generic [ref=e17]:
+      - generic [ref=e18]: 📧
+      - heading "Check Your Email" [level=2] [ref=e19]
       - generic [ref=e20]:
-        - heading "Tree-of-Thought (ToT)" [level=3] [ref=e21]
-        - paragraph [ref=e22]: Explore multiple reasoning paths and evaluate approaches to find the best solution.
-        - link "Create Prompt" [ref=e23] [cursor=pointer]:
-          - /url: /frameworks/tot
-      - generic [ref=e24]:
-        - heading "Self-Consistency" [level=3] [ref=e25]
-        - paragraph [ref=e26]: Generate multiple reasoning paths and select the most consistent answer.
-        - link "Create Prompt" [ref=e27] [cursor=pointer]:
-          - /url: /frameworks/self-consistency
-      - generic [ref=e28]:
-        - heading "Chain-of-Thought (CoT)" [level=3] [ref=e29]
-        - paragraph [ref=e30]: Break down complex problems into step-by-step reasoning.
-        - link "Create Prompt" [ref=e31] [cursor=pointer]:
-          - /url: /frameworks/cot
-      - generic [ref=e32]:
-        - heading "Few-Shot / Role Prompting" [level=3] [ref=e33]
-        - paragraph [ref=e34]: Provide examples and define a specific role for the AI to embody.
-        - link "Create Prompt" [ref=e35] [cursor=pointer]:
-          - /url: /frameworks/role
-      - generic [ref=e36]:
-        - heading "Reflection / Revision" [level=3] [ref=e37]
-        - paragraph [ref=e38]: Generate an initial response, then critically evaluate and improve it.
-        - link "Create Prompt" [ref=e39] [cursor=pointer]:
-          - /url: /frameworks/reflection
-  - contentinfo [ref=e40]:
-    - paragraph [ref=e42]:
+        - paragraph [ref=e21]:
+          - strong [ref=e22]: Account created successfully!
+        - paragraph [ref=e23]:
+          - text: We've sent a verification email to
+          - strong [ref=e24]: test-1766000280382-1i9h4j@example.com
+          - text: .
+      - paragraph [ref=e25]: Please check your inbox and click the verification link to activate your account. The link will expire in 24 hours.
+      - generic [ref=e26]:
+        - paragraph [ref=e27]: Didn't receive the email?
+        - button "Resend Verification Email" [ref=e29] [cursor=pointer]
+      - paragraph [ref=e30]: Check your spam folder if you don't see the email in your inbox.
+  - contentinfo [ref=e31]:
+    - paragraph [ref=e33]:
       - text: © 2026 Prompt Framework Studio by
-      - link "Simplicate AI" [ref=e43] [cursor=pointer]:
+      - link "Simplicate AI" [ref=e34] [cursor=pointer]:
         - /url: https://simplicate.ai
       - text: . Created by Dave Carty.
+      - link "Privacy Policy" [ref=e35] [cursor=pointer]:
+        - /url: /legal/privacy
+      - text: "|"
+      - link "Terms of Service" [ref=e36] [cursor=pointer]:
+        - /url: /legal/terms
 ```

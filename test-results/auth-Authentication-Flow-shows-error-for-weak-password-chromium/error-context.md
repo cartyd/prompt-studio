@@ -21,18 +21,18 @@
   - main [ref=e16]:
     - generic [ref=e17]:
       - heading "Create Account" [level=2] [ref=e18]
-      - generic [ref=e19]:
+      - form "Create Account form" [ref=e19]:
         - generic [ref=e20]:
           - generic [ref=e21]: Name
           - textbox "Name" [ref=e22]: Test User
         - generic [ref=e23]:
           - generic [ref=e24]: Email
-          - textbox "Email" [ref=e25]: test-1764780591027-c8n3yn@example.com
+          - textbox "Email" [ref=e25]: test-1766000242335-30bouj@example.com
         - generic [ref=e26]:
           - generic [ref=e27]: Password
           - textbox "Password" [active] [ref=e28]: weak
           - text: Minimum 8 characters
-        - button "Register" [ref=e29] [cursor=pointer]
+        - button "Submit create account" [ref=e29] [cursor=pointer]: Register
       - paragraph [ref=e30]:
         - text: Already have an account?
         - link "Login here" [ref=e31] [cursor=pointer]:
@@ -43,4 +43,9 @@
       - link "Simplicate AI" [ref=e35] [cursor=pointer]:
         - /url: https://simplicate.ai
       - text: . Created by Dave Carty.
+      - link "Privacy Policy" [ref=e36] [cursor=pointer]:
+        - /url: /legal/privacy
+      - text: "|"
+      - link "Terms of Service" [ref=e37] [cursor=pointer]:
+        - /url: /legal/terms
 ```

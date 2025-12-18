@@ -90,7 +90,14 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
-        include: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          isAdmin: true,
+          subscriptionTier: true,
+          createdAt: true,
+          lastLoginAt: true,
           _count: {
             select: { prompts: true, events: true },
           },
