@@ -19,7 +19,6 @@ window.FrameworkExamples = (function() {
   let currentCategory = 'general';
 
   function init(examplesData) {
-    console.log('[FrameworkExamples] Initializing with examples:', examplesData);
     examples = examplesData || {};
     setupToggle();
     setupCategoryButtons();
@@ -96,11 +95,8 @@ window.FrameworkExamples = (function() {
     loadBtn.addEventListener('click', function() {
       // Smart apply: load example from current category with conflict checks
       const example = examples[currentCategory] || {};
-      console.log('[FrameworkExamples] Loading example:', currentCategory, example);
       if (window.FormPopulation) {
         window.FormPopulation.applyFromSource(example, 'example');
-      } else {
-        console.error('[FrameworkExamples] FormPopulation not available');
       }
     });
   }
@@ -576,11 +572,9 @@ window.FormPopulation = (function() {
   }
 
   function setFieldValue(input, rawVal) {
-    console.log('[FormPopulation] setFieldValue called for', input.name, 'with value:', rawVal);
     const val = Array.isArray(rawVal) ? rawVal : String(rawVal ?? '');
     // Multi-select criteria uses hidden input + events
     if ((input.id === 'criteria' || input.name === 'criteria') && Array.isArray(rawVal)) {
-      console.log('[FormPopulation] Setting criteria field with array');
       withProgrammatic(() => {
         input.value = JSON.stringify(rawVal);
         const event = new CustomEvent('loadExampleCriteria', { detail: rawVal });
@@ -588,40 +582,23 @@ window.FormPopulation = (function() {
       });
       return;
     }
-    const finalValue = Array.isArray(val) ? val.join(', ') : String(val);
-    console.log('[FormPopulation] Setting', input.name, 'value to:', finalValue);
     withProgrammatic(() => {
-      input.value = finalValue;
+      input.value = Array.isArray(val) ? val.join(', ') : String(val);
       input.dataset.origin = 'template';
     });
-    console.log('[FormPopulation] After setting,', input.name, 'value is:', input.value);
   }
 
   function applyFromSource(values, source) {
-    console.log('[FormPopulation] applyFromSource called with source:', source, 'values:', values);
     // Select the framework form specifically (not the logout form in header)
     const form = document.querySelector('.form-container') || document.querySelector('form.form-container');
-    if (!form) {
-      console.error('[FormPopulation] No framework form found with class .form-container');
-      return;
-    }
-    if (!values) {
-      console.error('[FormPopulation] No values provided');
-      return;
-    }
+    if (!form || !values) return;
 
     const fields = Array.from(form.querySelectorAll('[name]'));
-    console.log('[FormPopulation] Found', fields.length, 'form fields:', fields.map(f => f.name));
-    console.log('[FormPopulation] Available values to apply:', Object.keys(values));
     const conflicts = [];
 
     for (const input of fields) {
       const name = input.name;
-      console.log('[FormPopulation] Processing field:', name, 'type:', input.type || input.tagName);
-      if (!(name in values)) {
-        console.log('[FormPopulation] Skipping field', name, '- not in values');
-        continue;
-      }
+      if (!(name in values)) continue;
       const incoming = normalize(values[name]);
       const current = normalize((input.value ?? ''));
       const baselines = collectBaselines(input);
@@ -645,15 +622,12 @@ window.FormPopulation = (function() {
     };
 
     const overwriteAll = () => {
-      console.log('[FormPopulation] overwriteAll called');
       for (const input of fields) {
         const name = input.name;
         if (!(name in values)) continue;
-        console.log('[FormPopulation] Setting field', name, 'to value:', values[name]);
         setFieldValue(input, values[name]);
         lastTemplateValues.set(name, normalize(values[name]));
       }
-      console.log('[FormPopulation] overwriteAll completed');
     };
 
     if (conflicts.length === 0) {
@@ -686,13 +660,8 @@ window.FrameworkTemplates = (function() {
   let selectedTemplateId = null;
 
   function init(templatesData) {
-    console.log('[FrameworkTemplates] Initializing with templates:', templatesData);
     templates = templatesData || [];
-    if (templates.length === 0) {
-      console.warn('[FrameworkTemplates] No templates provided');
-      return;
-    }
-    console.log('[FrameworkTemplates] Setting up', templates.length, 'template cards');
+    if (templates.length === 0) return;
 
     setupTemplateCards();
     addAnimations();
@@ -704,14 +673,9 @@ window.FrameworkTemplates = (function() {
     templateCards.forEach(card => {
       card.addEventListener('click', function() {
         const templateId = this.dataset.templateId;
-        console.log('[FrameworkTemplates] Template card clicked, ID:', templateId);
         const template = templates.find(t => t.id === templateId);
-        console.log('[FrameworkTemplates] Found template:', template);
         
-        if (!template) {
-          console.error('[FrameworkTemplates] Template not found for ID:', templateId);
-          return;
-        }
+        if (!template) return;
         
         // Toggle selection visually
         if (selectedTemplateId === templateId) {
@@ -761,12 +725,7 @@ window.FrameworkTemplates = (function() {
   }
 
   function populateFormFromTemplate(template) {
-    console.log('[FrameworkTemplates] populateFormFromTemplate called with:', template);
-    if (!template || !template.fields) {
-      console.error('[FrameworkTemplates] Template missing or has no fields:', template);
-      return;
-    }
-    console.log('[FrameworkTemplates] Applying template fields:', template.fields);
+    if (!template || !template.fields) return;
     window.FormPopulation.applyFromSource(template.fields, 'template');
     showTemplateNotification(template.name);
   }
