@@ -539,7 +539,8 @@ window.FormPopulation = (function() {
   }
 
   function trackDirty() {
-    const form = document.querySelector('form');
+    // Select the framework form specifically (not the logout form in header)
+    const form = document.querySelector('.form-container') || document.querySelector('form.form-container');
     if (!form) return;
     form.querySelectorAll('input[name], textarea[name], select[name]').forEach(el => {
       const markUser = () => {
@@ -588,7 +589,8 @@ window.FormPopulation = (function() {
   }
 
   function applyFromSource(values, source) {
-    const form = document.querySelector('form');
+    // Select the framework form specifically (not the logout form in header)
+    const form = document.querySelector('.form-container') || document.querySelector('form.form-container');
     if (!form || !values) return;
 
     const fields = Array.from(form.querySelectorAll('[name]'));
@@ -695,7 +697,8 @@ window.FrameworkTemplates = (function() {
   }
 
   function clearForm() {
-    const form = document.querySelector('form');
+    // Select the framework form specifically (not the logout form in header)
+    const form = document.querySelector('.form-container') || document.querySelector('form.form-container');
     if (!form) return;
     
     // Clear all text inputs and textareas
