@@ -76,9 +76,11 @@ async function start() {
       },
     });
 
+    const isTest = process.env.NODE_ENV === 'test';
+    
     await server.register(fastifyRateLimit, {
       global: false,
-      max: 100,
+      max: isTest ? 1000 : 100, // Higher limit for tests
       timeWindow: '15 minutes',
     });
 
