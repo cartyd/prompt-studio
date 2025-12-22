@@ -231,7 +231,7 @@ window.FrameworkCriteria = (function() {
     }
     
     allCriteria.push(criteriaName);
-    selectedCriteria.push(criteriaName);
+    // Don't auto-select - let the user select it
     
     if (isPremium && shouldSave) {
       fetch('/api/custom-criteria', {

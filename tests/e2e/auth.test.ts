@@ -15,7 +15,7 @@ test.describe('Authentication Flow', () => {
     await expect(page).toHaveURL('/frameworks');
     
     // Should see user avatar
-    await expect(page.locator('#avatar-btn')).toBeVisible();
+    await expect(page.locator('#avatar-wrapper')).toBeVisible();
   });
 
   test('shows error for invalid email', async ({ page }) => {
@@ -55,7 +55,7 @@ test.describe('Authentication Flow', () => {
     await page.waitForURL('/frameworks');
     
     // Logout
-    await page.click('#avatar-btn');
+    await page.click('#avatar-wrapper');
     await page.click('button:has-text("Logout")');
     await page.waitForURL('/');
     
@@ -67,7 +67,7 @@ test.describe('Authentication Flow', () => {
     
     // Should redirect to frameworks
     await expect(page).toHaveURL('/frameworks');
-    await expect(page.locator('#avatar-btn')).toBeVisible();
+    await expect(page.locator('#avatar-wrapper')).toBeVisible();
   });
 
   test('shows error for invalid credentials', async ({ page }) => {
@@ -93,13 +93,13 @@ test.describe('Authentication Flow', () => {
     await page.waitForURL('/frameworks');
     
     // Logout
-    await page.click('#avatar-btn');
+    await page.click('#avatar-wrapper');
     await page.click('button:has-text("Logout")');
     
     // Should redirect to homepage
     await expect(page).toHaveURL('/');
     
     // Should not see avatar
-    await expect(page.locator('#avatar-btn')).not.toBeVisible();
+    await expect(page.locator('#avatar-wrapper')).not.toBeVisible();
   });
 });

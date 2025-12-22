@@ -169,16 +169,21 @@ test.describe('Framework Selection and Template Usage', () => {
     await page.fill('textarea[name="problem"]', 'Test problem');
     await page.fill('input[name="role"]', 'test role');
     
-    // Clear form
+    // Clear form (opens modal)
     await page.click('#clear-form-btn');
     
-    // Check fields are empty
+    // Confirm in modal
+    await page.click('#unified-modal-primary');
+    
+    // Wait a moment for the clear action to complete
+    await page.waitForTimeout(100);
+    
+    // Check fields are cleared
     const problemValue = await page.locator('textarea[name="problem"]').inputValue();
     const roleValue = await page.locator('input[name="role"]').inputValue();
     
     expect(problemValue).toBe('');
-    // Role should be reset to default, not empty
-    expect(roleValue).toBe('logical thinker');
+    expect(roleValue).toBe(''); // Clear button empties all fields
   });
 
   test('validates required fields', async ({ page }) => {
@@ -348,6 +353,9 @@ test.describe('Framework Forms - Custom Criteria', () => {
     // Navigate to ToT framework (has criteria selector)
     await page.goto('/frameworks/tot');
     
+    // Wait for criteria checkboxes to load
+    await page.waitForSelector('#criteria-checkboxes');
+    
     // Click add custom criteria button
     await page.click('#add-custom-btn');
     
@@ -355,11 +363,18 @@ test.describe('Framework Forms - Custom Criteria', () => {
     await expect(page.locator('#custom-criteria-input')).toBeVisible();
     
     // Add custom criteria
-    await page.fill('#custom-criteria-input', 'Innovation');
+    await page.fill('#custom-criteria-input', 'User Experience');
     await page.click('#add-custom-submit-btn');
     
-    // Should see the custom criteria checkbox
-    await expect(page.locator('text=Innovation')).toBeVisible();
+    // Wait for criteria to be added
+    await page.waitForTimeout(300);
+    
+    // Should see the custom criteria in the checkbox list (use exact match)
+    const customCheckbox = page.locator('#criteria-checkboxes label').filter({ hasText: /^User Experience$/ }).locator('input[type="checkbox"]');
+    await expect(customCheckbox).toBeVisible();
+    
+    // Custom criteria should NOT be auto-selected (checkbox unchecked)
+    await expect(customCheckbox).not.toBeChecked();
   });
 
   test('can cancel adding custom criteria', async ({ page }) => {
@@ -411,18 +426,44 @@ test.describe('Framework Forms - Custom Criteria', () => {
   test('enforces max 4 criteria selection', async ({ page }) => {
     await page.goto('/frameworks/tot');
     
-    // Add a custom criteria
+    // Wait for criteria to load (4 defaults are checked)
+    await page.waitForSelector('#criteria-checkboxes');
+    
+    // Verify initial count is 4
+    let count = await page.locator('#criteria-count').textContent();
+    expect(parseInt(count || '0')).toBe(4);
+    
+    // Add a custom criteria (it will NOT be auto-selected)
     await page.click('#add-custom-btn');
     await page.fill('#custom-criteria-input', 'Extra Criteria');
     await page.click('#add-custom-submit-btn');
     
-    // Try to check it (should not work if 4 already selected)
-    const extraCheckbox = page.locator('input[type="checkbox"][value*="Extra Criteria"]');
+    // Wait for checkbox to be added
+    await page.waitForTimeout(300);
+    
+    // Count should still be 4 (new one not selected)
+    count = await page.locator('#criteria-count').textContent();
+    expect(parseInt(count || '0')).toBe(4);
+    
+    // Set up dialog handler before trying to check the 5th checkbox
+    page.on('dialog', async dialog => {
+      expect(dialog.message()).toContain('Maximum 4 criteria');
+      await dialog.accept();
+    });
+    
+    // Try to check the new custom criteria checkbox (should trigger alert)
+    const extraCheckbox = page.locator('#criteria-checkboxes label').filter({ hasText: 'Extra Criteria' }).locator('input[type="checkbox"]');
     await extraCheckbox.check();
     
-    // Count should not exceed 4
-    const count = await page.locator('#criteria-count').textContent();
-    expect(parseInt(count || '0')).toBeLessThanOrEqual(4);
+    // Wait a moment for alert to be handled
+    await page.waitForTimeout(200);
+    
+    // Checkbox should not be checked (max enforced)
+    await expect(extraCheckbox).not.toBeChecked();
+    
+    // Count should still be 4
+    count = await page.locator('#criteria-count').textContent();
+    expect(parseInt(count || '0')).toBe(4);
   });
 });
 

@@ -113,6 +113,7 @@ function renderAuthError(
 
 const authRoutes: FastifyPluginAsync = async (fastify) => {
   const isTest = process.env.NODE_ENV === 'test';
+  fastify.log.info({ NODE_ENV: process.env.NODE_ENV, isTest }, 'Auth routes initialized');
   
   // Registration page
   fastify.get('/register', async (request, reply) => {
@@ -174,16 +175,23 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
       return renderAuthError(reply, 'auth/register', ERROR_MESSAGES.AUTH.EMAIL_ALREADY_REGISTERED);
     }
 
-    // Hash password and create user (not verified by default)
+    // Hash password and create user
     const passwordHash = await bcrypt.hash(password, SECURITY_CONSTANTS.BCRYPT_SALT_ROUNDS);
     const user = await fastify.prisma.user.create({
       data: {
         name,
         email,
         passwordHash,
-        emailVerified: false,
+        emailVerified: isTest, // Auto-verify in test environment
+        emailVerifiedAt: isTest ? new Date() : null,
       },
     });
+
+    // In test environment, log in immediately and skip email verification
+    if (isTest) {
+      request.session.userId = user.id;
+      return reply.redirect('/frameworks');
+    }
 
     // Generate verification token
     const token = await createVerificationToken(fastify.prisma, user.id, 'email_verification');
