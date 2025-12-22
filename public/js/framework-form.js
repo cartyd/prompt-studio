@@ -19,6 +19,7 @@ window.FrameworkExamples = (function() {
   let currentCategory = 'general';
 
   function init(examplesData) {
+    console.log('[FrameworkExamples] Initializing with examples:', examplesData);
     examples = examplesData || {};
     setupToggle();
     setupCategoryButtons();
@@ -95,8 +96,11 @@ window.FrameworkExamples = (function() {
     loadBtn.addEventListener('click', function() {
       // Smart apply: load example from current category with conflict checks
       const example = examples[currentCategory] || {};
+      console.log('[FrameworkExamples] Loading example:', currentCategory, example);
       if (window.FormPopulation) {
         window.FormPopulation.applyFromSource(example, 'example');
+      } else {
+        console.error('[FrameworkExamples] FormPopulation not available');
       }
     });
   }
@@ -588,8 +592,16 @@ window.FormPopulation = (function() {
   }
 
   function applyFromSource(values, source) {
+    console.log('[FormPopulation] applyFromSource called with source:', source, 'values:', values);
     const form = document.querySelector('form');
-    if (!form || !values) return;
+    if (!form) {
+      console.error('[FormPopulation] No form found');
+      return;
+    }
+    if (!values) {
+      console.error('[FormPopulation] No values provided');
+      return;
+    }
 
     const fields = Array.from(form.querySelectorAll('[name]'));
     const conflicts = [];
@@ -658,8 +670,13 @@ window.FrameworkTemplates = (function() {
   let selectedTemplateId = null;
 
   function init(templatesData) {
+    console.log('[FrameworkTemplates] Initializing with templates:', templatesData);
     templates = templatesData || [];
-    if (templates.length === 0) return;
+    if (templates.length === 0) {
+      console.warn('[FrameworkTemplates] No templates provided');
+      return;
+    }
+    console.log('[FrameworkTemplates] Setting up', templates.length, 'template cards');
 
     setupTemplateCards();
     addAnimations();
@@ -671,9 +688,14 @@ window.FrameworkTemplates = (function() {
     templateCards.forEach(card => {
       card.addEventListener('click', function() {
         const templateId = this.dataset.templateId;
+        console.log('[FrameworkTemplates] Template card clicked, ID:', templateId);
         const template = templates.find(t => t.id === templateId);
+        console.log('[FrameworkTemplates] Found template:', template);
         
-        if (!template) return;
+        if (!template) {
+          console.error('[FrameworkTemplates] Template not found for ID:', templateId);
+          return;
+        }
         
         // Toggle selection visually
         if (selectedTemplateId === templateId) {
@@ -722,7 +744,12 @@ window.FrameworkTemplates = (function() {
   }
 
   function populateFormFromTemplate(template) {
-    if (!template || !template.fields) return;
+    console.log('[FrameworkTemplates] populateFormFromTemplate called with:', template);
+    if (!template || !template.fields) {
+      console.error('[FrameworkTemplates] Template missing or has no fields:', template);
+      return;
+    }
+    console.log('[FrameworkTemplates] Applying template fields:', template.fields);
     window.FormPopulation.applyFromSource(template.fields, 'template');
     showTemplateNotification(template.name);
   }
