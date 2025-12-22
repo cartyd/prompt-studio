@@ -575,9 +575,11 @@ window.FormPopulation = (function() {
   }
 
   function setFieldValue(input, rawVal) {
+    console.log('[FormPopulation] setFieldValue called for', input.name, 'with value:', rawVal);
     const val = Array.isArray(rawVal) ? rawVal : String(rawVal ?? '');
     // Multi-select criteria uses hidden input + events
     if ((input.id === 'criteria' || input.name === 'criteria') && Array.isArray(rawVal)) {
+      console.log('[FormPopulation] Setting criteria field with array');
       withProgrammatic(() => {
         input.value = JSON.stringify(rawVal);
         const event = new CustomEvent('loadExampleCriteria', { detail: rawVal });
@@ -585,10 +587,13 @@ window.FormPopulation = (function() {
       });
       return;
     }
+    const finalValue = Array.isArray(val) ? val.join(', ') : String(val);
+    console.log('[FormPopulation] Setting', input.name, 'value to:', finalValue);
     withProgrammatic(() => {
-      input.value = Array.isArray(val) ? val.join(', ') : String(val);
+      input.value = finalValue;
       input.dataset.origin = 'template';
     });
+    console.log('[FormPopulation] After setting,', input.name, 'value is:', input.value);
   }
 
   function applyFromSource(values, source) {
@@ -604,11 +609,17 @@ window.FormPopulation = (function() {
     }
 
     const fields = Array.from(form.querySelectorAll('[name]'));
+    console.log('[FormPopulation] Found', fields.length, 'form fields:', fields.map(f => f.name));
+    console.log('[FormPopulation] Available values to apply:', Object.keys(values));
     const conflicts = [];
 
     for (const input of fields) {
       const name = input.name;
-      if (!(name in values)) continue;
+      console.log('[FormPopulation] Processing field:', name, 'type:', input.type || input.tagName);
+      if (!(name in values)) {
+        console.log('[FormPopulation] Skipping field', name, '- not in values');
+        continue;
+      }
       const incoming = normalize(values[name]);
       const current = normalize((input.value ?? ''));
       const baselines = collectBaselines(input);
@@ -632,12 +643,15 @@ window.FormPopulation = (function() {
     };
 
     const overwriteAll = () => {
+      console.log('[FormPopulation] overwriteAll called');
       for (const input of fields) {
         const name = input.name;
         if (!(name in values)) continue;
+        console.log('[FormPopulation] Setting field', name, 'to value:', values[name]);
         setFieldValue(input, values[name]);
         lastTemplateValues.set(name, normalize(values[name]));
       }
+      console.log('[FormPopulation] overwriteAll completed');
     };
 
     if (conflicts.length === 0) {
