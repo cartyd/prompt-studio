@@ -1,6 +1,6 @@
 {
   "name": "prompt-framework-studio",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "A web application for creating structured LLM prompts using different prompting frameworks",
   "main": "dist/server.js",
   "scripts": {
