@@ -543,7 +543,8 @@ window.FormPopulation = (function() {
   }
 
   function trackDirty() {
-    const form = document.querySelector('form');
+    // Select the framework form specifically (not the logout form in header)
+    const form = document.querySelector('.form-container') || document.querySelector('form.form-container');
     if (!form) return;
     form.querySelectorAll('input[name], textarea[name], select[name]').forEach(el => {
       const markUser = () => {
@@ -598,9 +599,10 @@ window.FormPopulation = (function() {
 
   function applyFromSource(values, source) {
     console.log('[FormPopulation] applyFromSource called with source:', source, 'values:', values);
-    const form = document.querySelector('form');
+    // Select the framework form specifically (not the logout form in header)
+    const form = document.querySelector('.form-container') || document.querySelector('form.form-container');
     if (!form) {
-      console.error('[FormPopulation] No form found');
+      console.error('[FormPopulation] No framework form found with class .form-container');
       return;
     }
     if (!values) {
@@ -731,7 +733,8 @@ window.FrameworkTemplates = (function() {
   }
 
   function clearForm() {
-    const form = document.querySelector('form');
+    // Select the framework form specifically (not the logout form in header)
+    const form = document.querySelector('.form-container') || document.querySelector('form.form-container');
     if (!form) return;
     
     // Clear all text inputs and textareas
