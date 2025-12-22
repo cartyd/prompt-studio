@@ -9,7 +9,8 @@ const customCriteriaRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.status(403).send({ error: 'Premium subscription required' });
     }
 
-    const customCriteria = await fastify.prisma.customCriteria.findMany({
+    // Using repository factory instead of direct Prisma access
+    const customCriteria = await fastify.db.customCriteria.findMany({
       where: { userId: request.user!.id },
       orderBy: { createdAt: 'desc' },
     });
@@ -34,7 +35,8 @@ const customCriteriaRoutes: FastifyPluginAsync = async (fastify) => {
     }
 
     try {
-      const customCriteria = await fastify.prisma.customCriteria.create({
+      // Using repository factory instead of direct Prisma access
+      const customCriteria = await fastify.db.customCriteria.create({
         data: {
           userId: request.user!.id,
           criteriaName: criteriaName.trim(),
@@ -60,7 +62,8 @@ const customCriteriaRoutes: FastifyPluginAsync = async (fastify) => {
 
     const { criteriaName } = request.params as { criteriaName: string };
 
-    await fastify.prisma.customCriteria.deleteMany({
+    // Using repository factory instead of direct Prisma access
+    await fastify.db.customCriteria.deleteMany({
       where: {
         userId: request.user!.id,
         criteriaName: decodeURIComponent(criteriaName),

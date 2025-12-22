@@ -1,7 +1,11 @@
 import { FastifyPluginAsync } from 'fastify';
-import { requireAdmin } from '../plugins/auth';
+import { requireAdmin, requireAuth } from '../plugins/auth';
 import { AdminQueryParams } from '../types';
-import { USER_CONSTANTS } from '../constants';
+import { USER_CONSTANTS, PAGINATION_CONSTANTS } from '../constants';
+import { ViewContextBuilder } from '../utils/view-context';
+import { AdminAnalyticsService } from '../services/admin-analytics';
+import { SubscriptionService } from '../services/subscription';
+import { getCountryName } from '../utils/country-mapping';
 
 const adminRoutes: FastifyPluginAsync = async (fastify) => {
   // Admin Dashboard
@@ -37,34 +41,14 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
       take: 10,
     });
 
-    // Map country codes to names
-    const countryNameMap: Record<string, string> = {
-      'US': 'United States',
-      'GB': 'United Kingdom',
-      'CA': 'Canada',
-      'AU': 'Australia',
-      'DE': 'Germany',
-      'FR': 'France',
-      'IN': 'India',
-      'JP': 'Japan',
-      'CN': 'China',
-      'BR': 'Brazil',
-      'ID': 'Indonesia',
-      'MX': 'Mexico',
-      'ES': 'Spain',
-      'IT': 'Italy',
-      'NL': 'Netherlands',
-    };
-
+    // Map country codes to names using utility
     const countryStats = countryStatsRaw.map((stat: { country: string | null; _count: number }) => ({
-      country: countryNameMap[stat.country || ''] || stat.country || 'Unknown',
+      country: getCountryName(stat.country),
       countryCode: stat.country,
       _count: stat._count,
     }));
 
-    return reply.viewWithCsrf('admin/dashboard', {
-      user: request.user,
-      subscription: request.subscription,
+    return reply.viewWithCsrf('admin/dashboard', ViewContextBuilder.with(request, {
       stats: {
         totalUsers,
         premiumUsers,
@@ -75,14 +59,14 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
       },
       deviceStats,
       countryStats,
-    });
+    }));
   });
 
   // User Management
   fastify.get('/users', { preHandler: requireAdmin }, async (request, reply) => {
     const query = request.query as AdminQueryParams;
     const page = parseInt(query.page || '1', 10);
-    const pageSize = 20;
+    const pageSize = PAGINATION_CONSTANTS.ADMIN_USERS_PAGE_SIZE;
     const skip = (page - 1) * pageSize;
 
     const [users, totalUsers] = await Promise.all([
@@ -108,9 +92,7 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
 
     const totalPages = Math.ceil(totalUsers / pageSize);
 
-    return reply.viewWithCsrf('admin/users', {
-      user: request.user,
-      subscription: request.subscription,
+    return reply.viewWithCsrf('admin/users', ViewContextBuilder.with(request, {
       users,
       pagination: {
         currentPage: page,
@@ -118,39 +100,19 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
         totalUsers,
         pageSize,
       },
-    });
+    }));
   });
 
   // Toggle user premium status
   fastify.post('/users/:userId/toggle-premium', { preHandler: requireAdmin }, async (request, reply) => {
     const { userId } = request.params as { userId: string };
 
-    const targetUser = await fastify.prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!targetUser) {
-      return reply.status(404).view('errors/404', {
-        user: request.user,
-        message: 'User not found',
-      });
+    try {
+      await SubscriptionService.togglePremium(fastify.prisma, userId);
+      return reply.redirect('/admin/users');
+    } catch (error) {
+      return reply.status(404).view('errors/404', ViewContextBuilder.withError(request, 'User not found'));
     }
-
-    const isPremium = targetUser.subscriptionTier === USER_CONSTANTS.SUBSCRIPTION_TIERS.PREMIUM;
-    const newTier = isPremium ? 'free' : 'premium';
-    const expiresAt = isPremium
-      ? null
-      : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // 1 year from now
-
-    await fastify.prisma.user.update({
-      where: { id: userId },
-      data: {
-        subscriptionTier: newTier,
-        subscriptionExpiresAt: expiresAt,
-      },
-    });
-
-    return reply.redirect('/admin/users');
   });
 
   // Toggle user admin status
@@ -159,10 +121,7 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
 
     // Prevent self-demotion
     if (userId === request.user!.id) {
-      return reply.status(400).view('errors/400', {
-        user: request.user,
-        message: 'You cannot remove your own admin privileges',
-      });
+      return reply.status(400).view('errors/400', ViewContextBuilder.withError(request, 'You cannot remove your own admin privileges'));
     }
 
     const targetUser = await fastify.prisma.user.findUnique({
@@ -170,10 +129,7 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
     });
 
     if (!targetUser) {
-      return reply.status(404).view('errors/404', {
-        user: request.user,
-        message: 'User not found',
-      });
+      return reply.status(404).view('errors/404', ViewContextBuilder.withError(request, 'User not found'));
     }
 
     await fastify.prisma.user.update({
@@ -184,137 +140,27 @@ const adminRoutes: FastifyPluginAsync = async (fastify) => {
     return reply.redirect('/admin/users');
   });
 
+  // Self-service: Make current user premium (for testing/development)
+  fastify.post('/make-premium', { 
+    preHandler: [requireAuth, fastify.csrfProtection] 
+  }, async (request, reply) => {
+    await SubscriptionService.grantPremium(fastify.prisma, request.user!.id);
+    return reply.redirect('/premium');
+  });
+
   // Analytics page
   fastify.get('/analytics', { preHandler: requireAdmin }, async (request, reply) => {
     const query = request.query as AdminQueryParams;
     const days = parseInt(query.days || '7', 10);
-    const since = new Date();
-    since.setDate(since.getDate() - days);
 
-    // Event type distribution
-    const eventStats = await fastify.prisma.event.groupBy({
-      by: ['eventType'],
-      _count: true,
-      where: { createdAt: { gte: since } },
-      orderBy: { _count: { eventType: 'desc' } },
-    });
+    // Use analytics service to get all analytics data
+    const analyticsService = new AdminAnalyticsService(fastify.prisma);
+    const analytics = await analyticsService.getAnalytics(days);
 
-    // Daily event counts
-    const dailyEvents = await fastify.prisma.$queryRaw<Array<{ date: string; count: bigint }>>`
-      SELECT 
-        date(createdAt/1000, 'unixepoch') as date,
-        COUNT(*) as count
-      FROM Event
-      WHERE createdAt >= ${since.getTime()}
-      GROUP BY date(createdAt/1000, 'unixepoch')
-      ORDER BY date DESC
-    `;
-    
-    // Convert bigint count to number for display
-    const dailyEventsFormatted = dailyEvents.map((e: { date: string; count: bigint }) => ({
-      date: e.date,
-      count: Number(e.count)
-    }));
-    
-    // Time of day distribution (6-hour increments)
-    // Morning: 6-11, Afternoon: 12-17, Evening: 18-23, Night: 0-5
-    const timeOfDayQuery = await fastify.prisma.$queryRaw<Array<{ period: string; count: bigint }>>`
-      SELECT 
-        CASE 
-          WHEN CAST(strftime('%H', createdAt/1000, 'unixepoch', 'localtime') AS INTEGER) BETWEEN 6 AND 11 THEN 'Morning (6am-12pm)'
-          WHEN CAST(strftime('%H', createdAt/1000, 'unixepoch', 'localtime') AS INTEGER) BETWEEN 12 AND 17 THEN 'Afternoon (12pm-6pm)'
-          WHEN CAST(strftime('%H', createdAt/1000, 'unixepoch', 'localtime') AS INTEGER) BETWEEN 18 AND 23 THEN 'Evening (6pm-12am)'
-          ELSE 'Night (12am-6am)'
-        END as period,
-        COUNT(*) as count
-      FROM Event
-      WHERE createdAt >= ${since.getTime()}
-      GROUP BY period
-      ORDER BY 
-        CASE period
-          WHEN 'Morning (6am-12pm)' THEN 1
-          WHEN 'Afternoon (12pm-6pm)' THEN 2
-          WHEN 'Evening (6pm-12am)' THEN 3
-          WHEN 'Night (12am-6am)' THEN 4
-        END
-    `;
-    
-    const timeOfDayStats = timeOfDayQuery.map((t: { period: string; count: bigint }) => ({
-      period: t.period,
-      count: Number(t.count)
-    }));
-    
-    // Browser distribution
-    const browserStats = await fastify.prisma.event.groupBy({
-      by: ['browser'],
-      _count: true,
-      where: {
-        createdAt: { gte: since },
-        browser: { not: null },
-      },
-      orderBy: { _count: { browser: 'desc' } },
-      take: 10,
-    });
-
-    // Framework usage statistics (extract from metadata)
-    const frameworkEvents = await fastify.prisma.event.findMany({
-      where: {
-        createdAt: { gte: since },
-        eventType: { in: ['framework_view', 'prompt_generate'] },
-        metadata: { not: null },
-      },
-      select: {
-        eventType: true,
-        metadata: true,
-      },
-    });
-
-    // Parse metadata and aggregate framework stats
-    const frameworkStatsMap = new Map<string, { views: number; generates: number }>();
-    
-    for (const event of frameworkEvents) {
-      if (event.metadata) {
-        try {
-          const metadata = JSON.parse(event.metadata);
-          const frameworkName = metadata.frameworkName || metadata.frameworkType;
-          
-          if (frameworkName) {
-            const stats = frameworkStatsMap.get(frameworkName) || { views: 0, generates: 0 };
-            
-            if (event.eventType === 'framework_view') {
-              stats.views++;
-            } else if (event.eventType === 'prompt_generate') {
-              stats.generates++;
-            }
-            
-            frameworkStatsMap.set(frameworkName, stats);
-          }
-        } catch (e) {
-          // Skip invalid JSON
-        }
-      }
-    }
-
-    // Convert to array and sort by total usage
-    const frameworkStats = Array.from(frameworkStatsMap.entries())
-      .map(([name, stats]) => ({
-        name,
-        views: stats.views,
-        generates: stats.generates,
-        total: stats.views + stats.generates,
-      }))
-      .sort((a, b) => b.total - a.total);
-
-    return reply.viewWithCsrf('admin/analytics', {
-      user: request.user,
-      subscription: request.subscription,
+    return reply.viewWithCsrf('admin/analytics', ViewContextBuilder.with(request, {
       days,
-      eventStats,
-      dailyEvents: dailyEventsFormatted,
-      timeOfDayStats,
-      browserStats,
-      frameworkStats,
-    });
+      ...analytics,
+    }));
   });
 };
 

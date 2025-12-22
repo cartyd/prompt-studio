@@ -1,6 +1,7 @@
 export const TIME_CONSTANTS = {
   SESSION_MAX_AGE_MS: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
   PREMIUM_SUBSCRIPTION_DAYS: 90,
+  PREMIUM_SUBSCRIPTION_YEARS: 1, // Default premium subscription duration
 } as const;
 
 export const USER_CONSTANTS = {
@@ -20,6 +21,19 @@ export const TOKEN_CONSTANTS = {
   PASSWORD_RESET_EXPIRY_HOURS: 1,
   EMAIL_CHANGE_EXPIRY_HOURS: 24,
   TOKEN_BYTE_LENGTH: 32, // 64 hex characters
+} as const;
+
+export const SECURITY_CONSTANTS = {
+  BCRYPT_SALT_ROUNDS: 10, // Number of salt rounds for bcrypt hashing
+} as const;
+
+export const PAGINATION_CONSTANTS = {
+  ADMIN_USERS_PAGE_SIZE: 20, // Number of users per page in admin panel
+} as const;
+
+export const FILE_CONSTANTS = {
+  MAX_FILENAME_LENGTH: 255, // Maximum length for filenames (filesystem limit)
+  FILENAME_EXTENSION_LENGTH: 4, // Reserve space for file extensions like ".txt"
 } as const;
 
 export const ERROR_MESSAGES = {

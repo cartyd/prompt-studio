@@ -1,5 +1,6 @@
 import * as Prisma from '@prisma/client';
 import { USER_CONSTANTS } from '../constants';
+import { RepositoryFactory } from '../repositories/repository-factory';
 
 export type SubscriptionTier = typeof USER_CONSTANTS.SUBSCRIPTION_TIERS[keyof typeof USER_CONSTANTS.SUBSCRIPTION_TIERS];
 
@@ -23,6 +24,7 @@ export interface AuthUser {
 declare module 'fastify' {
   interface FastifyInstance {
     prisma: Prisma.PrismaClient;
+    db: RepositoryFactory;  // Repository factory for abstracted database access
     csrfProtection(request: any, reply: any, done: () => void): void;
   }
 

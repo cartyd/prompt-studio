@@ -1,25 +1,38 @@
-import { FastifyPluginAsync } from 'fastify';
+import { FastifyPluginAsync, FastifyRequest, FastifyReply } from 'fastify';
 import bcrypt from 'bcrypt';
-import { ERROR_MESSAGES } from '../constants';
+import { ERROR_MESSAGES, SECURITY_CONSTANTS } from '../constants';
 import { validatePassword } from '../validation';
 import { sendPasswordChangedNotification } from '../utils/email';
 import { logEvent } from '../utils/analytics';
 import { requireAuth } from '../plugins/auth';
+import { ViewContextBuilder } from '../utils/view-context';
+
+/**
+ * Helper to render account settings page with password change messages
+ * Eliminates duplication of error handling view rendering
+ */
+function renderAccountSettings(
+  request: FastifyRequest,
+  reply: FastifyReply,
+  options: {
+    passwordError?: string | null;
+    passwordSuccess?: string | null;
+  }
+) {
+  return reply.viewWithCsrf('account/settings', ViewContextBuilder.withMessages(request, {
+    success: null,
+    error: null,
+    passwordSuccess: options.passwordSuccess || null,
+    passwordError: options.passwordError || null,
+  }));
+}
 
 const accountRoutes: FastifyPluginAsync = async (fastify) => {
   // Account settings page
   fastify.get('/settings', {
     preHandler: requireAuth,
   }, async (request, reply) => {
-    const user = request.user!;
-    
-    return reply.viewWithCsrf('account/settings', {
-      user,
-      success: null,
-      error: null,
-      passwordSuccess: null,
-      passwordError: null,
-    });
+    return renderAccountSettings(request, reply, {});
   });
 
   // Change password handler
@@ -35,11 +48,7 @@ const accountRoutes: FastifyPluginAsync = async (fastify) => {
 
     // Validation
     if (!currentPassword || !newPassword || !confirmPassword) {
-      return reply.viewWithCsrf('account/settings', {
-        user,
-        success: null,
-        error: null,
-        passwordSuccess: null,
+      return renderAccountSettings(request, reply, {
         passwordError: ERROR_MESSAGES.AUTH.ALL_FIELDS_REQUIRED,
       });
     }
@@ -47,22 +56,14 @@ const accountRoutes: FastifyPluginAsync = async (fastify) => {
     // Verify current password
     const validPassword = await bcrypt.compare(currentPassword, user.passwordHash);
     if (!validPassword) {
-      return reply.viewWithCsrf('account/settings', {
-        user,
-        success: null,
-        error: null,
-        passwordSuccess: null,
+      return renderAccountSettings(request, reply, {
         passwordError: ERROR_MESSAGES.ACCOUNT.CURRENT_PASSWORD_INCORRECT,
       });
     }
 
     // Check passwords match
     if (newPassword !== confirmPassword) {
-      return reply.viewWithCsrf('account/settings', {
-        user,
-        success: null,
-        error: null,
-        passwordSuccess: null,
+      return renderAccountSettings(request, reply, {
         passwordError: ERROR_MESSAGES.AUTH.PASSWORD_MISMATCH,
       });
     }
@@ -70,11 +71,7 @@ const accountRoutes: FastifyPluginAsync = async (fastify) => {
     // Check new password is different
     const samePassword = await bcrypt.compare(newPassword, user.passwordHash);
     if (samePassword) {
-      return reply.viewWithCsrf('account/settings', {
-        user,
-        success: null,
-        error: null,
-        passwordSuccess: null,
+      return renderAccountSettings(request, reply, {
         passwordError: ERROR_MESSAGES.ACCOUNT.NEW_PASSWORD_SAME,
       });
     }
@@ -82,17 +79,13 @@ const accountRoutes: FastifyPluginAsync = async (fastify) => {
     // Validate new password strength
     const passwordValidation = validatePassword(newPassword);
     if (!passwordValidation.isValid) {
-      return reply.viewWithCsrf('account/settings', {
-        user,
-        success: null,
-        error: null,
-        passwordSuccess: null,
+      return renderAccountSettings(request, reply, {
         passwordError: passwordValidation.error!,
       });
     }
 
     // Update password
-    const newPasswordHash = await bcrypt.hash(newPassword, 10);
+    const newPasswordHash = await bcrypt.hash(newPassword, SECURITY_CONSTANTS.BCRYPT_SALT_ROUNDS);
     await fastify.prisma.user.update({
       where: { id: user.id },
       data: {
@@ -116,12 +109,13 @@ const accountRoutes: FastifyPluginAsync = async (fastify) => {
       where: { id: user.id },
     });
 
-    return reply.viewWithCsrf('account/settings', {
-      user: updatedUser,
-      success: null,
-      error: null,
+    // Update request.user to reflect changes
+    if (updatedUser) {
+      request.user = updatedUser as any;  // Safe cast as structure matches AuthUser
+    }
+    
+    return renderAccountSettings(request, reply, {
       passwordSuccess: ERROR_MESSAGES.ACCOUNT.PASSWORD_CHANGED,
-      passwordError: null,
     });
   });
 };

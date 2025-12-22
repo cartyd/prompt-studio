@@ -4,6 +4,7 @@ import { wizardQuestions, calculateRecommendation, validateAnswers } from '../wi
 import { WizardAnswer } from '../types';
 import { logEvent } from '../utils/analytics';
 import { WizardUtils } from '../utils/wizard-helpers';
+import { ViewContextBuilder } from '../utils/view-context';
 
 const wizardRoutes: FastifyPluginAsync = async (fastify) => {
   // Start wizard - show welcome page
@@ -20,10 +21,7 @@ const wizardRoutes: FastifyPluginAsync = async (fastify) => {
       source: 'framework_discovery',
     });
 
-    return reply.viewWithCsrf('wizard/start', {
-      user: request.user,
-      subscription: request.subscription,
-    });
+    return reply.viewWithCsrf('wizard/start', ViewContextBuilder.base(request));
   });
 
   // Get specific question step
@@ -32,10 +30,10 @@ const wizardRoutes: FastifyPluginAsync = async (fastify) => {
     const stepNum = parseInt(step, 10);
 
     if (isNaN(stepNum) || stepNum < 0 || stepNum >= wizardQuestions.length) {
-      return reply.status(404).viewWithCsrf('error', {
-        message: 'Invalid wizard step',
-        user: request.user,
-      });
+      return reply.status(404).viewWithCsrf('error', ViewContextBuilder.withError(
+        request,
+        'Invalid wizard step'
+      ));
     }
 
     const question = wizardQuestions[stepNum];
@@ -60,12 +58,10 @@ const wizardRoutes: FastifyPluginAsync = async (fastify) => {
     });
     const wizardScriptHtml = WizardUtils.renderScript(question as any, wizardQuestions.length, stepNum);
     
-    return reply.viewWithCsrf('wizard/question', {
+    return reply.viewWithCsrf('wizard/question', ViewContextBuilder.with(request, {
       wizardFormHtml,
       wizardScriptHtml,
-      user: request.user,
-      subscription: request.subscription,
-    });
+    }));
   });
 
   // Submit answer for current step
@@ -168,11 +164,9 @@ const wizardRoutes: FastifyPluginAsync = async (fastify) => {
     const csrfToken = (request as any).csrfToken || '';
     const recommendationHtml = WizardUtils.renderRecommendation(recommendation as any, csrfToken);
     
-    return reply.viewWithCsrf('wizard/recommendation', {
+    return reply.viewWithCsrf('wizard/recommendation', ViewContextBuilder.with(request, {
       recommendationHtml,
-      user: request.user,
-      subscription: request.subscription,
-    });
+    }));
   });
 
   // Reset wizard and start over

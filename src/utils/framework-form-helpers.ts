@@ -38,6 +38,26 @@ interface Subscription {
 
 export class FrameworkFormHelpers {
   /**
+   * Render all framework form components at once
+   * Reduces feature envy by encapsulating all rendering logic
+   */
+  static renderAll(
+    framework: Framework,
+    subscription: Subscription,
+    prepopulateData: Record<string, string> = {},
+    fromWizard = false
+  ) {
+    return {
+      renderedExamples: this.renderExamplesSection(framework),
+      renderedFields: this.renderFormFields(framework, prepopulateData, fromWizard),
+      renderedCriteria: this.renderCriteriaSelector(framework, subscription),
+      renderedAdvanced: this.renderAdvancedOptions(framework),
+      renderedTemplates: this.renderTemplatesSection(framework),
+      renderedModal: this.renderModal(),
+    };
+  }
+
+  /**
    * Render examples section for framework
    */
   static renderExamplesSection(framework: Framework): string {

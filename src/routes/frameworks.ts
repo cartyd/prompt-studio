@@ -5,15 +5,14 @@ import { ERROR_MESSAGES } from '../constants';
 import { logEvent } from '../utils/analytics';
 import { LIMITS } from '../constants/scoring';
 import { FrameworkFormHelpers } from '../utils/framework-form-helpers';
+import { ViewContextBuilder } from '../utils/view-context';
 
 const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
   // List all frameworks
   fastify.get('/', { preHandler: requireAuth }, async (request, reply) => {
-    return reply.viewWithCsrf('frameworks/list', {
+    return reply.viewWithCsrf('frameworks/list', ViewContextBuilder.with(request, {
       frameworks,
-      user: request.user,
-      subscription: request.subscription,
-    });
+    }));
   });
 
   // Show framework form
@@ -23,10 +22,10 @@ const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
     const framework = getFrameworkById(frameworkId);
 
     if (!framework) {
-      return reply.status(404).viewWithCsrf('error', {
-        message: ERROR_MESSAGES.FRAMEWORKS.NOT_FOUND,
-        user: request.user,
-      });
+      return reply.status(404).viewWithCsrf('error', ViewContextBuilder.withError(
+        request,
+        ERROR_MESSAGES.FRAMEWORKS.NOT_FOUND
+      ));
     }
 
     // Fetch custom criteria for premium users
@@ -57,28 +56,21 @@ const frameworkRoutes: FastifyPluginAsync = async (fastify) => {
       fromWizard: fromWizard === 'true',
     });
     
-    // Render form components server-side
-    const renderedExamples = FrameworkFormHelpers.renderExamplesSection(framework as any);
-    const renderedFields = FrameworkFormHelpers.renderFormFields(framework as any, prepopulateData || {}, fromWizard === 'true');
-    const renderedCriteria = FrameworkFormHelpers.renderCriteriaSelector(framework as any, request.subscription!);
-    const renderedAdvanced = FrameworkFormHelpers.renderAdvancedOptions(framework as any);
-    const renderedTemplates = FrameworkFormHelpers.renderTemplatesSection(framework as any);
-    const renderedModal = FrameworkFormHelpers.renderModal();
+    // Render all form components at once using helper
+    const renderedComponents = FrameworkFormHelpers.renderAll(
+      framework as any,
+      request.subscription!,
+      prepopulateData || {},
+      fromWizard === 'true'
+    );
 
-    return reply.viewWithCsrf('frameworks/form', {
+    return reply.viewWithCsrf('frameworks/form', ViewContextBuilder.with(request, {
       framework,
-      user: request.user,
-      subscription: request.subscription,
       customCriteria,
       prepopulateData,
       fromWizard: fromWizard === 'true',
-      renderedExamples,
-      renderedFields,
-      renderedCriteria,
-      renderedAdvanced,
-      renderedTemplates,
-      renderedModal,
-    });
+      ...renderedComponents,
+    }));
   });
 
   // Generate prompt preview (htmx endpoint)
