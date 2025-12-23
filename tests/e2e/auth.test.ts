@@ -25,9 +25,12 @@ test.describe('Authentication Flow', () => {
     await page.fill('input[name="password"]', 'TestPassword123!');
     await page.click('button[type="submit"]');
     
-    // Should show error message
-    await expect(page.locator('.error')).toBeVisible();
-    await expect(page.locator('.error')).toContainText('valid email');
+    // Check for browser validation error (HTML5 validation)
+    const emailInput = page.locator('input[name="email"]');
+    await expect(emailInput).toHaveJSProperty('validity.valid', false);
+    
+    // Verify we're still on the register page (form didn't submit)
+    await expect(page).toHaveURL('/auth/register');
   });
 
   test('shows error for weak password', async ({ page }) => {
@@ -36,7 +39,8 @@ test.describe('Authentication Flow', () => {
     await page.goto('/auth/register');
     await page.fill('input[name="name"]', 'Test User');
     await page.fill('input[name="email"]', email);
-    await page.fill('input[name="password"]', 'weak');
+    // Use password that passes HTML5 minlength but fails server validation
+    await page.fill('input[name="password"]', 'weakpass');
     await page.click('button[type="submit"]');
     
     // Should show error message

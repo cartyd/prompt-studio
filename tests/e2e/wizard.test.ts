@@ -15,7 +15,8 @@ test.describe('Wizard Flow', () => {
   test('should display wizard welcome page', async ({ page }) => {
     await page.goto('/wizard');
     
-    await expect(page.locator('h1')).toContainText('Perfect Prompting Framework');
+    // Check main content h1, not header h1
+    await expect(page.locator('main h1')).toContainText('Perfect Prompting Framework');
     await expect(page.locator('text=How It Works')).toBeVisible();
     await expect(page.locator('text=Start the Wizard')).toBeVisible();
   });
@@ -28,31 +29,31 @@ test.describe('Wizard Flow', () => {
     await page.waitForURL('/wizard/question/0');
     
     // Question 1
-    await expect(page.locator('h1')).toContainText('What do you want to accomplish?');
-    await page.click('label:has-text("Explore different ideas")');
+    await expect(page.locator('main h1')).toContainText('What do you want to accomplish?');
+    await page.click('label:has-text("Explore different ideas before deciding")');
     await page.click('button:has-text("Next")');
     await page.waitForURL('/wizard/question/1');
     
     // Question 2
-    await expect(page.locator('h1')).toContainText('How complex is your task?');
-    await page.click('label:has-text("Very complex")');
+    await expect(page.locator('main h1')).toContainText('How do you prefer to work?');
+    await page.click('label:has-text("See multiple approaches")');
     await page.click('button:has-text("Next")');
     await page.waitForURL('/wizard/question/2');
     
     // Question 3
-    await expect(page.locator('h1')).toContainText('What matters most to you?');
+    await expect(page.locator('main h1')).toContainText('What matters most to you?');
     await page.click('label:has-text("Exploring creative alternatives")');
     await page.click('button:has-text("Next")');
     await page.waitForURL('/wizard/question/3');
     
     // Question 4
-    await expect(page.locator('h1')).toContainText('Do you have examples or existing content?');
-    await page.click('label:has-text("No, starting from scratch")');
+    await expect(page.locator('main h1')).toContainText('What starting point do you have?');
+    await page.click('label:has-text("Open-ended exploration needed")');
     await page.click('button:has-text("See Recommendation")');
     await page.waitForURL('/wizard/recommend');
     
-    // Recommendation page
-    await expect(page.locator('text=Perfect Match Found!')).toBeVisible();
+    // Recommendation page - text varies by confidence level
+    await expect(page.locator('main h1')).toContainText('Match Found');
     await expect(page.locator('text=Tree-of-Thought')).toBeVisible();
     await expect(page.locator('text=Why We Chose This for You')).toBeVisible();
   });
@@ -61,17 +62,17 @@ test.describe('Wizard Flow', () => {
     await page.goto('/wizard/question/0');
     
     // Answer first question
-    await page.click('label:has-text("Explore different ideas")');
+    await page.click('label:has-text("Explore different ideas before deciding")');
     await page.click('button:has-text("Next")');
     await page.waitForURL('/wizard/question/1');
     
-    // Go back
-    await page.click('text=Back');
+    // Go back - Back is an <a> tag, not button
+    await page.click('a:has-text("Back")');
     await page.waitForURL('/wizard/question/0');
     
     // Verify answer was preserved
     const selectedOption = page.locator('.wizard-option-card.selected');
-    await expect(selectedOption).toContainText('Explore different ideas');
+    await expect(selectedOption).toContainText('Explore different ideas before deciding');
   });
 
   test('should show discover card on frameworks page', async ({ page }) => {
@@ -87,21 +88,22 @@ test.describe('Wizard Flow', () => {
   test('should navigate from recommendation to framework form', async ({ page }) => {
     // Complete wizard quickly
     await page.goto('/wizard/question/0');
-    await page.click('label:has-text("Break down a complex problem")');
+    await page.click('label:has-text("Break down a complex problem step-by-step")');
     await page.click('button:has-text("Next")');
     
-    await page.click('label:has-text("Needs careful analysis")');
+    await page.click('label:has-text("Follow a logical, step-by-step process")');
     await page.click('button:has-text("Next")');
     
-    await page.click('label:has-text("Clarity and easy-to-follow")');
+    await page.click('label:has-text("Clarity and easy-to-follow reasoning")');
     await page.click('button:has-text("Next")');
     
-    await page.click('label:has-text("No, starting from scratch")');
+    await page.click('label:has-text("A clear problem definition")');
     await page.click('button:has-text("See Recommendation")');
     await page.waitForURL('/wizard/recommend');
     
-    // Click through to framework
-    await page.click('text=Start with');
+    // Click through to framework - button text varies based on prepopulate data
+    const frameworkButton = page.locator('.btn-primary:has-text("Framework"), .btn-primary:has-text("Prompt")');
+    await frameworkButton.click();
     await expect(page.url()).toContain('/frameworks/');
     await expect(page.url()).toContain('fromWizard=true');
   });

@@ -9,8 +9,8 @@ test.describe('Avatar Dropdown Menu', () => {
   });
 
   test('shows menu when avatar clicked', async ({ page }) => {
-    const dropdown = page.locator('#user-dropdown');
-    const avatarBtn = page.locator('#avatar-btn');
+    const dropdown = page.locator('#dropdown-menu');
+    const avatarBtn = page.locator('#avatar-wrapper');
     
     // Initially hidden
     await expect(dropdown).toBeHidden();
@@ -26,15 +26,15 @@ test.describe('Avatar Dropdown Menu', () => {
   });
 
   test('toggles menu on multiple clicks', async ({ page }) => {
-    const dropdown = page.locator('#user-dropdown');
-    const avatarBtn = page.locator('#avatar-btn');
+    const dropdown = page.locator('#dropdown-menu');
+    const avatarBtn = page.locator('#avatar-wrapper');
     
     // Click to open
     await avatarBtn.click();
     await expect(dropdown).toBeVisible();
     
-    // Click again to close
-    await avatarBtn.click();
+    // Click again to close (use force since dropdown may overlay avatar)
+    await avatarBtn.click({ force: true });
     await expect(dropdown).toBeHidden();
     
     // Click again to open
@@ -43,8 +43,8 @@ test.describe('Avatar Dropdown Menu', () => {
   });
 
   test('hides menu when clicking outside', async ({ page }) => {
-    const dropdown = page.locator('#user-dropdown');
-    const avatarBtn = page.locator('#avatar-btn');
+    const dropdown = page.locator('#dropdown-menu');
+    const avatarBtn = page.locator('#avatar-wrapper');
     
     // Open menu
     await avatarBtn.click();
@@ -56,8 +56,8 @@ test.describe('Avatar Dropdown Menu', () => {
   });
 
   test('hides menu on Escape key', async ({ page }) => {
-    const dropdown = page.locator('#user-dropdown');
-    const avatarBtn = page.locator('#avatar-btn');
+    const dropdown = page.locator('#dropdown-menu');
+    const avatarBtn = page.locator('#avatar-wrapper');
     
     // Open menu
     await avatarBtn.click();
@@ -69,8 +69,8 @@ test.describe('Avatar Dropdown Menu', () => {
   });
 
   test('menu does not have display:none when visible', async ({ page }) => {
-    const dropdown = page.locator('#user-dropdown');
-    const avatarBtn = page.locator('#avatar-btn');
+    const dropdown = page.locator('#dropdown-menu');
+    const avatarBtn = page.locator('#avatar-wrapper');
     
     // Open menu
     await avatarBtn.click();
@@ -84,20 +84,20 @@ test.describe('Avatar Dropdown Menu', () => {
   });
 
   test('navigation links work from dropdown', async ({ page }) => {
-    const avatarBtn = page.locator('#avatar-btn');
+    const avatarBtn = page.locator('#avatar-wrapper');
     
     // Open menu
     await avatarBtn.click();
     
     // Click "Frameworks" link
-    await page.click('#user-dropdown a[href="/frameworks"]');
+    await page.click('#dropdown-menu a[href="/frameworks"]');
     await expect(page).toHaveURL('/frameworks');
     
     // Reopen menu
     await avatarBtn.click();
     
     // Click "My Prompts" link
-    await page.click('#user-dropdown a[href="/prompts"]');
+    await page.click('#dropdown-menu a[href="/prompts"]');
     await expect(page).toHaveURL('/prompts');
   });
 });

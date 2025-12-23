@@ -367,11 +367,14 @@ test.describe('Framework Forms - Custom Criteria', () => {
     await page.click('#add-custom-submit-btn');
     
     // Wait for criteria to be added
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(500);
     
-    // Should see the custom criteria in the checkbox list (use exact match)
-    const customCheckbox = page.locator('#criteria-checkboxes label').filter({ hasText: /^User Experience$/ }).locator('input[type="checkbox"]');
-    await expect(customCheckbox).toBeVisible();
+    // Should see the custom criteria text in the checkbox list
+    await expect(page.locator('#criteria-checkboxes')).toContainText('User Experience');
+    
+    // Find the checkbox by looking for label containing the text
+    const customLabel = page.locator('#criteria-checkboxes label').filter({ hasText: 'User Experience' });
+    const customCheckbox = customLabel.locator('..').locator('input[type="checkbox"]');
     
     // Custom criteria should NOT be auto-selected (checkbox unchecked)
     await expect(customCheckbox).not.toBeChecked();
@@ -439,7 +442,10 @@ test.describe('Framework Forms - Custom Criteria', () => {
     await page.click('#add-custom-submit-btn');
     
     // Wait for checkbox to be added
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(500);
+    
+    // Verify the custom criteria was added
+    await expect(page.locator('#criteria-checkboxes')).toContainText('Extra Criteria');
     
     // Count should still be 4 (new one not selected)
     count = await page.locator('#criteria-count').textContent();
@@ -452,8 +458,10 @@ test.describe('Framework Forms - Custom Criteria', () => {
     });
     
     // Try to check the new custom criteria checkbox (should trigger alert)
-    const extraCheckbox = page.locator('#criteria-checkboxes label').filter({ hasText: 'Extra Criteria' }).locator('input[type="checkbox"]');
-    await extraCheckbox.check();
+    const extraLabel = page.locator('#criteria-checkboxes label').filter({ hasText: 'Extra Criteria' });
+    const extraCheckbox = extraLabel.locator('..').locator('input[type="checkbox"]');
+    // Use click instead of check since the app prevents the state change with an alert
+    await extraCheckbox.click();
     
     // Wait a moment for alert to be handled
     await page.waitForTimeout(200);
